@@ -17,6 +17,7 @@ DEFAULT_DB_PATH = 'db/critique.db'
 DEFAULT_SCHEMA = "db/critique_schema_dump.sql"
 DEFAULT_DATA_DUMP = "db/critique_data_dump.sql"
 
+
 class Engine(object):
     '''
     Abstraction of the database.
@@ -127,6 +128,139 @@ class Engine(object):
                 cur.executescript(sql)
         finally:
             con.close()
+
+    # METHODS TO CREATE THE TABLES PROGRAMMATICALLY WITHOUT USING SQL SCRIPT
+    def create_users_table(self):
+        '''
+        Create the table ``users`` programmatically, without using .sql file.
+
+        Print an error message in the console if it could not be created.
+
+        :return: ``True`` if the table was successfully created or ``False``
+            otherwise.
+
+        '''
+        keys_on = 'PRAGMA foreign_keys = ON'
+        statement = 'CREATE TABLE IF NOT EXISTS users(\
+                    user_id INTEGER PRIMARY KEY AUTOINCREMENT,\
+                    nickname TEXT UNIQUE,\
+                    regDate INTEGER NOT NULL,\
+                    lastLogin INTEGER)'
+        con = sqlite3.connect(self.db_path)
+        with con:
+            cur = con.cursor()
+            try:
+                cur.execute(keys_on)
+                # execute the statement
+                cur.execute(statement)
+            except sqlite3.Error as e:
+                print("Error %s:" % e.args[0])
+                return False
+        return True
+
+    def create_user_profile_table(self):
+        '''
+        Create the table ``users_profile`` programmatically, without using .sql file.
+
+        Print an error message in the console if it could not be created.
+
+        :return: ``True`` if the table was successfully created or ``False``
+            otherwise.
+
+        '''
+        keys_on = 'PRAGMA foreign_keys = ON'
+        statement = 'CREATE TABLE IF NOT EXISTS users_profile(\
+                        user_id INTEGER PRIMARY KEY,\
+                        firstname TEXT NOT NULL,\
+                        lastname TEXT,\
+                        bio TEXT,\
+                        email TEXT UNIQUE,\
+                        mobile TEXT UNIQUE,\
+                        birthdate TEXT,\
+                        gender TEXT,\
+                        avatar TEXT,\
+                        FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE)'
+
+        con = sqlite3.connect(self.db_path)
+        with con:
+            cur = con.cursor()
+            try:
+                cur.execute(keys_on)
+                # execute the statement
+                cur.execute(statement)
+            except sqlite3.Error as e:
+                print("Error %s:" % e.args[0])
+                return False
+        return True
+
+    def create_posts_table(self):
+        '''
+        Create the table ``posts`` programmatically, without using .sql file.
+
+        Print an error message in the console if it could not be created.
+
+        :return: ``True`` if the table was successfully created or ``False``
+            otherwise.
+
+        '''
+        keys_on = 'PRAGMA foreign_keys = ON'
+        statement = 'CREATE TABLE IF NOT EXISTS posts(\
+                        post_id INTEGER PRIMARY KEY AUTOINCREMENT,\
+                        timestamp INTEGER NOT NULL,\
+                        public INTEGER NOT NULL,\
+                        sender_id INTEGER NOT NULL,\
+                        anonymous INTEGER NOT NULL,\
+                        receiver_id INTEGER NOT NULL,\
+                        reply_to TEXT,\
+                        post_text TEXT NOT NULL,\
+                        rating INTEGER,\
+                        FOREIGN KEY(sender_id) REFERENCES users(user_id) ON DELETE CASCADE,\
+                        FOREIGN KEY(receiver_id) REFERENCES users(user_id) ON DELETE CASCADE,\
+                        FOREIGN KEY(reply_to) REFERENCES posts(post_id) ON DELETE CASCADE)'
+
+        con = sqlite3.connect(self.db_path)
+        with con:
+            cur = con.cursor()
+            try:
+                cur.execute(keys_on)
+                # execute the statement
+                cur.execute(statement)
+            except sqlite3.Error as e:
+                print("Error %s:" % e.args[0])
+                return False
+        return True
+
+    def create_ratings_table(self):
+        '''
+        Create the table ``ratings`` programmatically, without using .sql file.
+
+        Print an error message in the console if it could not be created.
+
+        :return: ``True`` if the table was successfully created or ``False``
+            otherwise.
+
+        '''
+        keys_on = 'PRAGMA foreign_keys = ON'
+        statement = 'CREATE TABLE IF NOT EXISTS ratings(\
+                        ratings_id INTEGER PRIMARY KEY AUTOINCREMENT,\
+                        timestamp INTEGER NOT NULL,\
+                        rating INTEGER NOT NULL,\
+                        sender_id INTEGER NOT NULL,\
+                        receiver_id INTEGER NOT NULL,\
+                        FOREIGN KEY(sender_id) REFERENCES users(user_id) ON DELETE CASCADE,\
+                        FOREIGN KEY(receiver_id) REFERENCES users(user_id) ON DELETE CASCADE)'
+
+        con = sqlite3.connect(self.db_path)
+        with con:
+            cur = con.cursor()
+            try:
+                cur.execute(keys_on)
+                # execute the statement
+                cur.execute(statement)
+            except sqlite3.Error as e:
+                print("Error %s:" % e.args[0])
+                return False
+        return True
 
 
 class Connection(object):
