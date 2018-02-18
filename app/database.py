@@ -19,6 +19,48 @@ DEFAULT_DATA_DUMP = "db/critique_data_dump.sql"
 
 
 class Engine(object):
+    create_users_sql = \
+        'CREATE TABLE IF NOT EXISTS users(\
+        user_id INTEGER PRIMARY KEY AUTOINCREMENT,\
+        nickname TEXT UNIQUE,\
+        regDate INTEGER NOT NULL,\
+        lastLogin INTEGER)'
+    create_user_profile_sql = \
+        'CREATE TABLE IF NOT EXISTS users_profile(\
+        user_id INTEGER PRIMARY KEY,\
+        firstname TEXT NOT NULL,\
+        lastname TEXT,\
+        email TEXT UNIQUE,\
+        mobile TEXT UNIQUE,\
+        gender TEXT,\
+        avatar TEXT,\
+        birthdate TEXT,\
+        bio TEXT,\
+        FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE)'
+    create_posts_sql = \
+        'CREATE TABLE IF NOT EXISTS posts(\
+        post_id INTEGER PRIMARY KEY AUTOINCREMENT,\
+        timestamp INTEGER NOT NULL,\
+        sender_id INTEGER NOT NULL,\
+        receiver_id INTEGER NOT NULL,\
+        reply_to TEXT,\
+        post_text TEXT NOT NULL,\
+        rating INTEGER,\
+        anonymous INTEGER NOT NULL,\
+        public INTEGER NOT NULL,\
+        FOREIGN KEY(sender_id) REFERENCES users(user_id) ON DELETE CASCADE,\
+        FOREIGN KEY(receiver_id) REFERENCES users(user_id) ON DELETE CASCADE,\
+        FOREIGN KEY(reply_to) REFERENCES posts(post_id) ON DELETE CASCADE)'
+    create_ratings_sql = \
+        'CREATE TABLE IF NOT EXISTS ratings(\
+        ratings_id INTEGER PRIMARY KEY AUTOINCREMENT,\
+        timestamp INTEGER NOT NULL,\
+        sender_id INTEGER NOT NULL,\
+        receiver_id INTEGER NOT NULL,\
+        rating INTEGER NOT NULL,\
+        FOREIGN KEY(sender_id) REFERENCES users(user_id) ON DELETE CASCADE,\
+        FOREIGN KEY(receiver_id) REFERENCES users(user_id) ON DELETE CASCADE)'
+
     '''
     Abstraction of the database.
 
@@ -140,23 +182,7 @@ class Engine(object):
             otherwise.
 
         '''
-        keys_on = 'PRAGMA foreign_keys = ON'
-        statement = 'CREATE TABLE IF NOT EXISTS users(\
-                    user_id INTEGER PRIMARY KEY AUTOINCREMENT,\
-                    nickname TEXT UNIQUE,\
-                    regDate INTEGER NOT NULL,\
-                    lastLogin INTEGER)'
-        con = sqlite3.connect(self.db_path)
-        with con:
-            cur = con.cursor()
-            try:
-                cur.execute(keys_on)
-                # execute the statement
-                cur.execute(statement)
-            except sqlite3.Error as e:
-                print("Error %s:" % e.args[0])
-                return False
-        return True
+        return self._execute_statement(self.create_users_sql)
 
     def create_user_profile_table(self):
         '''
@@ -168,30 +194,7 @@ class Engine(object):
             otherwise.
 
         '''
-        keys_on = 'PRAGMA foreign_keys = ON'
-        statement = 'CREATE TABLE IF NOT EXISTS users_profile(\
-                        user_id INTEGER PRIMARY KEY,\
-                        firstname TEXT NOT NULL,\
-                        lastname TEXT,\
-                        bio TEXT,\
-                        email TEXT UNIQUE,\
-                        mobile TEXT UNIQUE,\
-                        birthdate TEXT,\
-                        gender TEXT,\
-                        avatar TEXT,\
-                        FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE)'
-
-        con = sqlite3.connect(self.db_path)
-        with con:
-            cur = con.cursor()
-            try:
-                cur.execute(keys_on)
-                # execute the statement
-                cur.execute(statement)
-            except sqlite3.Error as e:
-                print("Error %s:" % e.args[0])
-                return False
-        return True
+        return self._execute_statement(self.create_user_profile_sql)
 
     def create_posts_table(self):
         '''
@@ -203,32 +206,7 @@ class Engine(object):
             otherwise.
 
         '''
-        keys_on = 'PRAGMA foreign_keys = ON'
-        statement = 'CREATE TABLE IF NOT EXISTS posts(\
-                        post_id INTEGER PRIMARY KEY AUTOINCREMENT,\
-                        timestamp INTEGER NOT NULL,\
-                        public INTEGER NOT NULL,\
-                        sender_id INTEGER NOT NULL,\
-                        anonymous INTEGER NOT NULL,\
-                        receiver_id INTEGER NOT NULL,\
-                        reply_to TEXT,\
-                        post_text TEXT NOT NULL,\
-                        rating INTEGER,\
-                        FOREIGN KEY(sender_id) REFERENCES users(user_id) ON DELETE CASCADE,\
-                        FOREIGN KEY(receiver_id) REFERENCES users(user_id) ON DELETE CASCADE,\
-                        FOREIGN KEY(reply_to) REFERENCES posts(post_id) ON DELETE CASCADE)'
-
-        con = sqlite3.connect(self.db_path)
-        with con:
-            cur = con.cursor()
-            try:
-                cur.execute(keys_on)
-                # execute the statement
-                cur.execute(statement)
-            except sqlite3.Error as e:
-                print("Error %s:" % e.args[0])
-                return False
-        return True
+        return self._execute_statement(self.create_posts_sql)
 
     def create_ratings_table(self):
         '''
@@ -240,27 +218,34 @@ class Engine(object):
             otherwise.
 
         '''
-        keys_on = 'PRAGMA foreign_keys = ON'
-        statement = 'CREATE TABLE IF NOT EXISTS ratings(\
-                        ratings_id INTEGER PRIMARY KEY AUTOINCREMENT,\
-                        timestamp INTEGER NOT NULL,\
-                        rating INTEGER NOT NULL,\
-                        sender_id INTEGER NOT NULL,\
-                        receiver_id INTEGER NOT NULL,\
-                        FOREIGN KEY(sender_id) REFERENCES users(user_id) ON DELETE CASCADE,\
-                        FOREIGN KEY(receiver_id) REFERENCES users(user_id) ON DELETE CASCADE)'
+        return self._execute_statement(self.create_ratings_sql)
 
+    def _execute_statement(self, statement):
+        '''
+        Execute a given sql statement with foreign key support on
+
+        Print an error message in the console if it could not be created.
+
+        :param statement: A ``string`` sql statement to be executed. 
+
+        :return: ``True`` if the sql successfully executed or ``False``
+            otherwise.
+
+        '''
         con = sqlite3.connect(self.db_path)
         with con:
             cur = con.cursor()
             try:
-                cur.execute(keys_on)
+                result = con.set_foreign_keys_support()
+                if not result:
+                    raise Exception('Couldn\'t set foreign key support')
                 # execute the statement
                 cur.execute(statement)
             except sqlite3.Error as e:
                 print("Error %s:" % e.args[0])
                 return False
         return True
+
 
 
 class Connection(object):
