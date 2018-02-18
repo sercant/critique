@@ -12,7 +12,7 @@ import sqlite3
 import re
 import os
 
-#Default paths for .db and .sql files to create and populate the database.
+# Default paths for .db and .sql files to create and populate the database.
 DEFAULT_DB_PATH = 'db/critique.db'
 DEFAULT_SCHEMA = "db/critique_schema_dump.sql"
 DEFAULT_DATA_DUMP = "db/critique_data_dump.sql"
@@ -63,7 +63,7 @@ class Engine(object):
 
         '''
         if os.path.exists(self.db_path):
-            #THIS REMOVES THE DATABASE STRUCTURE
+            # THIS REMOVES THE DATABASE STRUCTURE
             os.remove(self.db_path)
 
     def clear(self):
@@ -73,19 +73,18 @@ class Engine(object):
 
         '''
         keys_on = 'PRAGMA foreign_keys = ON'
-        #THIS KEEPS THE SCHEMA AND REMOVE VALUES
+        # THIS KEEPS THE SCHEMA AND REMOVE VALUES
         con = sqlite3.connect(self.db_path)
-        #Activate foreing keys support
+        # Activate foreing keys support
         cur = con.cursor()
         cur.execute(keys_on)
         with con:
             cur = con.cursor()
-            cur.execute("DELETE FROM messages")
+            # NOTE Since we have delete on cascade on all the tables to users
+            # deleting the user will also delete all other entries
             cur.execute("DELETE FROM users")
-            #NOTE since we have ON DELETE CASCADE BOTH IN users_profile AND
-            #friends, WE DO NOT HAVE TO WORRY TO CLEAR THOSE TABLES.
 
-    #METHODS TO CREATE AND POPULATE A DATABASE USING DIFFERENT SCRIPTS
+    # METHODS TO CREATE AND POPULATE A DATABASE USING DIFFERENT SCRIPTS
     def create_tables(self, schema=None):
         '''
         Create programmatically the tables from a schema file.
@@ -115,10 +114,10 @@ class Engine(object):
         '''
         keys_on = 'PRAGMA foreign_keys = ON'
         con = sqlite3.connect(self.db_path)
-        #Activate foreing keys support
+        # Activate foreing keys support
         cur = con.cursor()
         cur.execute(keys_on)
-        #Populate database from dump
+        # Populate database from dump
         if dump is None:
             dump = DEFAULT_DATA_DUMP
         try:
@@ -170,7 +169,7 @@ class Connection(object):
             self.con.close()
             self._isclosed = True
 
-    #FOREIGN KEY STATUS
+    # FOREIGN KEY STATUS
     def check_foreign_keys_status(self):
         '''
         Check if the foreign keys has been activated.
@@ -181,11 +180,11 @@ class Connection(object):
 
         '''
         try:
-            #Create a cursor to receive the database values
+            # Create a cursor to receive the database values
             cur = self.con.cursor()
-            #Execute the pragma command
+            # Execute the pragma command
             cur.execute('PRAGMA foreign_keys')
-            #We know we retrieve just one record: use fetchone()
+            # We know we retrieve just one record: use fetchone()
             data = cur.fetchone()
             is_activated = data == (1,)
             print("Foreign Keys status: %s" % 'ON' if is_activated else 'OFF')
@@ -204,10 +203,10 @@ class Connection(object):
         '''
         keys_on = 'PRAGMA foreign_keys = ON'
         try:
-            #Get the cursor object.
-            #It allows to execute SQL code and traverse the result set
+            # Get the cursor object.
+            # It allows to execute SQL code and traverse the result set
             cur = self.con.cursor()
-            #execute the pragma command, ON
+            # execute the pragma command, ON
             cur.execute(keys_on)
             return True
         except sqlite3.Error as excp:
@@ -223,10 +222,10 @@ class Connection(object):
         '''
         keys_on = 'PRAGMA foreign_keys = OFF'
         try:
-            #Get the cursor object.
-            #It allows to execute SQL code and traverse the result set
+            # Get the cursor object.
+            # It allows to execute SQL code and traverse the result set
             cur = self.con.cursor()
-            #execute the pragma command, OFF
+            # execute the pragma command, OFF
             cur.execute(keys_on)
             return True
         except sqlite3.Error as excp:
