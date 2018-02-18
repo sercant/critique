@@ -13,9 +13,9 @@ import re
 import os
 
 #Default paths for .db and .sql files to create and populate the database.
-DEFAULT_DB_PATH = 'db/forum.db'
-DEFAULT_SCHEMA = "db/forum_schema_dump.sql"
-DEFAULT_DATA_DUMP = "db/forum_data_dump.sql"
+DEFAULT_DB_PATH = 'db/critique.db'
+DEFAULT_SCHEMA = "db/critique_schema_dump.sql"
+DEFAULT_DATA_DUMP = "db/critique_data_dump.sql"
 
 class Engine(object):
     '''
@@ -33,7 +33,7 @@ class Engine(object):
 
     :param db_path: The path of the database file (always with respect to the
         calling script. If not specified, the Engine will use the file located
-        at *db/forum.db*
+        at *db/critique.db*
 
     '''
 
@@ -91,7 +91,7 @@ class Engine(object):
         Create programmatically the tables from a schema file.
 
         :param schema: path to the .sql schema file. If this parmeter is
-            None, then *db/forum_schema_dump.sql* is utilized.
+            None, then *db/critique_schema_dump.sql* is utilized.
 
         '''
         con = sqlite3.connect(self.db_path)
@@ -110,7 +110,7 @@ class Engine(object):
         Populate programmatically the tables from a dump file.
 
         :param dump:  path to the .sql dump file. If this parmeter is
-            None, then *db/forum_data_dump.sql* is utilized.
+            None, then *db/critique_data_dump.sql* is utilized.
 
         '''
         keys_on = 'PRAGMA foreign_keys = ON'
@@ -132,7 +132,7 @@ class Engine(object):
 
 class Connection(object):
     '''
-    API to access the Forum database.
+    API to access the critique database.
 
     The sqlite3 connection instance is accessible to all the methods of this
     class through the :py:attr:`self.con` attribute.
