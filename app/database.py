@@ -24,7 +24,7 @@ class Engine(object):
         user_id INTEGER PRIMARY KEY AUTOINCREMENT,\
         nickname TEXT UNIQUE,\
         regDate INTEGER NOT NULL,\
-        lastLogin INTEGER)'
+        lastLoginDate INTEGER)'
     create_user_profile_sql = \
         'CREATE TABLE IF NOT EXISTS users_profile(\
         user_id INTEGER PRIMARY KEY,\
@@ -94,7 +94,7 @@ class Engine(object):
         '''
         Creates a connection to the database.
 
-        :return: A Connection instance
+        :returns: A Connection instance
         :rtype: Connection
 
         '''
@@ -178,7 +178,7 @@ class Engine(object):
 
         Print an error message in the console if it could not be created.
 
-        :return: ``True`` if the table was successfully created or ``False``
+        :returns: ``True`` if the table was successfully created or ``False``
             otherwise.
 
         '''
@@ -190,7 +190,7 @@ class Engine(object):
 
         Print an error message in the console if it could not be created.
 
-        :return: ``True`` if the table was successfully created or ``False``
+        :returns: ``True`` if the table was successfully created or ``False``
             otherwise.
 
         '''
@@ -202,7 +202,7 @@ class Engine(object):
 
         Print an error message in the console if it could not be created.
 
-        :return: ``True`` if the table was successfully created or ``False``
+        :returns: ``True`` if the table was successfully created or ``False``
             otherwise.
 
         '''
@@ -214,7 +214,7 @@ class Engine(object):
 
         Print an error message in the console if it could not be created.
 
-        :return: ``True`` if the table was successfully created or ``False``
+        :returns: ``True`` if the table was successfully created or ``False``
             otherwise.
 
         '''
@@ -228,7 +228,7 @@ class Engine(object):
 
         :param statement: A ``string`` sql statement to be executed. 
 
-        :return: ``True`` if the sql successfully executed or ``False``
+        :returns: ``True`` if the sql successfully executed or ``False``
             otherwise.
 
         '''
@@ -245,7 +245,6 @@ class Engine(object):
                 print("Error %s:" % e.args[0])
                 return False
         return True
-
 
 
 class Connection(object):
@@ -274,7 +273,7 @@ class Connection(object):
 
     def isclosed(self):
         '''
-        :return: ``True`` if connection has already being closed.  
+        :returns: ``True`` if connection has already being closed.  
         '''
         return self._isclosed
 
@@ -293,7 +292,7 @@ class Connection(object):
         '''
         Check if the foreign keys has been activated.
 
-        :return: ``True`` if  foreign_keys is activated and ``False`` otherwise.
+        :returns: ``True`` if  foreign_keys is activated and ``False`` otherwise.
         :raises sqlite3.Error: when a sqlite3 error happen. In this case the
             connection is closed.
 
@@ -317,7 +316,7 @@ class Connection(object):
         '''
         Activate the support for foreign keys.
 
-        :return: ``True`` if operation succeed and ``False`` otherwise.
+        :returns: ``True`` if operation succeed and ``False`` otherwise.
 
         '''
         keys_on = 'PRAGMA foreign_keys = ON'
@@ -336,7 +335,7 @@ class Connection(object):
         '''
         Deactivate the support for foreign keys.
 
-        :return: ``True`` if operation succeed and ``False`` otherwise.
+        :returns: ``True`` if operation succeed and ``False`` otherwise.
 
         '''
         keys_on = 'PRAGMA foreign_keys = OFF'
@@ -350,3 +349,156 @@ class Connection(object):
         except sqlite3.Error as excp:
             print("Error %s:" % excp.args[0])
             return False
+
+    # Helpers
+    def _create_user_list_object(self, row):
+        '''
+        Same as :py:meth:`_create_message_object`. However, the resulting
+        dictionary is targeted to build messages in a list.
+
+        :param row: The row obtained from the database.
+        :type row: sqlite3.Row
+
+        :returns: a dictionary with the keys ``nickname`` (str), ``registrationdate``
+            (long representing UNIX timestamp), ``bio`` (str) and ``avatar`` (str)
+
+        '''
+        return {
+            'nickname': row['nickname'],
+            'registrationdate': row['regDate'],
+            'bio': row['bio'],
+            'avatar': row['avatar']
+        }
+
+    def _create_user_object(self, row):
+        '''
+        It takes a database Row and transform it into a python dictionary.
+
+        :param row: The row obtained from the database.
+        :type row: sqlite3.Row
+        :return: a dictionary with the following format:
+
+            .. code-block:: javascript
+
+                {
+                    'nickname': '',
+                    'registrationdate': ,
+                    'lastlogindate': ,
+                    'firstname': '',
+                    'lastname': '',
+                    'email': '',
+                    'mobile': '',
+                    'gender': '',
+                    'avatar': '',
+                    'age': '',
+                    'bio': ''
+                }
+
+            where:
+
+            * ``nickname``: nickname of the user
+            * ``registrationdate``: UNIX timestamp when the user registered in the system (long integer)
+            * ``lastlogindate``: UNIX timestamp when the user last logged in to the system (long integer)
+            * ``firstname``: given name of the user
+            * ``lastname``: family name of the user
+            * ``email``: current email of the user.
+            * ``mobile``: string showing the user's phone number. Can be None.
+            * ``gender``: User's gender ('male' or 'female').
+            * ``avatar``: name of the image file used as avatar
+            * ``age``: integer containing the age of the user.
+            * ``bio``: text chosen by the user for biography
+
+            Note that all values are string if they are not otherwise indicated.
+
+        '''
+        birthdate = row['birthdate']
+        currentDay = datetime.today()
+        age = currentDay.year - birthdate.year + \
+            ((currentDay.month > birthdate.month) and (currentDay.day > birthdate.day))
+        return {
+            'nickname': row['nickname'],
+            'registrationdate': row['regDate'],
+            'lastlogindate': row['lastLoginDate'],
+            'firstname': row['firstname'],
+            'lastname': row['lastname'],
+            'email': row['email'],
+            'mobile': row['mobile'],
+            'gender': row['gender'],
+            'avatar': row['avatar'],
+            'age': age,
+            'bio': row['bio']
+        }
+
+    # Database API
+
+    # ACCESSING THE USER and USER_PROFILE tables
+    def get_users(self):
+        '''
+        Extracts all users in the database.
+
+        :returns: list of Users of the database. Each user is a dictionary
+            that contains following keys: ``nickname`` (str), ``registrationdate``
+            (long representing UNIX timestamp), ``bio`` (str) and ``avatar`` (str). None is returned if the database
+            has no users.
+
+        '''
+        # Create the SQL Statements
+        # SQL Statement for retrieving the users
+        query = 'SELECT users.*, users_profile.* FROM users, users_profile \
+                 WHERE users.user_id = users_profile.user_id'
+        # Activate foreign key support
+        self.set_foreign_keys_support()
+        # Create the cursor
+        self.con.row_factory = sqlite3.Row
+        cur = self.con.cursor()
+        # Execute main SQL Statement
+        cur.execute(query)
+        # Process the results
+        rows = cur.fetchall()
+        if rows is None:
+            return None
+        # Process the response.
+        users = []
+        for row in rows:
+            users.append(self._create_user_list_object(row))
+        return users
+
+    def get_user(self, nickname):
+        '''
+        Extracts all the information of a user.
+
+        :param str nickname: The nickname of the user to search for.
+        :returns: dictionary with the format provided in the method:
+            :py:meth:`_create_user_object`
+
+        '''
+        # Create the SQL Statements
+        # SQL Statement for retrieving the user given a nickname
+        query1 = 'SELECT user_id from users WHERE nickname = ?'
+        # SQL Statement for retrieving the user information
+        query2 = 'SELECT users.*, users_profile.* FROM users, users_profile \
+                  WHERE users.user_id = ? \
+                  AND users_profile.user_id = users.user_id'
+        # Variable to be used in the second query.
+        user_id = None
+        # Activate foreign key support
+        self.set_foreign_keys_support()
+        # Cursor and row initialization
+        self.con.row_factory = sqlite3.Row
+        cur = self.con.cursor()
+        # Execute SQL Statement to retrieve the id given a nickname
+        pvalue = (nickname,)
+        cur.execute(query1, pvalue)
+        # Extract the user id
+        row = cur.fetchone()
+        if row is None:
+            return None
+        user_id = row["user_id"]
+        # Execute the SQL Statement to retrieve the user information.
+        # Create first the valuse
+        pvalue = (user_id, )
+        # execute the statement
+        cur.execute(query2, pvalue)
+        # Process the response. Only one possible row is expected.
+        row = cur.fetchone()
+        return self._create_user_object(row)

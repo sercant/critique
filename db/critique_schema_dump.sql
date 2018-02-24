@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS users(
   user_id INTEGER PRIMARY KEY AUTOINCREMENT,
   nickname TEXT UNIQUE,
   regDate INTEGER NOT NULL,
-  lastLogin INTEGER);
+  lastLoginDate INTEGER);
 
 CREATE TABLE IF NOT EXISTS users_profile(
   user_id INTEGER PRIMARY KEY,
