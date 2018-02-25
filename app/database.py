@@ -618,7 +618,7 @@ class Connection(object):
             'sender_id' : str(row['sender_id']),
             'receiver_id' : str(row['receiver_id']),
             'reply_to' : str(row['reply_to']),
-            'post_text' : str(row['post_text'])
+            'post_text' : str(row['post_text']),
             'rating' : row['rating'],
             'anonymity' : row['anonymous'],
             'publicity' : row['public'],
@@ -978,7 +978,7 @@ class Connection(object):
         # using cursor and row initalization to enable 
         # reading and returning the data in a dictionary
         # format, with key-value pairs
-        self.con.row_factory = sqlite3.
+        self.con.row_factory = sqlite3.Row
         cur = self.con.cursor()
         # execute the SQL query
         cur.execute(query, queryParameter)
