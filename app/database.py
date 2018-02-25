@@ -7,7 +7,7 @@ Provides the database API to access the critique persistent data.
 @author: mina
 
     REFERENCEs:
-    -   Programmable Web Project, Exercise1, forum.database.py
+    -   [1] Programmable Web Project, Exercise1, forum.database.py
 '''
 
 from datetime import datetime
@@ -52,8 +52,8 @@ class Engine(object):
         post_id INTEGER PRIMARY KEY AUTOINCREMENT,\
         timestamp INTEGER NOT NULL,\
         sender_id INTEGER NOT NULL,\
-        receiver_id INTEGER NOT NULL,\
-        reply_to TEXT,\
+        receiver_id INTEGER,\
+        reply_to INTEGER,\
         post_text TEXT NOT NULL,\
         rating INTEGER,\
         anonymous INTEGER NOT NULL,\
@@ -206,7 +206,7 @@ class Engine(object):
             otherwise.
 
         '''
-        return self._execute_statement(self.create_user_profile_sql)
+        return self._execute_statement(self.create_users_profile_sql)
 
     def create_posts_table(self):
         '''
@@ -238,7 +238,7 @@ class Engine(object):
 
         Print an error message in the console if it could not be created.
 
-        :param statement: A ``string`` sql statement to be executed. 
+        :param statement: A ``string`` sql statement to be executed.
 
         :returns: ``True`` if the sql successfully executed or ``False``
             otherwise.
@@ -285,7 +285,7 @@ class Connection(object):
 
     def isclosed(self):
         '''
-        :returns: ``True`` if connection has already being closed.  
+        :returns: ``True`` if connection has already being closed.
         '''
         return self._isclosed
 
@@ -366,7 +366,7 @@ class Connection(object):
     # Users Helpers
     def _create_user_list_object(self, row):
         '''
-        Same as :py:meth:`_create_message_object`. However, the resulting
+        Same as :py:meth:`_create_post_object`. However, the resulting
         dictionary is targeted to build messages in a list.
 
         :param row: The row obtained from the database.
@@ -394,17 +394,21 @@ class Connection(object):
             .. code-block:: javascript
 
                 {
-                    'nickname': '',
-                    'registrationdate': ,
-                    'lastlogindate': ,
-                    'firstname': '',
-                    'lastname': '',
-                    'email': '',
-                    'mobile': '',
-                    'gender': '',
-                    'avatar': '',
-                    'age': '',
-                    'bio': ''
+                    'summary': {
+                        'nickname': '',
+                        'registrationdate': ,
+                        'bio': '',
+                        'avatar': '']
+                    },
+                    'details': {
+                        'lastlogindate': ,
+                        'firstname': '',
+                        'lastname': '',
+                        'email': '',
+                        'mobile': '',
+                        'gender': '',
+                        'birthdate': '',
+                    }
                 }
 
             where:
@@ -418,29 +422,28 @@ class Connection(object):
             * ``mobile``: string showing the user's phone number. Can be None.
             * ``gender``: User's gender ('male' or 'female').
             * ``avatar``: name of the image file used as avatar
-            * ``age``: integer containing the age of the user.
+            * ``birthdate``: string containing the birth date of the user in yyyy-mm-dd format.
             * ``bio``: text chosen by the user for biography
 
             Note that all values are string if they are not otherwise indicated.
 
         '''
-        birthdate = row['birthdate']
-        currentDay = datetime.today()
-        age = currentDay.year - birthdate.year + \
-            ((currentDay.month > birthdate.month)
-             and (currentDay.day > birthdate.day))
         return {
-            'nickname': row['nickname'],
-            'registrationdate': row['regDate'],
-            'lastlogindate': row['lastLoginDate'],
-            'firstname': row['firstname'],
-            'lastname': row['lastname'],
-            'email': row['email'],
-            'mobile': row['mobile'],
-            'gender': row['gender'],
-            'avatar': row['avatar'],
-            'age': age,
-            'bio': row['bio']
+            'summary': {
+                'nickname': row['nickname'],
+                'registrationdate': row['regDate'],
+                'bio': row['bio'],
+                'avatar': row['avatar']
+            },
+            'details': {
+                'lastlogindate': row['lastLoginDate'],
+                'firstname': row['firstname'],
+                'lastname': row['lastname'],
+                'email': row['email'],
+                'mobile': row['mobile'],
+                'gender': row['gender'],
+                'birthdate': row['birthdate'],
+            }
         }
 
     # Database API
@@ -550,3 +553,107 @@ class Connection(object):
         for row in rows:
             rating.append(self._create_ratings_list(row))
         return rating
+    def delete_user(self, nickname):
+        '''
+        Deletes the user from the database.
+
+        :param str nickname: The nickname of the user to delete.
+
+        :returns: ``True`` if user is successfully deleted else ``False``.
+
+        '''
+        # Create the SQL Statements
+        # SQL Statement for deleting the user with nickname
+        query = 'DELETE from users WHERE nickname = ?'
+        # Activate foreign key support
+        self.set_foreign_keys_support()
+        # Cursor and row initialization
+        self.con.row_factory = sqlite3.Row
+        cur = self.con.cursor()
+        pvalue = (nickname,)
+        try:
+            cur.execute(query, pvalue)
+            #Commit the delete
+            self.con.commit()
+        except sqlite3.Error as e:
+            print("Error %s:" % (e.args[0]))
+        return bool(cur.rowcount)
+
+    def _create_post_object(self, row):
+        '''
+        It takes a :py:class:`sqlite.Row` and transform it into a dictionary
+        with key-value pairs.
+
+            :param row: the row returned from the database. 
+            :type row: sqlite3.Row
+            :return: a dictionary containing the following keys:
+
+                * ``post_id``: id of the post
+                * ``timestamp``: the time of creation (int)
+                * ``sender_id``: id of the sending user
+                * ``receiver_id``: id of the receiving user
+                * ``reply_to``: if of the parent post
+                * ``rating``: rating of the post given by users (int)
+                * ``anonymous``: (int) that represents the anonymity 
+                    of the post, if "0" it is False, if "1" it is True.
+                * ``public``: (int) that represents the publicity 
+                    of the post, if "0" it is False, if "1" it is True.
+
+        All values are returned as string, containing the value in the 
+        mentioned data type.
+        '''
+        post = {
+            'post_id'  = str(row['post_id']),
+            'timestamp' = row['timestamp'],
+            'sender_id' = str(row['sender_id']),
+            'receiver_id' = str(row['receiver_id']),
+            'reply_to' = str(row['reply_to']),
+            'rating' = row['rating'],
+            'anonymity' = row['anonymous'],
+            'publicity' = row['public'],
+        }
+
+        return post
+
+    def get_post(self, post_id):
+        '''
+        GETs a post from the database using the post_id
+        as a query parameter
+
+        :param post_id: post id in the database, which is of
+            the type (int)
+
+        :return: returns a dictionary with all the attributes
+            of the message. the format is provided in
+            :py:meth:`_create_post_object`
+            or returns None if the post_id is not matching any ids.
+        
+        :raises ValueError: when ``post_id`` is not valid format
+
+        REFERENCEs:
+        -   [1]
+        '''
+        # first check if the input is valid
+        if post_id is None:
+            raise ValueError("No input post id")
+        # setting foreign keys support
+        self.set_foreign_keys_support()
+        # initializing the SQL query
+        query = 'SELECT * FROM posts WHERE post_id = ?'
+        # using cursor and row initalization to enable 
+        # reading and returning the data in a dictionary
+        # format, with key-value pairs
+        self.con.row_factory = sqlite3.Row
+        cur = self.con.cursor()
+        # putting the query parameter in a tuple
+        # to be able to execute.
+        queryPostId = (post_id,)
+        cur.execute(query, queryPostId)
+        # checking if the returned value contains a post
+        # or not. if not, function will return None
+        row = cur.fetchone()
+        if row is None:
+            return None
+        # however, in case it has returned an actual post
+        # it has to be parsed before returning
+        return self._create_post_object(row)

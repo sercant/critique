@@ -1,12 +1,6 @@
 PRAGMA foreign_keys=OFF;
 BEGIN TRANSACTION;
 
-/*
-  REFERENCEs:
-  -   http://schema.org/Person
-  -   Programmable Web Project Course, Exercise 1, forum_schema_dump.sql
-*/
-
 CREATE TABLE IF NOT EXISTS users(
   user_id INTEGER PRIMARY KEY AUTOINCREMENT,
   nickname TEXT UNIQUE,
@@ -29,8 +23,8 @@ CREATE TABLE IF NOT EXISTS posts (
   post_id INTEGER PRIMARY KEY AUTOINCREMENT,
   timestamp INTEGER NOT NULL,
   sender_id INTEGER NOT NULL,
-  receiver_id INTEGER NOT NULL,
-  reply_to TEXT,
+  receiver_id INTEGER,
+  reply_to INTEGER,
   post_text TEXT NOT NULL,
   rating INTEGER,
   anonymous INTEGER NOT NULL,
