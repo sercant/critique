@@ -23,7 +23,7 @@ DEFAULT_DATA_DUMP = "db/critique_data_dump.sql"
 
 
 class Engine(object):
-   
+
     # SQL command to create users table
     create_users_sql = \
         'CREATE TABLE IF NOT EXISTS users(\
@@ -45,7 +45,7 @@ class Engine(object):
         birthdate TEXT,\
         bio TEXT,\
         FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE)'
-    
+
     # SQL command to create posts table
     create_posts_sql = \
         'CREATE TABLE IF NOT EXISTS posts(\
@@ -61,7 +61,7 @@ class Engine(object):
         FOREIGN KEY(sender_id) REFERENCES users(user_id) ON DELETE CASCADE,\
         FOREIGN KEY(receiver_id) REFERENCES users(user_id) ON DELETE CASCADE,\
         FOREIGN KEY(reply_to) REFERENCES posts(post_id) ON DELETE CASCADE)'
-    
+
     # SQL command to create ratings table
     create_ratings_sql = \
         'CREATE TABLE IF NOT EXISTS ratings(\
@@ -525,9 +525,9 @@ class Connection(object):
         '''
         Extracts ratings in the database for a user
 
-        :returns: ratings for each user 
+        :returns: ratings for each user
             contains following keys: ``id`` (integer), ``timestamp``
-            (long representing UNIX timestamp), ``sender`` (str), ``receiver`` (str) and ``rating`` (integer). 
+            (long representing UNIX timestamp), ``sender`` (str), ``receiver`` (str) and ``rating`` (integer).
             None is returned if the database has no users.
 
         '''
@@ -553,6 +553,7 @@ class Connection(object):
         for row in rows:
             rating.append(self._create_ratings_list(row))
         return rating
+
     def delete_user(self, nickname):
         '''
         Deletes the user from the database.
@@ -573,7 +574,7 @@ class Connection(object):
         pvalue = (nickname,)
         try:
             cur.execute(query, pvalue)
-            #Commit the delete
+            # Commit the delete
             self.con.commit()
         except sqlite3.Error as e:
             print("Error %s:" % (e.args[0]))
@@ -584,7 +585,7 @@ class Connection(object):
         It takes a :py:class:`sqlite.Row` and transform it into a dictionary
         with key-value pairs.
 
-            :param row: the row returned from the database. 
+            :param row: the row returned from the database.
             :type row: sqlite3.Row
             :return: a dictionary containing the following keys:
 
@@ -594,12 +595,12 @@ class Connection(object):
                 * ``receiver_id``: id of the receiving user
                 * ``reply_to``: if of the parent post
                 * ``rating``: rating of the post given by users (int)
-                * ``anonymous``: (int) that represents the anonymity 
+                * ``anonymous``: (int) that represents the anonymity
                     of the post, if "0" it is False, if "1" it is True.
-                * ``public``: (int) that represents the publicity 
+                * ``public``: (int) that represents the publicity
                     of the post, if "0" it is False, if "1" it is True.
 
-        All values are returned as string, containing the value in the 
+        All values are returned as string, containing the value in the
         mentioned data type.
         '''
         post = {
@@ -627,7 +628,7 @@ class Connection(object):
             of the message. the format is provided in
             :py:meth:`_create_post_object`
             or returns None if the post_id is not matching any ids.
-        
+
         :raises ValueError: when ``post_id`` is not valid format
 
         REFERENCEs:
@@ -640,7 +641,7 @@ class Connection(object):
         self.set_foreign_keys_support()
         # initializing the SQL query
         query = 'SELECT * FROM posts WHERE post_id = ?'
-        # using cursor and row initalization to enable 
+        # using cursor and row initalization to enable
         # reading and returning the data in a dictionary
         # format, with key-value pairs
         self.con.row_factory = sqlite3.Row
@@ -711,8 +712,8 @@ class Connection(object):
         if user_id is None:
             return None
 
-        #Create the SQL Statements
-        #SQL Statement to update the user_profile table
+        # Create the SQL Statements
+        # SQL Statement to update the user_profile table
         query = 'UPDATE users_profile SET firstname = ?, lastname = ?, email = ?, mobile = ?, gender = ?, avatar = ?, birthdate = ?, bio = ? WHERE user_id = ?'
 
         _firstname = None if not details else details.get('firstname', None)
@@ -724,12 +725,12 @@ class Connection(object):
         _birthdate = None if not details else details.get('birthdate', None)
         _bio = None if not summary else summary.get('bio', None)
 
-        #Activate foreign key support
+        # Activate foreign key support
         self.set_foreign_keys_support()
-        #Cursor and row initialization
+        # Cursor and row initialization
         self.con.row_factory = sqlite3.Row
         cur = self.con.cursor()
-        #execute the main statement
+        # execute the main statement
         pvalue = (
             _firstname,
             _lastname,
@@ -743,7 +744,7 @@ class Connection(object):
         )
         cur.execute(query, pvalue)
         self.con.commit()
-        #Check that I have modified the user
+        # Check that I have modified the user
         if cur.rowcount < 1:
             return None
         return nickname
@@ -762,19 +763,19 @@ class Connection(object):
 
         '''
         query = 'SELECT user_id FROM users WHERE nickname = ?'
-        #Activate foreign key support
+        # Activate foreign key support
         self.set_foreign_keys_support()
-        #Cursor and row initialization
+        # Cursor and row initialization
         self.con.row_factory = sqlite3.Row
         cur = self.con.cursor()
-        #Execute the  main SQL statement
+        # Execute the  main SQL statement
         pvalue = (nickname,)
         cur.execute(query, pvalue)
-        #Process the response.
-        #Just one row is expected
+        # Process the response.
+        # Just one row is expected
         row = cur.fetchone()
         if row is None:
             return None
-        #Build the return object
+        # Build the return object
         else:
             return row[0]
