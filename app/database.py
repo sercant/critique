@@ -593,6 +593,7 @@ class Connection(object):
                 * ``sender_id``: id of the sending user
                 * ``receiver_id``: id of the receiving user
                 * ``reply_to``: if of the parent post
+                * ``post_text``: post's text
                 * ``rating``: rating of the post given by users (int)
                 * ``anonymous``: (int) that represents the anonymity 
                     of the post, if "0" it is False, if "1" it is True.
@@ -616,6 +617,7 @@ class Connection(object):
             'sender_id' : str(row['sender_id']),
             'receiver_id' : str(row['receiver_id']),
             'reply_to' : str(row['reply_to']),
+            'post_text' : str(row['post_text'])
             'rating' : row['rating'],
             'anonymity' : row['anonymous'],
             'publicity' : row['public'],
