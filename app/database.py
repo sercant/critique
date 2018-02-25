@@ -687,15 +687,15 @@ class Connection(object):
         -   [1]
         '''
         post = {
-            'post_id': str(row['post_id']),
+            'post_id': row['post_id'],
             'timestamp': row['timestamp'],
-            'sender_id': str(row['sender_id']),
-            'receiver_id': str(row['receiver_id']),
-            'reply_to': str(row['reply_to']),
+            'sender_id': row['sender_id'],
+            'receiver_id': row['receiver_id'],
+            'reply_to': row['reply_to'],
             'post_text': str(row['post_text']),
             'rating': row['rating'],
-            'anonymity': row['anonymous'],
-            'publicity': row['public'],
+            'anonymous': row['anonymous'],
+            'public': row['public'],
         }
 
         return post
@@ -1052,7 +1052,7 @@ class Connection(object):
         queryParameter = (user_id, )
         # create the SQL query
         # TODO : this might need to change format
-        query = 'SELECT * FROM posts WHERE user_id = ? ORDER BY timestamp DESC'
+        query = 'SELECT * FROM posts WHERE sender_id = ? ORDER BY timestamp DESC'
         # set foreign keys support
         self.set_foreign_keys_support()
         # using cursor and row initalization to enable
