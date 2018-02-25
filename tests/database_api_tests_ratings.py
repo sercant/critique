@@ -231,40 +231,38 @@ class RatingDBAPITestCase(unittest.TestCase):
             self.assertIn(rating['rating_id'],
                           ('rating-1', 'rating-2', 'rating-3', 'rating-4'))
 
-    # def test_modify_rating(self):
-    #     '''
-    #     Test that the rating rating-1 is modifed
-    #     '''
-    #     print('('+self.test_modify_ratings.__name__+')', \
-    #           self.test_modify_ratings.__doc__)
-    #     resp = self.connection.modify_rating(RATING1_ID, "new title",
-    #                                           "new body", "new editor")
-    #     self.assertEqual(resp, RATING1_ID)
-    #     #Check that the ratings has been really modified through a get
-    #     resp2 = self.connection.get_ratings(RATING1_ID)
-    #     self.assertDictContainsSubset(resp2, RATING1_MODIFIED)
+    def test_modify_rating(self):
+        '''
+        Test that the rating rating-1 is modifed
+        '''
+        print('('+self.test_modify_rating.__name__+')', \
+              self.test_modify_rating.__doc__)
+        resp = self.connection.modify_rating(
+            RATING1_ID, RATING1_MODIFIED['rating'])
+        self.assertEqual(resp, RATING1_ID)
+        #Check that the ratings has been really modified through a get
+        resp2 = self.connection.get_rating(RATING1_ID)
+        self.assertDictContainsSubset(resp2, RATING1_MODIFIED)
 
-    # def test_modify_ratings_malformedid(self):
-    #     '''
-    #     Test that trying to modify rating wit id ='2' raises an error
-    #     '''
-    #     print('('+self.test_ratings_message_malformedid.__name__+')',\
-    #           self.test_ratings_message_malformedid.__doc__)
-    #     #Test with an existing rating
-    #     with self.assertRaises(ValueError):
-    #         self.connection.modify_message('1', "new title", "new body",
-    #                                        "editor")
+    def test_modify_ratings_malformedid(self):
+        '''
+        Test that trying to modify rating with id ='2' raises an error
+        '''
+        print('('+self.test_modify_ratings_malformedid.__name__+')',
+              self.test_modify_ratings_malformedid.__doc__)
+        #Test with an existing rating
+        with self.assertRaises(ValueError):
+            self.connection.modify_rating('2', 2)
 
-    # def test_modify_ratings_noexistingid(self):
-    #     '''
-    #     Test modify_ratings with  rating-200 (no-existing)
-    #     '''
-    #     print('('+self.test_modify_ratings_noexistingid.__name__+')',\
-    #           self.test_modify_ratings_noexistingid.__doc__)
-    #     #Test with an existing rating
-    #     resp = self.connection.modify_message(WRONG_MESSAGE_ID, "new title",
-    #                                           "new body", "editor")
-    #     self.assertIsNone(resp)
+    def test_modify_ratings_noexistingid(self):
+        '''
+        Test modify_ratings with rating-200 (no-existing)
+        '''
+        print('('+self.test_modify_ratings_noexistingid.__name__+')',\
+              self.test_modify_ratings_noexistingid.__doc__)
+        #Test with an existing rating
+        resp = self.connection.modify_rating(WRONG_RATING_ID, 5)
+        self.assertIsNone(resp)
 
     # def test_create_rating(self):
     #     '''
