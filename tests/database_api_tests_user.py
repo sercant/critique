@@ -124,6 +124,42 @@ NEW_USER = {
     }
 }
 
+NEW_USER_MALFORMED1 = {
+    'summary': {
+        'nickname': 'Staceyb',
+        'registrationdate': 1519585947,
+        'bio': 'I hate you Scott!',
+        'avatar': 'photo9.png',
+    },
+    'detailsa': {
+        'lastlogindate': 1519585947,
+        'firstname': 'Stacey',
+        'lastname': 'Pilgrim',
+        'email': 'stacey@hotmail.com',
+        'mobile': None,
+        'gender': 'female',
+        'birthdate': '1990-11-11',
+    }
+}
+
+NEW_USER_MALFORMED2 = {
+    'summary': {
+        'nickname': 'Staceya',
+        'registrationdate': 1519585947,
+        'bio': 'I hate you Scott!',
+        'avatar': 'photo9.png',
+    },
+    'details': {
+        'lastlogindate': 1519585947,
+        'firstname': None,
+        'lastname': 'Pilgrim',
+        'email': 'stacey@hotmail.com',
+        'mobile': None,
+        'gender': 'female',
+        'birthdate': '1990-11-11',
+    }
+}
+
 USER1_ID = 1
 USER2_ID = 2
 
@@ -351,6 +387,19 @@ class UserDBAPITestCase(unittest.TestCase):
                                       resp2['summary'])
         self.assertDictContainsSubset(NEW_USER['details'],
                                       resp2['details'])
+
+    def test_create_user_malformed(self):
+        '''
+        Test that I can't add new malformed users
+        '''
+        print('('+self.test_create_user_malformed.__name__+')',
+              self.test_create_user_malformed.__doc__)
+        with self.assertRaises(ValueError):
+            nickname = self.connection.create_user(
+                NEW_USER_MALFORMED1['summary']['nickname'], NEW_USER_MALFORMED1)
+        with self.assertRaises(ValueError):
+            nickname = self.connection.create_user(
+                NEW_USER_MALFORMED2['summary']['nickname'], NEW_USER_MALFORMED2)
 
     def test_create_existing_user(self):
         '''

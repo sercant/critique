@@ -606,27 +606,27 @@ class Connection(object):
             $ row = cursor.fetchone()
             $ self._create_post_object(row)
 
-        All values are returned as string, containing the value in the 
+        All values are returned as string, containing the value in the
         mentioned data type.
 
         REFERENCEs:
         -   [1]
         '''
         post = {
-            'post_id'  : str(row['post_id']),
-            'timestamp' : row['timestamp'],
-            'sender_id' : str(row['sender_id']),
-            'receiver_id' : str(row['receiver_id']),
-            'reply_to' : str(row['reply_to']),
-            'post_text' : str(row['post_text']),
-            'rating' : row['rating'],
-            'anonymity' : row['anonymous'],
-            'publicity' : row['public'],
+            'post_id': str(row['post_id']),
+            'timestamp': row['timestamp'],
+            'sender_id': str(row['sender_id']),
+            'receiver_id': str(row['receiver_id']),
+            'reply_to': str(row['reply_to']),
+            'post_text': str(row['post_text']),
+            'rating': row['rating'],
+            'anonymity': row['anonymous'],
+            'publicity': row['public'],
         }
 
         return post
 
-    def get_post(self, post_id = None):
+    def get_post(self, post_id=None):
         '''
         GETs a post from the database using the post_id
         as a query parameter
@@ -806,6 +806,8 @@ class Connection(object):
         :return: the nickname of the modified user or None if the
             ``nickname`` passed as parameter is not in the database.
 
+        :rtype: str
+
         :raise ValueError: if the user argument is not well formed.
 
         '''
@@ -823,16 +825,17 @@ class Connection(object):
                                              gender,avatar, \
                                              birthdate,bio)\
                   VALUES (?,?,?,?,?,?,?,?,?)'
-        #temporal variables for user table
-        #timestamp will be used for lastlogin and regDate.
+        # timestamp will be used for lastlogin and regDate if not provided.
         timestamp = time.mktime(datetime.now().timetuple())
-        #temporal variables for user profiles
-        summary = user['summary']
-        details = user['details']
+
+
+        summary = user.get('summary', None)
+        details = user.get('details', None)
 
         if summary is None or details is None:
             raise ValueError("User dictionary is not well formed")
 
+        # temporal variables for user table
         _firstname = details.get('firstname', None)
         _lastname = details.get('lastname', None)
         _email = details.get('email', None)
@@ -843,6 +846,10 @@ class Connection(object):
         _bio = summary.get('bio', None)
         _registrationdate = summary.get('registrationdate', timestamp)
         _lastlogindate = details.get('lastlogindate', timestamp)
+
+        if _registrationdate is None or _firstname is None:
+            raise ValueError(
+                "User dictionary is not well formed, registrationdate and firstname can not be None")
 
         # Activate foreign key support
         self.set_foreign_keys_support()
@@ -908,7 +915,7 @@ class Connection(object):
         # Build the return object
         else:
             return row[0]
-    
+
     def _create_post_list_object(self, row):
         '''
         used to make list objects for list appending, when the API
@@ -917,7 +924,7 @@ class Connection(object):
             :param row: a row obtained from the database
             :type row: sqlite3.Row
             :return: a dictionary with the following keys:
-        
+
                 * ``post_id``: id of the post from the row input
                 * ``receiver_id``: the receiver of the post
                 * ``timestamp``: (int) timestamp of the post
@@ -930,7 +937,7 @@ class Connection(object):
                     0 is False, 1 is True
         Note: all returned values are strings, unless otherwise stated.
         '''
-        post = {\
+        post = {
             'post_id': str(row['post_id']),
             'receiver_id': str(row['receiver_id']),
             'timestamp': row['timestamp'],
@@ -941,22 +948,21 @@ class Connection(object):
             'public': row['public']
         }
         return post
-        
 
     def get_posts_by_user(self, user_id = None, number_of_messages = None):
         '''
-        Used to retrieve some posts posted by a user. 
+        Used to retrieve some posts posted by a user.
 
         :param user_id: default is None, takes the user id of the user
             that you want the posts of. if the parameter is None, it
-            will raise a ValueError exception. 
+            will raise a ValueError exception.
         :type user_id: integer
         :param number_of_messages: sets the number of maximum window of
             messages returned. if None, it returns a list of all the
-            posts made by the requested user. 
+            posts made by the requested user.
         :type number_of_messages: integer
-        
-        :return: a list of posts made by the mentioned user. each 
+
+        :return: a list of posts made by the mentioned user. each
             message is a dictionary containing the keys mentioned in
             :py:meth:`_create_posts_list_object`
 
@@ -967,15 +973,15 @@ class Connection(object):
         # check if the user_id is not None
         if user_id is None:
             raise ValueError("No input user ID input")
-        
+
         # initialize the query parameter as a tuple
         queryParameter = (user_id, )
-        # create the SQL query 
+        # create the SQL query
         # TODO : this might need to change format
         query = 'SELECT * FROM posts WHERE user_id = ? ORDER BY timestamp DESC'
         # set foreign keys support
         self.set_foreign_keys_support()
-        # using cursor and row initalization to enable 
+        # using cursor and row initalization to enable
         # reading and returning the data in a dictionary
         # format, with key-value pairs
         self.con.row_factory = sqlite3.Row
@@ -983,7 +989,7 @@ class Connection(object):
         # execute the SQL query
         cur.execute(query, queryParameter)
         # fetching the results
-        rows = cur.fetchall() 
+        rows = cur.fetchall()
         # check if there are posts fetched or not
         if rows is None:
             return None
