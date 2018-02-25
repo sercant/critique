@@ -12,18 +12,44 @@ Such idea for a criticism platform have never been implemented before in such de
 
 ### You will need
 
-+ Python 3.6.4
-+ Flask 0.12.2
-+ SQLite3
++ [Python 3.6.4](https://www.python.org/downloads/)
++ [SQLite3](https://www.sqlite.org/download.html)
+
+### Setting up the python virtual environment
+
+In the project root folder run the following commands.
 
 ```bash
-virtualenv --python=/path/to/your/python3/binary venv
+virtualenv --python=/path/to/your/python3-binary venv
+# this is for mac users, please check your how you activate the virtual environment in your operating system.
 . venv/bin/activate
-pip install flask
 ```
 
-<!-- ### Starting the server
+### Setting up and populating the database
+
+In the project root folder run the following commands.
 
 ```bash
-python server.py
-``` -->
+# Activate the sqlite3 command line.
+sqlite3 db/critique.db
+```
+
+```sql
+.databases
+-- Read the schema dump.
+.read db/critique_schema_dump.sql
+-- Populate the db using the data dump.
+.read db/critique_data_dump.sql
+.exit
+```
+
+## Running the tests
+
+To run the tests please make sure that you activated the virtual environment using. To activate the virtual environment you can run the following command on your bash.
+
+```bash
+# In the project root folder
+# this is for mac users, please check your how you activate the virtual environment in your operating system.
+. venv/bin/activate
+./run_database_api_tests.sh
+```
