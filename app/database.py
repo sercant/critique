@@ -749,8 +749,127 @@ class Connection(object):
             return None
         return nickname
 
-    # Utils
+    def create_user(self, nickname, user):
+        '''
+        Create a new user in the database.
 
+        :param str nickname: The nickname of the user to modify
+        :param dict user: a dictionary with the information to be modified. The
+                dictionary has the following structure:
+
+                .. code-block:: javascript
+
+                    {
+                        'summary': {
+                            'nickname': '',
+                            'registrationdate': ,
+                            'bio': '',
+                            'avatar': ''
+                        },
+                        'details': {
+                            'lastlogindate': ,
+                            'firstname': '',
+                            'lastname': '',
+                            'email': '',
+                            'mobile': '',
+                            'gender': '',
+                            'birthdate': '',
+                        }
+                    }
+
+                where:
+
+            * ``nickname``: nickname of the user
+            * ``registrationdate``: (Optional) UNIX timestamp when the user registered in the system (long integer)
+            * ``lastlogindate``: (Optional) UNIX timestamp when the user last logged in to the system (long integer)
+            * ``firstname``: given name of the user
+            * ``lastname``: family name of the user
+            * ``email``: current email of the user.
+            * ``mobile``: string showing the user's phone number. Can be None.
+            * ``gender``: User's gender ('male' or 'female').
+            * ``avatar``: name of the image file used as avatar
+            * ``birthdate``: string containing the birth date of the user in yyyy-mm-dd format.
+            * ``bio``: text chosen by the user for biography
+
+            Note that all values are string if they are not otherwise indicated.
+
+        :return: the nickname of the modified user or None if the
+            ``nickname`` passed as parameter is not in the database.
+
+        :raise ValueError: if the user argument is not well formed.
+
+        '''
+        # Check if nickname already exists in the database
+        if self.get_user_id(nickname) is not None:
+            return None
+
+        # Create the SQL Statements
+        # SQL Statement to create the row in  users table
+        query1 = 'INSERT INTO users(nickname,regDate,lastLoginDate)\
+                  VALUES(?,?,?)'
+        # SQL Statement to create the row in user_profile table
+        query2 = 'INSERT INTO users_profile (user_id,firstname,lastname, \
+                                             email,mobile, \
+                                             gender,avatar, \
+                                             birthdate,bio)\
+                  VALUES (?,?,?,?,?,?,?,?,?)'
+        #temporal variables for user table
+        #timestamp will be used for lastlogin and regDate.
+        timestamp = time.mktime(datetime.now().timetuple())
+        #temporal variables for user profiles
+        summary = user['summary']
+        details = user['details']
+
+        if summary is None or details is None:
+            raise ValueError("User dictionary is not well formed")
+
+        _firstname = details.get('firstname', None)
+        _lastname = details.get('lastname', None)
+        _email = details.get('email', None)
+        _mobile = details.get('mobile', None)
+        _gender = details.get('gender', None)
+        _avatar = summary.get('avatar', None)
+        _birthdate = details.get('birthdate', None)
+        _bio = summary.get('bio', None)
+        _registrationdate = summary.get('registrationdate', timestamp)
+        _lastlogindate = details.get('lastlogindate', timestamp)
+
+        # Activate foreign key support
+        self.set_foreign_keys_support()
+        # Cursor and row initialization
+        self.con.row_factory = sqlite3.Row
+        cur = self.con.cursor()
+        # Add the row in users table
+        # Execute the statement
+        pvalue = (
+            nickname,
+            _registrationdate,
+            _lastlogindate
+        )
+        cur.execute(query1, pvalue)
+        # Extrat the rowid => user-id
+        lid = cur.lastrowid
+        # Add the row in users_profile table
+        # Execute the statement
+        pvalue = (
+            lid,
+            _firstname,
+            _lastname,
+            _email,
+            _mobile,
+            _gender,
+            _avatar,
+            _birthdate,
+            _bio,
+        )
+
+        cur.execute(query2, pvalue)
+        self.con.commit()
+
+        # We do not do any comprobation and return the nickname
+        return nickname
+
+    # Utils
     def get_user_id(self, nickname):
         '''
         Get the key of the database row which contains the user with the given
@@ -779,3 +898,9 @@ class Connection(object):
         # Build the return object
         else:
             return row[0]
+
+    def contains_user(self, nickname):
+        '''
+        :returns: ``True`` if the user is in the database else ``False``
+        '''
+        return self.get_user_id(nickname) is not None
