@@ -7,7 +7,7 @@ The user has a data model represented by the following User dictionary:
             'nickname': '',
             'registrationdate': ,
             'bio': '',
-            'avatar': '']
+            'avatar': ''
         },
         'details': {
             'lastlogindate': ,
@@ -67,6 +67,24 @@ USER1 = {
         'mobile': None,
         'gender': 'male',
         'birthdate': '1998-01-22'
+    }
+}
+
+MODIFIED_USER1 = {
+    'summary': {
+        'nickname': 'Scott',
+        'registrationdate': 1519557738,
+        'bio': 'Best bass in town.',
+        'avatar': 'photo8.jpg'
+    },
+    'details': {
+        'lastlogindate': 1519557799,
+        'firstname': 'Scott',
+        'lastname': 'Pilgrim',
+        'email': 'scott_pilgrim@outlook.com',
+        'mobile': '+345635454',
+        'gender': 'male',
+        'birthdate': '1998-01-23'
     }
 }
 
@@ -256,45 +274,33 @@ class UserDBAPITestCase(unittest.TestCase):
         resp = self.connection.delete_user(USER_WRONG_NICKNAME)
         self.assertFalse(resp)
 
+    def test_modify_user(self):
+        '''
+        Test that the user Mystery is modifed
+        '''
+        print('('+self.test_modify_user.__name__+')',
+              self.test_modify_user.__doc__)
+        # Get the modified user
+        resp = self.connection.modify_user(
+            USER1['summary']['nickname'], MODIFIED_USER1['summary'], MODIFIED_USER1['details'])
 
-    # def test_delete_user_noexistingnickname(self):
-    #     '''
-    #     Test delete_user with  Batty (no-existing)
-    #     '''
-    #     print('('+self.test_delete_user_noexistingnickname.__name__+')',
-    #           self.test_delete_user_noexistingnickname.__doc__)
-    #     # Test with an existing user
-    #     resp = self.connection.delete_user(USER_WRONG_NICKNAME)
-    #     self.assertFalse(resp)
+        self.assertEqual(resp, USER1['summary']['nickname'])
 
-    # def test_modify_user(self):
-    #     '''
-    #     Test that the user Mystery is modifed
-    #     '''
-    #     print('('+self.test_modify_user.__name__+')',
-    #           self.test_modify_user.__doc__)
-    #     # Get the modified user
-    #     resp = self.connection.modify_user(USER1_NICKNAME, MODIFIED_USER1['public_profile'], MODIFIED_USER1['restricted_profile']
-    #                                        )
-    #     self.assertEqual(resp, USER1_NICKNAME)
-    #     # Check that the users has been really modified through a get
-    #     resp2 = self.connection.get_user(USER1_NICKNAME)
-    #     resp_p_profile = resp2['public_profile']
-    #     resp_r_profile = resp2['restricted_profile']
-    #     # Check the expected values
-    #     p_profile = MODIFIED_USER1['public_profile']
-    #     r_profile = MODIFIED_USER1['restricted_profile']
-    #     self.assertEqual(p_profile['signature'],
-    #                      resp_p_profile['signature'])
-    #     self.assertEqual(p_profile['avatar'], resp_p_profile['avatar'])
-    #     self.assertEqual(r_profile['birthday'], resp_r_profile['birthday'])
-    #     self.assertEqual(r_profile['email'], resp_r_profile['email'])
-    #     self.assertEqual(r_profile['website'], resp_r_profile['website'])
-    #     self.assertEqual(r_profile['residence'], resp_r_profile['residence'])
-    #     self.assertEqual(r_profile['mobile'], resp_r_profile['mobile'])
-    #     self.assertEqual(r_profile['skype'], resp_r_profile['skype'])
-    #     self.assertEqual(r_profile['picture'], resp_r_profile['picture'])
-    #     self.assertDictContainsSubset(resp2, MODIFIED_USER1)
+        # Check that the users has been really modified through a get
+        resp2 = self.connection.get_user(USER1['summary']['nickname'])
+        resp_summary = resp2['summary']
+        resp_details = resp2['details']
+
+        # Check the expected values
+        new_summary = MODIFIED_USER1['summary']
+        for key, value in new_summary.items():
+            self.assertEqual(value, resp_summary[key])
+
+        new_details = MODIFIED_USER1['details']
+        for key, value in new_details.items():
+            self.assertEqual(value, resp_details[key])
+
+        self.assertDictContainsSubset(resp2, MODIFIED_USER1)
 
     # def test_modify_user_noexistingnickname(self):
     #     '''

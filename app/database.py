@@ -387,7 +387,7 @@ class Connection(object):
         '''
         It takes a database Row and transform it into a python dictionary.
 
-        :param row: The row obtained from the database.
+        :param dict row: The row obtained from the database.
         :type row: sqlite3.Row
         :return: a dictionary with the following format:
 
@@ -398,7 +398,7 @@ class Connection(object):
                         'nickname': '',
                         'registrationdate': ,
                         'bio': '',
-                        'avatar': '']
+                        'avatar': ''
                     },
                     'details': {
                         'lastlogindate': ,
@@ -657,3 +657,124 @@ class Connection(object):
         # however, in case it has returned an actual post
         # it has to be parsed before returning
         return self._create_post_object(row)
+
+    def modify_user(self, nickname, summary, details):
+        '''
+        Modifies the user in the database.
+
+        :param str nickname: The nickname of the user to modify.
+
+        :param dict summary: Updated version of the summary of the user.
+            The dictionary has the following structure:
+
+            .. code-block:: javascript
+
+                    'summary': {
+                        'bio': '',
+                        'avatar': ''
+                    }
+
+        :param dict details: Updated version of the details of the user.
+            The dictionary has the following structure:
+
+            .. code-block:: javascript
+
+                    'details': {
+                        'firstname': '',
+                        'lastname': '',
+                        'email': '',
+                        'mobile': '',
+                        'gender': '',
+                        'birthdate': '',
+                    }
+
+            where:
+
+            * ``firstname``: given name of the user
+            * ``lastname``: family name of the user
+            * ``email``: current email of the user.
+            * ``mobile``: string showing the user's phone number. Can be None.
+            * ``gender``: User's gender ('male' or 'female').
+            * ``avatar``: name of the image file used as avatar
+            * ``birthdate``: string containing the birth date of the user in yyyy-mm-dd format.
+            * ``bio``: text chosen by the user for biography
+
+            Note that all values are string if they are not otherwise indicated.
+
+        :return: the nickname of the modified user or None if the
+            ``nickname`` passed as parameter is not in the database.
+
+        :raise ValueError: if the user argument is not well formed.
+
+        '''
+        user_id = self.get_user_id(nickname)
+        if user_id is None:
+            return None
+
+        #Create the SQL Statements
+        #SQL Statement to update the user_profile table
+        query = 'UPDATE users_profile SET firstname = ?, lastname = ?, email = ?, mobile = ?, gender = ?, avatar = ?, birthdate = ?, bio = ? WHERE user_id = ?'
+
+        _firstname = None if not details else details.get('firstname', None)
+        _lastname = None if not details else details.get('lastname', None)
+        _email = None if not details else details.get('email', None)
+        _mobile = None if not details else details.get('mobile', None)
+        _gender = None if not details else details.get('gender', None)
+        _avatar = None if not summary else summary.get('avatar', None)
+        _birthdate = None if not details else details.get('birthdate', None)
+        _bio = None if not summary else summary.get('bio', None)
+
+        #Activate foreign key support
+        self.set_foreign_keys_support()
+        #Cursor and row initialization
+        self.con.row_factory = sqlite3.Row
+        cur = self.con.cursor()
+        #execute the main statement
+        pvalue = (
+            _firstname,
+            _lastname,
+            _email,
+            _mobile,
+            _gender,
+            _avatar,
+            _birthdate,
+            _bio,
+            user_id,
+        )
+        cur.execute(query, pvalue)
+        self.con.commit()
+        #Check that I have modified the user
+        if cur.rowcount < 1:
+            return None
+        return nickname
+
+    # Utils
+
+    def get_user_id(self, nickname):
+        '''
+        Get the key of the database row which contains the user with the given
+        nickname.
+
+        :param str nickname: The nickname of the user to search.
+        :return: the database attribute user_id or None if ``nickname`` does
+            not exit.
+        :rtype: str
+
+        '''
+        query = 'SELECT user_id FROM users WHERE nickname = ?'
+        #Activate foreign key support
+        self.set_foreign_keys_support()
+        #Cursor and row initialization
+        self.con.row_factory = sqlite3.Row
+        cur = self.con.cursor()
+        #Execute the  main SQL statement
+        pvalue = (nickname,)
+        cur.execute(query, pvalue)
+        #Process the response.
+        #Just one row is expected
+        row = cur.fetchone()
+        if row is None:
+            return None
+        #Build the return object
+        else:
+            return row[0]
