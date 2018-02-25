@@ -628,6 +628,49 @@ class Connection(object):
             return None
         return self._create_rating_object(row)
 
+    def modify_rating(self, rating_id, new_rating):
+        '''
+        Modify the rating of the rating with id ``rating_id``
+
+        :param str rating_id: The id of the rating to modify. Note that
+            rating_id is a string with format rating-\d+
+
+        :param int new_rating: the rating's rating
+
+        :return: the id of the edited rating or None if the rating was
+              not found. The id of the rating has the format ``rating-\d+``,
+              where \d+ is the id of the rating in the database.
+
+        :raises ValueError: if the rating_id has a wrong format.
+
+        '''
+        #Extracts the int which is the id for a rating in the database
+        match = re.match('rating-(\d+)', rating_id)
+        if match is None:
+            raise ValueError("The rating_id is malformed")
+        rating_id = int(match.group(1))
+
+        #SQL Statement to update the ratings table
+        query = 'UPDATE ratings SET rating = ? WHERE rating_id = ?'
+        #Activate foreign key support
+        self.set_foreign_keys_support()
+        #Cursor and row initialization
+        self.con.row_factory = sqlite3.Row
+
+        try:
+            cur = self.con.cursor()
+            #Execute the statement to extract the id associated to a nickname
+            pvalue = (new_rating, rating_id)
+            cur.execute(query, pvalue)
+            self.con.commit()
+        except sqlite3.Error as excp:
+            print("Error %s:" % excp.args[0])
+            return None
+        #Check that I have modified the user
+        if cur.rowcount < 1:
+            return None
+        return 'rating-' + str(rating_id)
+
     def delete_user(self, nickname):
         '''
         Deletes the user from the database.
