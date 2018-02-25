@@ -23,7 +23,7 @@ DEFAULT_DATA_DUMP = "db/critique_data_dump.sql"
 
 
 class Engine(object):
-   
+
     # SQL command to create users table
     create_users_sql = \
         'CREATE TABLE IF NOT EXISTS users(\
@@ -45,7 +45,7 @@ class Engine(object):
         birthdate TEXT,\
         bio TEXT,\
         FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE)'
-    
+
     # SQL command to create posts table
     create_posts_sql = \
         'CREATE TABLE IF NOT EXISTS posts(\
@@ -61,7 +61,7 @@ class Engine(object):
         FOREIGN KEY(sender_id) REFERENCES users(user_id) ON DELETE CASCADE,\
         FOREIGN KEY(receiver_id) REFERENCES users(user_id) ON DELETE CASCADE,\
         FOREIGN KEY(reply_to) REFERENCES posts(post_id) ON DELETE CASCADE)'
-    
+
     # SQL command to create ratings table
     create_ratings_sql = \
         'CREATE TABLE IF NOT EXISTS ratings(\
@@ -525,9 +525,9 @@ class Connection(object):
         '''
         Extracts ratings in the database for a user
 
-        :returns: ratings for each user 
+        :returns: ratings for each user
             contains following keys: ``id`` (integer), ``timestamp``
-            (long representing UNIX timestamp), ``sender`` (str), ``receiver`` (str) and ``rating`` (integer). 
+            (long representing UNIX timestamp), ``sender`` (str), ``receiver`` (str) and ``rating`` (integer).
             None is returned if the database has no users.
 
         '''
@@ -553,6 +553,7 @@ class Connection(object):
         for row in rows:
             rating.append(self._create_ratings_list(row))
         return rating
+
     def delete_user(self, nickname):
         '''
         Deletes the user from the database.
@@ -573,7 +574,7 @@ class Connection(object):
         pvalue = (nickname,)
         try:
             cur.execute(query, pvalue)
-            #Commit the delete
+            # Commit the delete
             self.con.commit()
         except sqlite3.Error as e:
             print("Error %s:" % (e.args[0]))
@@ -584,7 +585,7 @@ class Connection(object):
         It takes a :py:class:`sqlite.Row` and transform it into a dictionary
         with key-value pairs.
 
-            :param row: the row returned from the database. 
+            :param row: the row returned from the database.
             :type row: sqlite3.Row
             :return: a dictionary containing the following keys:
 
@@ -595,9 +596,9 @@ class Connection(object):
                 * ``reply_to``: if of the parent post
                 * ``post_text``: post's text
                 * ``rating``: rating of the post given by users (int)
-                * ``anonymous``: (int) that represents the anonymity 
+                * ``anonymous``: (int) that represents the anonymity
                     of the post, if "0" it is False, if "1" it is True.
-                * ``public``: (int) that represents the publicity 
+                * ``public``: (int) that represents the publicity
                     of the post, if "0" it is False, if "1" it is True.
 
         Examples:
@@ -637,7 +638,7 @@ class Connection(object):
             of the message. the format is provided in
             :py:meth:`_create_post_object`
             or returns None if the post_id is not matching any ids.
-        
+
         :raises ValueError: when ``post_id`` is not valid format
 
         REFERENCEs:
@@ -650,7 +651,7 @@ class Connection(object):
         self.set_foreign_keys_support()
         # initializing the SQL query
         query = 'SELECT * FROM posts WHERE post_id = ?'
-        # using cursor and row initalization to enable 
+        # using cursor and row initalization to enable
         # reading and returning the data in a dictionary
         # format, with key-value pairs
         self.con.row_factory = sqlite3.Row
@@ -721,8 +722,8 @@ class Connection(object):
         if user_id is None:
             return None
 
-        #Create the SQL Statements
-        #SQL Statement to update the user_profile table
+        # Create the SQL Statements
+        # SQL Statement to update the user_profile table
         query = 'UPDATE users_profile SET firstname = ?, lastname = ?, email = ?, mobile = ?, gender = ?, avatar = ?, birthdate = ?, bio = ? WHERE user_id = ?'
 
         _firstname = None if not details else details.get('firstname', None)
@@ -734,12 +735,12 @@ class Connection(object):
         _birthdate = None if not details else details.get('birthdate', None)
         _bio = None if not summary else summary.get('bio', None)
 
-        #Activate foreign key support
+        # Activate foreign key support
         self.set_foreign_keys_support()
-        #Cursor and row initialization
+        # Cursor and row initialization
         self.con.row_factory = sqlite3.Row
         cur = self.con.cursor()
-        #execute the main statement
+        # execute the main statement
         pvalue = (
             _firstname,
             _lastname,
@@ -753,13 +754,132 @@ class Connection(object):
         )
         cur.execute(query, pvalue)
         self.con.commit()
-        #Check that I have modified the user
+        # Check that I have modified the user
         if cur.rowcount < 1:
             return None
         return nickname
 
-    # Utils
+    def create_user(self, nickname, user):
+        '''
+        Create a new user in the database.
 
+        :param str nickname: The nickname of the user to modify
+        :param dict user: a dictionary with the information to be modified. The
+                dictionary has the following structure:
+
+                .. code-block:: javascript
+
+                    {
+                        'summary': {
+                            'nickname': '',
+                            'registrationdate': ,
+                            'bio': '',
+                            'avatar': ''
+                        },
+                        'details': {
+                            'lastlogindate': ,
+                            'firstname': '',
+                            'lastname': '',
+                            'email': '',
+                            'mobile': '',
+                            'gender': '',
+                            'birthdate': '',
+                        }
+                    }
+
+                where:
+
+            * ``nickname``: nickname of the user
+            * ``registrationdate``: (Optional) UNIX timestamp when the user registered in the system (long integer)
+            * ``lastlogindate``: (Optional) UNIX timestamp when the user last logged in to the system (long integer)
+            * ``firstname``: given name of the user
+            * ``lastname``: family name of the user
+            * ``email``: current email of the user.
+            * ``mobile``: string showing the user's phone number. Can be None.
+            * ``gender``: User's gender ('male' or 'female').
+            * ``avatar``: name of the image file used as avatar
+            * ``birthdate``: string containing the birth date of the user in yyyy-mm-dd format.
+            * ``bio``: text chosen by the user for biography
+
+            Note that all values are string if they are not otherwise indicated.
+
+        :return: the nickname of the modified user or None if the
+            ``nickname`` passed as parameter is not in the database.
+
+        :raise ValueError: if the user argument is not well formed.
+
+        '''
+        # Check if nickname already exists in the database
+        if self.get_user_id(nickname) is not None:
+            return None
+
+        # Create the SQL Statements
+        # SQL Statement to create the row in  users table
+        query1 = 'INSERT INTO users(nickname,regDate,lastLoginDate)\
+                  VALUES(?,?,?)'
+        # SQL Statement to create the row in user_profile table
+        query2 = 'INSERT INTO users_profile (user_id,firstname,lastname, \
+                                             email,mobile, \
+                                             gender,avatar, \
+                                             birthdate,bio)\
+                  VALUES (?,?,?,?,?,?,?,?,?)'
+        #temporal variables for user table
+        #timestamp will be used for lastlogin and regDate.
+        timestamp = time.mktime(datetime.now().timetuple())
+        #temporal variables for user profiles
+        summary = user['summary']
+        details = user['details']
+
+        if summary is None or details is None:
+            raise ValueError("User dictionary is not well formed")
+
+        _firstname = details.get('firstname', None)
+        _lastname = details.get('lastname', None)
+        _email = details.get('email', None)
+        _mobile = details.get('mobile', None)
+        _gender = details.get('gender', None)
+        _avatar = summary.get('avatar', None)
+        _birthdate = details.get('birthdate', None)
+        _bio = summary.get('bio', None)
+        _registrationdate = summary.get('registrationdate', timestamp)
+        _lastlogindate = details.get('lastlogindate', timestamp)
+
+        # Activate foreign key support
+        self.set_foreign_keys_support()
+        # Cursor and row initialization
+        self.con.row_factory = sqlite3.Row
+        cur = self.con.cursor()
+        # Add the row in users table
+        # Execute the statement
+        pvalue = (
+            nickname,
+            _registrationdate,
+            _lastlogindate
+        )
+        cur.execute(query1, pvalue)
+        # Extrat the rowid => user-id
+        lid = cur.lastrowid
+        # Add the row in users_profile table
+        # Execute the statement
+        pvalue = (
+            lid,
+            _firstname,
+            _lastname,
+            _email,
+            _mobile,
+            _gender,
+            _avatar,
+            _birthdate,
+            _bio,
+        )
+
+        cur.execute(query2, pvalue)
+        self.con.commit()
+
+        # We do not do any comprobation and return the nickname
+        return nickname
+
+    # Utils
     def get_user_id(self, nickname):
         '''
         Get the key of the database row which contains the user with the given
@@ -772,20 +892,20 @@ class Connection(object):
 
         '''
         query = 'SELECT user_id FROM users WHERE nickname = ?'
-        #Activate foreign key support
+        # Activate foreign key support
         self.set_foreign_keys_support()
-        #Cursor and row initialization
+        # Cursor and row initialization
         self.con.row_factory = sqlite3.Row
         cur = self.con.cursor()
-        #Execute the  main SQL statement
+        # Execute the  main SQL statement
         pvalue = (nickname,)
         cur.execute(query, pvalue)
-        #Process the response.
-        #Just one row is expected
+        # Process the response.
+        # Just one row is expected
         row = cur.fetchone()
         if row is None:
             return None
-        #Build the return object
+        # Build the return object
         else:
             return row[0]
     
@@ -877,3 +997,9 @@ class Connection(object):
                 if (postsCounter == number_of_messages):
                     break
         return posts
+
+    def contains_user(self, nickname):
+        '''
+        :returns: ``True`` if the user is in the database else ``False``
+        '''
+        return self.get_user_id(nickname) is not None
