@@ -65,7 +65,7 @@ class Engine(object):
     # SQL command to create ratings table
     create_ratings_sql = \
         'CREATE TABLE IF NOT EXISTS ratings(\
-        ratings_id INTEGER PRIMARY KEY AUTOINCREMENT,\
+        rating_id INTEGER PRIMARY KEY AUTOINCREMENT,\
         timestamp INTEGER NOT NULL,\
         sender_id INTEGER NOT NULL,\
         receiver_id INTEGER NOT NULL,\
@@ -446,6 +446,25 @@ class Connection(object):
             }
         }
 
+    # Ratings helpers
+    def _create_rating_object(self, row):
+        '''
+        Creates the rating object
+
+        :param row: The row obtained from the database.
+        :type row: sqlite3.Row
+
+        :returns: a dictionary with the keys ``rating_id`` (str), ``timestamp`` (int), ``sender`` (str), ``receiver`` (str) and ``rating`` (int)
+
+        '''
+        return {
+            'rating_id': 'rating-' + str(row['rating_id']),
+            'timestamp': row['timestamp'],
+            'sender': row['sender'],
+            'receiver': row['receiver'],
+            'rating': row['rating']
+        }
+
     # Database API
 
     # User API
@@ -521,29 +540,45 @@ class Connection(object):
         return self._create_user_object(row)
 
     # Ratings API
-    def get_ratings(self):
+    def get_ratings(self, sender=None, receiver=None):
         '''
         Extracts ratings in the database for a user
 
         :returns: ratings for each user
             contains following keys: ``id`` (integer), ``timestamp``
             (long representing UNIX timestamp), ``sender`` (str), ``receiver`` (str) and ``rating`` (integer).
-            None is returned if the database has no users.
+            None is returned if the database has no ratings.
 
         '''
 
         # Create the SQL Statements
-        # SQL Statement for retrieving the users
-        query = 'SELECT rating.*, sender_id.*, receiver_id.*, FROM users, ratings \
-                 WHERE users.user_id = ratings.sender_id \
-                 AND users.user_id = ratings.receiver_id'
+        # SQL Statement for retrieving the ratings
+        query = 'SELECT ratings.*, sender.nickname sender, receiver.nickname receiver FROM ratings INNER JOIN users sender on sender.user_id = ratings.sender_id INNER JOIN users receiver on receiver.user_id = ratings.receiver_id'
+
+        pval = None
+        if sender is not None or receiver is not None:
+            query = query + " WHERE "
+            if sender is not None:
+                query = query + "sender = ?"
+                pval = (sender,)
+            if receiver is not None:
+                query = query + "receiver = ?"
+                if pval is not None:
+                    pval = (sender, receiver)
+                else:
+                    pval = (receiver,)
+
         # Activate foreign key support
         self.set_foreign_keys_support()
         # Create the cursor
         self.con.row_factory = sqlite3.Row
         cur = self.con.cursor()
         # Execute main SQL Statement
+
+        if pval is None:
         cur.execute(query)
+        else:
+            cur.execute(query, pval)
         # Process the results
         rows = cur.fetchall()
         if rows is None:
@@ -551,8 +586,47 @@ class Connection(object):
         # Process the response.
         rating = []
         for row in rows:
-            rating.append(self._create_ratings_list(row))
+            rating.append(self._create_rating_object(row))
         return rating
+
+    def get_rating(self, rating_id):
+        '''
+        Extracts rating in the database for given rating id
+
+        :param str rating_id: rating id in the database in format ``rating-(\d+)``
+
+        :returns: rating information for the given rating id
+            contains following keys: ``id`` (integer), ``timestamp``
+            (long representing UNIX timestamp), ``sender`` (str), ``receiver`` (str) and ``rating`` (integer).
+            None is returned if the rating_id doesn't exist.
+
+        :raises ValueError: when ``rating_id`` is not valid format
+
+        '''
+
+
+        m = re.match('rating-(\d+)', rating_id)
+        if m is None or m.group(1) is None:
+            raise ValueError('rating id is malformed')
+        rating_id = int(m.group(1))
+
+
+        # Create the SQL Statements
+        # SQL Statement for retrieving the ratings
+        query = 'SELECT ratings.*, sender.nickname sender, receiver.nickname receiver FROM ratings INNER JOIN users sender on sender.user_id = ratings.sender_id INNER JOIN users receiver on receiver.user_id = ratings.receiver_id WHERE ratings.rating_id = ?'
+
+        # Activate foreign key support
+        self.set_foreign_keys_support()
+        # Create the cursor
+        self.con.row_factory = sqlite3.Row
+        cur = self.con.cursor()
+        # Execute main SQL Statement
+        cur.execute(query, (rating_id,))
+        # Process the results
+        row = cur.fetchone()
+        if row is None:
+            return None
+        return self._create_rating_object(row)
 
     def delete_user(self, nickname):
         '''

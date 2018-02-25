@@ -17,6 +17,20 @@
 			"debugOptions": [
 				"RedirectOutput"
 			]
-		}
+        },
+        {
+            "name": "database_api_tests_ratings",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": false,
+            "pythonPath": "${config:python.pythonPath}",
+            "module": "tests.database_api_tests_ratings",
+            "cwd": "${workspaceFolder}",
+            "env": {},
+            "envFile": "${workspaceFolder}/.env",
+            "debugOptions": [
+                "RedirectOutput"
+            ]
+        }
 	]
 }

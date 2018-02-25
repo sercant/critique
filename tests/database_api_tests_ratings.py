@@ -1,52 +1,58 @@
 '''
 Created on 25.02.2018
-Database interface testing for all users related methods.
+Database interface testing for all ratings related methods.
 
 A ratings object is a dictionary which contains the following keys:
-      - ratingsid: id of the message (int)
+      - ratingsid: id of the rating (int)
       - timestamp: UNIX timestamp (long integer) that specifies when the
-                   message was created.
-      - sender: The nickname of the message's creator
-      - reciever: The nickname of the message's reciever
-      - rating: The rating the sender send to reciever.
+                   rating was created.
+      - sender: The nickname of the rating's creator
+      - receiver: The nickname of the rating's receiver
+      - rating: The rating the sender send to receiver.
 
 A rating' list has the following format:
-[{'ratingid':'', 'timestamp':, 'sender':'', 'reciever':'', 'rating':'',}]
+[{'rating_id':'', 'timestamp':, 'sender':'', 'receiver':'', 'rating':''},{'rating_id':'', 'timestamp':, 'sender':'', 'receiver':'', 'rating':''}]
 
 @author: moamen
 '''
 
 import sqlite3, unittest
 
-from forum import database
+from app import database
 
 #Path to the database file, different from the deployment db
-DB_PATH = 'db/forum_test.db'
+DB_PATH = 'db/critique_test.db'
 ENGINE = database.Engine(DB_PATH)
 
 
 #CONSTANTS DEFINING DIFFERENT USERS AND USER PROPERTIES
 RATING1_ID = 'rating-1'
 
-RATING1 = {'ratings_id': 'rating-1',
-            'timestamp': 1362017481, 
-            'receiver': 'Scott', 
-            'sender': 'Young',
-            'rating': 7}
+RATING1 = {
+    'rating_id': RATING1_ID,
+    'timestamp': 1362022401,
+    'sender': 'Scott',
+    'receiver': 'Kim',
+    'rating': 3
+}
 
-RATING1_MODIFIED = {'ratings_id': RATING1_ID,
-                     'timestamp': 1362017481, 
-                     'receiver': 'Young',
-                     'sender': 'Kim', 
-                     'rating': 5}
+RATING1_MODIFIED = {
+    'rating_id': RATING1_ID,
+    'timestamp': 1362022401,
+    'sender': 'Scott',
+    'receiver': 'Kim',
+    'rating': 4
+}
 
-RATING2_ID = 'rating-10'
+RATING2_ID = 'rating-2'
 
-RATING2 = {'ratings_id': 'rating-10',
-            'timestamp': 1362017481,
-            'receiver': 'Knives',
-            'sender': 'Kim',
-            'rating': 9}
+RATING2 = {
+    'rating_id': RATING2_ID,
+    'timestamp': 1362022411,
+    'sender': 'Scott',
+    'receiver': 'Stephen',
+    'rating': 5
+}
 
 WRONG_RATING_ID = 'rating-200'
 
@@ -78,11 +84,11 @@ class RatingDBAPITestCase(unittest.TestCase):
         Populates the database
         '''
         try:
-          #This method load the initial values from forum_data_dump.sql
+          #This method load the initial values from critique_data_dump.sql
           ENGINE.populate_tables()
           #Creates a Connection instance to use the API
           self.connection = ENGINE.connect()
-        except Exception as e: 
+        except Exception as e:
         #For instance if there is an error while populating the tables
           ENGINE.clear()
 
@@ -96,8 +102,8 @@ class RatingDBAPITestCase(unittest.TestCase):
     def test_ratings_table_created(self):
         '''
         Checks that the table initially contains 17 ratings (check
-        forum_data_dump.sql). 
-        
+        critique_data_dump.sql).
+
         NOTE: Do not use Connection instance but
         call directly SQL.
         '''
@@ -120,17 +126,17 @@ class RatingDBAPITestCase(unittest.TestCase):
             #Assert
             self.assertEqual(len(ratings), INITIAL_SIZE)
 
-    def test_create_ratings_object(self):
+    def test_create_rating_object(self):
         '''
-        Check that the method _create_ratings_object works return adequate
+        Check that the method _create_rating_object works return adequate
         values for the first database row. NOTE: Do not use Connection instace
         to extract data from database but call directly SQL.
         '''
-        print('('+self.test_create_ratings_object.__name__+')', \
-              self.test_create_ratings_object.__doc__)
+        print('('+self.test_create_rating_object.__name__+')', \
+              self.test_create_rating_object.__doc__)
         #Create the SQL Statement
         keys_on = 'PRAGMA foreign_keys = ON'
-        query = 'SELECT * FROM messages WHERE message_id = 1'
+        query = 'SELECT ratings.*, sender.nickname sender, receiver.nickname receiver FROM ratings INNER JOIN users sender on sender.user_id = ratings.sender_id INNER JOIN users receiver on receiver.user_id = ratings.receiver_id WHERE ratings.rating_id = 1'
         #Get the sqlite3 con from the Connection instance
         con = self.connection.con
         with con:
@@ -144,157 +150,170 @@ class RatingDBAPITestCase(unittest.TestCase):
             #Extrac the row
             row = cur.fetchone()
         #Test the method
-        ratings = self.connection._create_ratings_object(row)
+        ratings = self.connection._create_rating_object(row)
         self.assertDictContainsSubset(ratings, RATING1)
 
     def test_get_ratings(self):
         '''
-        Test get_ratings with id msg-1 and msg-10
+        Test get_rating with id rating-1 and rating-2
         '''
         print('('+self.test_get_ratings.__name__+')', \
               self.test_get_ratings.__doc__)
-        #Test with an existing message
-        ratings = self.connection.get_ratings(RATING1_ID)
-        self.assertDictContainsSubset(ratings, RATING1)
-        ratings = self.connection.get_ratings(MESSAGE2_ID)
-        self.assertDictContainsSubset(ratings, RATING1)
+        #Test with an existing rating
+        rating = self.connection.get_rating(RATING1_ID)
+        self.assertDictContainsSubset(rating, RATING1)
+        rating = self.connection.get_rating(RATING2_ID)
+        self.assertDictContainsSubset(rating, RATING2)
 
-    def test_get_ratings_malformedid(self):
+    def test_get_rating_malformedid(self):
         '''
-        Test get_ratings with id 1 (malformed)
+        Test get_rating with id 1 (malformed)
         '''
-        print('('+self.test_get_ratings_malformedid.__name__+')', \
-              self.test_get_ratings_malformedid.__doc__)
-        #Test with an existing message
+        print('('+self.test_get_rating_malformedid.__name__+')', \
+              self.test_get_rating_malformedid.__doc__)
+        #Test with an existing rating
         with self.assertRaises(ValueError):
-            self.connection.get_ratings('1')
+            self.connection.get_rating('1')
 
-    def test_get_ratings_noexistingid(self):
+    def test_get_rating_noexistingid(self):
         '''
-        Test get_ratings with msg-200 (no-existing)
+        Test get_rating with rating-200 (no-existing)
         '''
-        print('('+self.test_get_ratings_noexistingid.__name__+')',\
-              self.test_get_ratings_noexistingid.__doc__)
-        #Test with an existing message
-        ratings = self.connection.get_ratings(WRONG_RATING_ID)
-        self.assertIsNone(ratings)
+        print('('+self.test_get_rating_noexistingid.__name__+')',\
+              self.test_get_rating_noexistingid.__doc__)
+        #Test with an existing rating
+        rating = self.connection.get_rating(WRONG_RATING_ID)
+        self.assertIsNone(rating)
 
     def test_get_ratings(self):
         '''
-        Test that get_messages work correctly
+        Test that get_ratings work correctly
         '''
         print('('+self.test_get_ratings.__name__+')', self.test_get_ratings.__doc__)
         ratings = self.connection.get_ratings()
         #Check that the size is correct
         self.assertEqual(len(ratings), INITIAL_SIZE)
-        #Iterate throug ratings and check if the ratings with RATING1_ID and
-        #MESSAGE2_ID are correct:
-        for rating in messages:
-            if rating['ratings_id'] == RATING1_ID:
-                self.assertEqual(len(rating), 4)
+        #Iterate through ratings and check if the ratings with RATING1_ID and
+        #RATING2_ID are correct:
+        for rating in ratings:
+            if rating['rating_id'] == RATING1_ID:
+                self.assertEqual(len(rating), 5)
                 self.assertDictContainsSubset(rating, RATING1)
-            elif ratings['ratings_id'] == RATING2_ID:
-                self.assertEqual(len(rating), 4)
+            elif rating['rating_id'] == RATING2_ID:
+                self.assertEqual(len(rating), 5)
                 self.assertDictContainsSubset(rating, RATING2)
 
-    def test_get_ratings_specific_user(self):
+    def test_get_ratings_for_specific_user(self):
         '''
-        Get all ratings from user Mystery. Check that their ids are 13 and 14.
+        Get all ratings for user Scott. Check that their ids are 5, 9, 13 and 17.
         '''
-        #Ratings sent from Mystery are 13 and 14
-        print('('+self.test_get_ratings_specific_user.__name__+')', \
-              self.test_get_ratings_specific_user.__doc__)
-        ratings = self.connection.get_ratings(nickname="Mystery")
-        self.assertEqual(len(ratings), 2)
-        #Ratings id are 13 and 14
+        #Ratings sent from Scott are 5, 9, 13 and 17
+        print('('+self.test_get_ratings_for_specific_user.__name__+')',
+              self.test_get_ratings_for_specific_user.__doc__)
+        ratings = self.connection.get_ratings(receiver="Scott")
+        self.assertEqual(len(ratings), 4)
+        #Ratings id are 5, 9, 13 and 17
         for rating in ratings:
-            self.assertIn(rating['ratings_id'], ('rating-13', 'rating-14'))
-            self.assertNotIn(rating['ratings_id'], ('rating-1', 'rating-2',
-                                                    'rating-3', 'rating-4'))
+            self.assertIn(rating['rating_id'],
+                          ('rating-5', 'rating-9', 'rating-13', 'rating-17'))
 
-    def test_modify_rating(self):
+    def test_get_ratings_of_specific_user(self):
         '''
-        Test that the rating rating-1 is modifed
+        Get all ratings of user Scott. Check that their ids are 1, 2, 3 and 4.
         '''
-        print('('+self.test_modify_ratings.__name__+')', \
-              self.test_modify_ratings.__doc__)
-        resp = self.connection.modify_rating(RATING1_ID, "new title",
-                                              "new body", "new editor")
-        self.assertEqual(resp, RATING1_ID)
-        #Check that the messages has been really modified through a get
-        resp2 = self.connection.get_ratings(RATING1_ID)
-        self.assertDictContainsSubset(resp2, RATING1_MODIFIED)
+        #Ratings sent from Scott are 1, 2, 3 and 4.
+        print('('+self.test_get_ratings_of_specific_user.__name__+')',
+              self.test_get_ratings_of_specific_user.__doc__)
+        ratings = self.connection.get_ratings(sender="Scott")
+        self.assertEqual(len(ratings), 4)
+        #Ratings id are 1, 2, 3 and 4
+        for rating in ratings:
+            self.assertIn(rating['rating_id'],
+                          ('rating-1', 'rating-2', 'rating-3', 'rating-4'))
 
-    def test_modify_ratings_malformedid(self):
-        '''
-        Test that trying to modify message wit id ='2' raises an error
-        '''
-        print('('+self.test_ratings_message_malformedid.__name__+')',\
-              self.test_ratings_message_malformedid.__doc__)
-        #Test with an existing message
-        with self.assertRaises(ValueError):
-            self.connection.modify_message('1', "new title", "new body",
-                                           "editor")
+    # def test_modify_rating(self):
+    #     '''
+    #     Test that the rating rating-1 is modifed
+    #     '''
+    #     print('('+self.test_modify_ratings.__name__+')', \
+    #           self.test_modify_ratings.__doc__)
+    #     resp = self.connection.modify_rating(RATING1_ID, "new title",
+    #                                           "new body", "new editor")
+    #     self.assertEqual(resp, RATING1_ID)
+    #     #Check that the ratings has been really modified through a get
+    #     resp2 = self.connection.get_ratings(RATING1_ID)
+    #     self.assertDictContainsSubset(resp2, RATING1_MODIFIED)
 
-    def test_modify_ratings_noexistingid(self):
-        '''
-        Test modify_ratings with  msg-200 (no-existing)
-        '''
-        print('('+self.test_modify_ratings_noexistingid.__name__+')',\
-              self.test_modify_ratings_noexistingid.__doc__)
-        #Test with an existing message
-        resp = self.connection.modify_message(WRONG_MESSAGE_ID, "new title",
-                                              "new body", "editor")
-        self.assertIsNone(resp)
+    # def test_modify_ratings_malformedid(self):
+    #     '''
+    #     Test that trying to modify rating wit id ='2' raises an error
+    #     '''
+    #     print('('+self.test_ratings_message_malformedid.__name__+')',\
+    #           self.test_ratings_message_malformedid.__doc__)
+    #     #Test with an existing rating
+    #     with self.assertRaises(ValueError):
+    #         self.connection.modify_message('1', "new title", "new body",
+    #                                        "editor")
 
-    def test_create_rating(self):
-        '''
-        Test that a new rating can be created
-        '''
-        print('('+self.test_create_ratings.__name__+')',\
-              self.test_create_ratings.__doc__)
-        ratingid = self.connection.create_ratings("new title", "new body",
-                                                   "Koodari")
-        self.assertIsNotNone(ratingid)
-        #Get the expected modified rating
-        new_rating = {}
-        new_rating['title'] = 'new title'
-        new_rating['body'] = 'new body'
-        new_rating['sender'] = 'Koodari'
-        #Check that the messages has been really modified through a get
-        resp2 = self.connection.get_message(ratingid)
-        self.assertDictContainsSubset(new_rating, resp2)
-        #CHECK NOW NOT REGISTERED USER
-        ratingid = self.connection.create_rating("new title", "new body",
-                                                   "anonymous_User")
-        self.assertIsNotNone(ratingid)
-        #Get the expected modified message
-        new_rating = {}
-        new_rating['title'] = 'new title'
-        new_rating['body'] = 'new body'
-        new_rating['sender'] = 'anonymous_User'
-        #Check that the messages has been really modified through a get
-        resp2 = self.connection.get_message(ratingid)
-        self.assertDictContainsSubset(new_rating, resp2)
+    # def test_modify_ratings_noexistingid(self):
+    #     '''
+    #     Test modify_ratings with  rating-200 (no-existing)
+    #     '''
+    #     print('('+self.test_modify_ratings_noexistingid.__name__+')',\
+    #           self.test_modify_ratings_noexistingid.__doc__)
+    #     #Test with an existing rating
+    #     resp = self.connection.modify_message(WRONG_MESSAGE_ID, "new title",
+    #                                           "new body", "editor")
+    #     self.assertIsNone(resp)
 
-    def test_not_contains_ratings(self):
-        '''
-        Check if the database does not contain ratings with id rating-200
+    # def test_create_rating(self):
+    #     '''
+    #     Test that a new rating can be created
+    #     '''
+    #     print('('+self.test_create_ratings.__name__+')',\
+    #           self.test_create_ratings.__doc__)
+    #     ratingid = self.connection.create_ratings("new title", "new body",
+    #                                                "Koodari")
+    #     self.assertIsNotNone(ratingid)
+    #     #Get the expected modified rating
+    #     new_rating = {}
+    #     new_rating['title'] = 'new title'
+    #     new_rating['body'] = 'new body'
+    #     new_rating['sender'] = 'Koodari'
+    #     #Check that the ratings has been really modified through a get
+    #     resp2 = self.connection.get_message(ratingid)
+    #     self.assertDictContainsSubset(new_rating, resp2)
+    #     #CHECK NOW NOT REGISTERED USER
+    #     ratingid = self.connection.create_rating("new title", "new body",
+    #                                                "anonymous_User")
+    #     self.assertIsNotNone(ratingid)
+    #     #Get the expected modified rating
+    #     new_rating = {}
+    #     new_rating['title'] = 'new title'
+    #     new_rating['body'] = 'new body'
+    #     new_rating['sender'] = 'anonymous_User'
+    #     #Check that the ratings has been really modified through a get
+    #     resp2 = self.connection.get_message(ratingid)
+    #     self.assertDictContainsSubset(new_rating, resp2)
 
-        '''
-        print('('+self.test_contains_ratings.__name__+')', \
-              self.test_contains_ratings.__doc__)
-        self.assertFalse(self.connection.contains_ratings(WRONG_MESSAGE_ID))
+    # def test_not_contains_ratings(self):
+    #     '''
+    #     Check if the database does not contain ratings with id rating-200
 
-    def test_contains_ratings(self):
-        '''
-        Check if the database contains ratings with id msg-1 and msg-10
+    #     '''
+    #     print('('+self.test_contains_ratings.__name__+')', \
+    #           self.test_contains_ratings.__doc__)
+    #     self.assertFalse(self.connection.contains_ratings(WRONG_MESSAGE_ID))
 
-        '''
-        print('('+self.test_contains_ratings.__name__+')', \
-              self.test_contains_ratings.__doc__)
-        self.assertTrue(self.connection.contains_ratings(RATING1_ID))
-        self.assertTrue(self.connection.contains_ratings(RATING2_ID))
+    # def test_contains_ratings(self):
+    #     '''
+    #     Check if the database contains ratings with id rating-1 and rating-10
+
+    #     '''
+    #     print('('+self.test_contains_ratings.__name__+')', \
+    #           self.test_contains_ratings.__doc__)
+    #     self.assertTrue(self.connection.contains_ratings(RATING1_ID))
+    #     self.assertTrue(self.connection.contains_ratings(RATING2_ID))
 
 if __name__ == '__main__':
     print('Start running rating tests')
