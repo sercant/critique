@@ -351,6 +351,7 @@ class Connection(object):
             return False
 
     # Helpers
+    # Users Helpers
     def _create_user_list_object(self, row):
         '''
         Same as :py:meth:`_create_message_object`. However, the resulting
@@ -414,7 +415,8 @@ class Connection(object):
         birthdate = row['birthdate']
         currentDay = datetime.today()
         age = currentDay.year - birthdate.year + \
-            ((currentDay.month > birthdate.month) and (currentDay.day > birthdate.day))
+            ((currentDay.month > birthdate.month)
+             and (currentDay.day > birthdate.day))
         return {
             'nickname': row['nickname'],
             'registrationdate': row['regDate'],
@@ -431,7 +433,7 @@ class Connection(object):
 
     # Database API
 
-    # ACCESSING THE USER and USER_PROFILE tables
+    # User API
     def get_users(self):
         '''
         Extracts all users in the database.
