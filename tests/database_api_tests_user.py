@@ -230,20 +230,32 @@ class UserDBAPITestCase(unittest.TestCase):
             elif user['nickname'] == USER2['summary']['nickname']:
                 self.assertDictContainsSubset(user, USER2['summary'])
 
-    # def test_delete_user(self):
-    #     '''
-    #     Test that the user Scott is deleted
-    #     '''
-    #     print('('+self.test_delete_user.__name__+')',
-    #           self.test_delete_user.__doc__)
-    #     resp = self.connection.delete_user(USER1['nickname'])
-    #     self.assertTrue(resp)
-    #     # Check that the users has been really deleted through a get
-    #     resp2 = self.connection.get_user(USER1['nickname'])
-    #     self.assertIsNone(resp2)
-    #     # Check that the user does not have associated any message
-    #     resp3 = self.connection.get_messages(nickname=USER1['nickname'])
-    #     self.assertEqual(len(resp3), 0)
+    def test_delete_user(self):
+        '''
+        Test that the user Scott is deleted
+        '''
+        print('('+self.test_delete_user.__name__+')',
+              self.test_delete_user.__doc__)
+        resp = self.connection.delete_user(USER1['summary']['nickname'])
+        self.assertTrue(resp)
+        # Check that the users has been really deleted through a get
+        resp2 = self.connection.get_user(USER1['summary']['nickname'])
+        self.assertIsNone(resp2)
+        # TODO (sercant): enable when posts implemented
+        # # Check that the user does not have associated any message
+        # resp3 = self.connection.get_posts(nickname=USER1['nickname'])
+        # self.assertEqual(len(resp3), 0)
+
+    def test_delete_user_noexistingnickname(self):
+        '''
+        Test delete_user with  Batty (no-existing)
+        '''
+        print('('+self.test_delete_user_noexistingnickname.__name__+')',
+              self.test_delete_user_noexistingnickname.__doc__)
+        # Test with an existing user
+        resp = self.connection.delete_user(USER_WRONG_NICKNAME)
+        self.assertFalse(resp)
+
 
     # def test_delete_user_noexistingnickname(self):
     #     '''

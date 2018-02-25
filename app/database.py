@@ -519,3 +519,29 @@ class Connection(object):
         # Process the response. Only one possible row is expected.
         row = cur.fetchone()
         return self._create_user_object(row)
+
+    def delete_user(self, nickname):
+        '''
+        Deletes the user from the database.
+
+        :param str nickname: The nickname of the user to delete.
+
+        :returns: ``True`` if user is successfully deleted else ``False``.
+
+        '''
+        # Create the SQL Statements
+        # SQL Statement for deleting the user with nickname
+        query = 'DELETE from users WHERE nickname = ?'
+        # Activate foreign key support
+        self.set_foreign_keys_support()
+        # Cursor and row initialization
+        self.con.row_factory = sqlite3.Row
+        cur = self.con.cursor()
+        pvalue = (nickname,)
+        try:
+            cur.execute(query, pvalue)
+            #Commit the delete
+            self.con.commit()
+        except sqlite3.Error as e:
+            print("Error %s:" % (e.args[0]))
+        return bool(cur.rowcount)
