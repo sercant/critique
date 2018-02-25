@@ -7,7 +7,7 @@ Provides the database API to access the critique persistent data.
 @author: mina
 
     REFERENCEs:
-    -   Programmable Web Project, Exercise1, forum.database.py
+    -   [1] Programmable Web Project, Exercise1, forum.database.py
 '''
 
 from datetime import datetime
@@ -366,7 +366,7 @@ class Connection(object):
     # Users Helpers
     def _create_user_list_object(self, row):
         '''
-        Same as :py:meth:`_create_message_object`. However, the resulting
+        Same as :py:meth:`_create_post_object`. However, the resulting
         dictionary is targeted to build messages in a list.
 
         :param row: The row obtained from the database.
@@ -545,3 +545,82 @@ class Connection(object):
         except sqlite3.Error as e:
             print("Error %s:" % (e.args[0]))
         return bool(cur.rowcount)
+
+    def _create_post_object(self, row):
+        '''
+        It takes a :py:class:`sqlite.Row` and transform it into a dictionary
+        with key-value pairs.
+
+            :param row: the row returned from the database. 
+            :type row: sqlite3.Row
+            :return: a dictionary containing the following keys:
+
+                * ``post_id``: id of the post
+                * ``timestamp``: the time of creation (int)
+                * ``sender_id``: id of the sending user
+                * ``receiver_id``: id of the receiving user
+                * ``reply_to``: if of the parent post
+                * ``rating``: rating of the post given by users (int)
+                * ``anonymous``: (int) that represents the anonymity 
+                    of the post, if "0" it is False, if "1" it is True.
+                * ``public``: (int) that represents the publicity 
+                    of the post, if "0" it is False, if "1" it is True.
+
+        All values are returned as string, containing the value in the 
+        mentioned data type.
+        '''
+        post = {
+            'post_id'  = str(row['post_id']),
+            'timestamp' = row['timestamp'],
+            'sender_id' = str(row['sender_id']),
+            'receiver_id' = str(row['receiver_id']),
+            'reply_to' = str(row['reply_to']),
+            'rating' = row['rating'],
+            'anonymity' = row['anonymous'],
+            'publicity' = row['public'],
+        }
+
+        return post
+
+    def get_post(self, post_id):
+        '''
+        GETs a post from the database using the post_id
+        as a query parameter
+
+        :param post_id: post id in the database, which is of
+            the type (int)
+
+        :return: returns a dictionary with all the attributes
+            of the message. the format is provided in
+            :py:meth:`_create_post_object`
+            or returns None if the post_id is not matching any ids.
+        
+        :raises ValueError: when ``post_id`` is not valid format
+
+        REFERENCEs:
+        -   [1]
+        '''
+        # first check if the input is valid
+        if post_id is None:
+            raise ValueError("No input post id")
+        # setting foreign keys support
+        self.set_foreign_keys_support()
+        # initializing the SQL query
+        query = 'SELECT * FROM posts WHERE post_id = ?'
+        # using cursor and row initalization to enable 
+        # reading and returning the data in a dictionary
+        # format, with key-value pairs
+        self.con.row_factory = sqlite3.Row
+        cur = self.con.cursor()
+        # putting the query parameter in a tuple
+        # to be able to execute.
+        queryPostId = (post_id,)
+        cur.execute(query, queryPostId)
+        # checking if the returned value contains a post
+        # or not. if not, function will return None
+        row = cur.fetchone()
+        if row is None:
+            return None
+        # however, in case it has returned an actual post
+        # it has to be parsed before returning
+        return self._create_post_object(row)
