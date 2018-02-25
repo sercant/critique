@@ -4,6 +4,10 @@ Created on 17.02.2018
 Provides the database API to access the critique persistent data.
 
 @author: sercant
+@author: mina
+
+    REFERENCEs:
+    -   Programmable Web Project, Exercise1, forum.database.py
 '''
 
 from datetime import datetime
@@ -19,13 +23,17 @@ DEFAULT_DATA_DUMP = "db/critique_data_dump.sql"
 
 
 class Engine(object):
+   
+    # SQL command to create users table
     create_users_sql = \
         'CREATE TABLE IF NOT EXISTS users(\
         user_id INTEGER PRIMARY KEY AUTOINCREMENT,\
         nickname TEXT UNIQUE,\
         regDate INTEGER NOT NULL,\
         lastLoginDate INTEGER)'
-    create_user_profile_sql = \
+
+    # SQL command to create user_profile table
+    create_users_profile_sql = \
         'CREATE TABLE IF NOT EXISTS users_profile(\
         user_id INTEGER PRIMARY KEY,\
         firstname TEXT NOT NULL,\
@@ -37,6 +45,8 @@ class Engine(object):
         birthdate TEXT,\
         bio TEXT,\
         FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE)'
+    
+    # SQL command to create posts table
     create_posts_sql = \
         'CREATE TABLE IF NOT EXISTS posts(\
         post_id INTEGER PRIMARY KEY AUTOINCREMENT,\
@@ -51,6 +61,8 @@ class Engine(object):
         FOREIGN KEY(sender_id) REFERENCES users(user_id) ON DELETE CASCADE,\
         FOREIGN KEY(receiver_id) REFERENCES users(user_id) ON DELETE CASCADE,\
         FOREIGN KEY(reply_to) REFERENCES posts(post_id) ON DELETE CASCADE)'
+    
+    # SQL command to create ratings table
     create_ratings_sql = \
         'CREATE TABLE IF NOT EXISTS ratings(\
         ratings_id INTEGER PRIMARY KEY AUTOINCREMENT,\

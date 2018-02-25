@@ -1,6 +1,12 @@
 PRAGMA foreign_keys=OFF;
 BEGIN TRANSACTION;
 
+/*
+  REFERENCEs:
+  -   http://schema.org/Person
+  -   Programmable Web Project Course, Exercise 1, forum_schema_dump.sql
+*/
+
 CREATE TABLE IF NOT EXISTS users(
   user_id INTEGER PRIMARY KEY AUTOINCREMENT,
   nickname TEXT UNIQUE,
