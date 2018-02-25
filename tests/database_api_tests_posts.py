@@ -52,6 +52,16 @@ POST0 = {   'post_id':0,
             'anonymous': 0,
             'public': 1}
 
+POST0_MODIFIED = {   'post_id':0,
+            'timestamp':1362017481,
+            'sender_id':1,
+            'receiver_id': 2,
+            'reply_to': None,
+            'post_text': 'new text',
+            'rating': 3,
+            'anonymous': 0,
+            'public': 1}
+
 POST1_ID = 2
 
 POST1 =  {  'post_id':2,
@@ -201,6 +211,26 @@ class PostDBAPITestCase(unittest.TestCase):
             elif post['post_id'] == POST1_ID:
                 self.assertEqual(len(post), 8)
                 self.assertDictContainsSubset(post, POST1)
+
+    def test_delete_post(self):
+        '''
+        Test that post with post_id = 0, has been deleted
+        '''
+        print('('+self.test_delete_post.__name__+')', \
+              self.test_delete_post.__doc__)
+        resp = self.connection.delete_post(POST0_ID)
+        self.assertTrue(resp)
+        #Check that the messages has been really deleted throug a get
+        resp2 = self.connection.get_post(POST0_ID)
+        self.assertIsNone(resp2)
+
+    def test_modify_post(self):
+        '''
+        Test that the post POST0 is modifed
+        '''
+        print('('+self.test_modify_post.__name__+')', \
+              self.test_modify_post.__doc__)
+        resp = self.connection.modify_post(POST0_ID, "")
 
 
 if __name__ == '__main__':

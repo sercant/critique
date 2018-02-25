@@ -1078,6 +1078,42 @@ class Connection(object):
                     break
         return posts
 
+    def delete_post(self, post_id = None):
+        '''
+        Delete the post with id given as parameter.
+
+        :param post_id: id of the post to remove.
+        :type post_id: integer
+        :return: True if the message has been deleted, False otherwise
+        :raises ValueError: if the post_id not inserted.
+
+        '''
+        if post_id is None:
+            raise ValueError("No post ID inserted to delete.")
+        queryParameter = (post_id, )
+        #Create the SQL Statement
+        query = 'DELETE FROM posts WHERE post_id = ?'
+        #Activate foreign key support
+        self.set_foreign_keys_support()
+        #Cursor and row initialization
+        self.con.row_factory = sqlite3.Row
+        #Execute main SQL Statement
+        try:
+            #Get the cursor object.
+            #It allows to execute SQL code and traverse the result set
+            cur = self.con.cursor()
+            #execute the pragma command, OFF
+            cur.execute(query, queryParameter)
+            if cur.rowcount < 1:
+                print("No posts with post_id = %s" %str(post_id))
+                return False
+            print("%s post deleted" % str(post_id))
+            self.con.commit()
+        except sqlite3.Error as excp:
+            print("Error %s:" % excp.args[0])
+            return False
+        return True
+
     def contains_user(self, nickname):
         '''
         :returns: ``True`` if the user is in the database else ``False``
