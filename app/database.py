@@ -52,7 +52,7 @@ class Engine(object):
         post_id INTEGER PRIMARY KEY AUTOINCREMENT,\
         timestamp INTEGER NOT NULL,\
         sender_id INTEGER NOT NULL,\
-        receiver_id INTEGER NOT NULL,\
+        receiver_id INTEGER,\
         reply_to INTEGER,\
         post_text TEXT NOT NULL,\
         rating INTEGER,\
@@ -206,7 +206,7 @@ class Engine(object):
             otherwise.
 
         '''
-        return self._execute_statement(self.create_user_profile_sql)
+        return self._execute_statement(self.create_users_profile_sql)
 
     def create_posts_table(self):
         '''
@@ -238,7 +238,7 @@ class Engine(object):
 
         Print an error message in the console if it could not be created.
 
-        :param statement: A ``string`` sql statement to be executed. 
+        :param statement: A ``string`` sql statement to be executed.
 
         :returns: ``True`` if the sql successfully executed or ``False``
             otherwise.
@@ -285,7 +285,7 @@ class Connection(object):
 
     def isclosed(self):
         '''
-        :returns: ``True`` if connection has already being closed.  
+        :returns: ``True`` if connection has already being closed.
         '''
         return self._isclosed
 
@@ -394,17 +394,21 @@ class Connection(object):
             .. code-block:: javascript
 
                 {
-                    'nickname': '',
-                    'registrationdate': ,
-                    'lastlogindate': ,
-                    'firstname': '',
-                    'lastname': '',
-                    'email': '',
-                    'mobile': '',
-                    'gender': '',
-                    'avatar': '',
-                    'age': '',
-                    'bio': ''
+                    'summary': {
+                        'nickname': '',
+                        'registrationdate': ,
+                        'bio': '',
+                        'avatar': '']
+                    },
+                    'details': {
+                        'lastlogindate': ,
+                        'firstname': '',
+                        'lastname': '',
+                        'email': '',
+                        'mobile': '',
+                        'gender': '',
+                        'birthdate': '',
+                    }
                 }
 
             where:
@@ -418,29 +422,28 @@ class Connection(object):
             * ``mobile``: string showing the user's phone number. Can be None.
             * ``gender``: User's gender ('male' or 'female').
             * ``avatar``: name of the image file used as avatar
-            * ``age``: integer containing the age of the user.
+            * ``birthdate``: string containing the birth date of the user in yyyy-mm-dd format.
             * ``bio``: text chosen by the user for biography
 
             Note that all values are string if they are not otherwise indicated.
 
         '''
-        birthdate = row['birthdate']
-        currentDay = datetime.today()
-        age = currentDay.year - birthdate.year + \
-            ((currentDay.month > birthdate.month)
-             and (currentDay.day > birthdate.day))
         return {
-            'nickname': row['nickname'],
-            'registrationdate': row['regDate'],
-            'lastlogindate': row['lastLoginDate'],
-            'firstname': row['firstname'],
-            'lastname': row['lastname'],
-            'email': row['email'],
-            'mobile': row['mobile'],
-            'gender': row['gender'],
-            'avatar': row['avatar'],
-            'age': age,
-            'bio': row['bio']
+            'summary': {
+                'nickname': row['nickname'],
+                'registrationdate': row['regDate'],
+                'bio': row['bio'],
+                'avatar': row['avatar']
+            },
+            'details': {
+                'lastlogindate': row['lastLoginDate'],
+                'firstname': row['firstname'],
+                'lastname': row['lastname'],
+                'email': row['email'],
+                'mobile': row['mobile'],
+                'gender': row['gender'],
+                'birthdate': row['birthdate'],
+            }
         }
 
     # Database API

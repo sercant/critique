@@ -1,12 +1,12 @@
-INSERT INTO "users" VALUES(1, 'Scott', 1519557738, 1519557799, 2311);
-INSERT INTO "users" VALUES(2, 'Kim', 1518557738, 1519554738, 8112);
-INSERT INTO "users" VALUES(3, 'Stephen', 1517557738, 1519537738, 139);
-INSERT INTO "users" VALUES(4, 'Young', 1509557738, 1519557138, 2198);
-INSERT INTO "users" VALUES(5, 'Knives', 1515557738, 1519457738, 612);
+INSERT INTO "users" VALUES(1, 'Scott', 1519557738, 1519557799);
+INSERT INTO "users" VALUES(2, 'Kim', 1518557738, 1519554738);
+INSERT INTO "users" VALUES(3, 'Stephen', 1517557738, 1519537738);
+INSERT INTO "users" VALUES(4, 'Young', 1509557738, 1519557138);
+INSERT INTO "users" VALUES(5, 'Knives', 1515557738, 1519457738);
 
 INSERT INTO "users_profile" VALUES(1, 'Scott', 'Pilgrim', 'scott@outlook.com', NULL, 'male', 'photo1.jpg', '1998-01-22', 'Best bass in town. Ramona <3');
 INSERT INTO "users_profile" VALUES(2, 'Kim', 'Pine', 'kim@hotmail.com', NULL, 'female', 'photo3.png', '2000-11-11', 'Drums! Dont irritate me...');
-INSERT INTO "users_profile" VALUES(3, 'Stephen', 'Stills', 'stephen@gmail.com', '+358884567676', 'male', '2001-03-28', 'Im the best!');
+INSERT INTO "users_profile" VALUES(3, 'Stephen', 'Stills', 'stephen@gmail.com', '+358884567676', 'male', 'photo4.png', '2001-03-28', 'Im the best!');
 INSERT INTO "users_profile" VALUES(4, 'Young', 'Neil', 'young@yahoo.com', '+902345448679', 'male', 'photo_5.jpg', '1981-07-30', 'Im good at gameboy');
 INSERT INTO "users_profile" VALUES(5, 'Knives', 'Chau', 'knives@naver.com', NULL, 'female', 'photo8.png', '1981-12-22', 'Love you Scott!!');
 
