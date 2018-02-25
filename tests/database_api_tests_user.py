@@ -47,3 +47,4 @@ from app import database
 # Path to the database file, different from the deployment db
 DB_PATH = 'db/critique_test.db'
 ENGINE = database.Engine(DB_PATH)
+

@@ -1,6 +1,7 @@
 {
-	"python.pythonPath": "${workspaceFolder}/venv/bin/python",
+	"python.pythonPath": "C:\\ProgramData\\Anaconda3\\envs\\tensorflow\\python.exe",
 	"cSpell.words": [
 		"sqlite"
-	]
+	],
+	"python.linting.enabled": false
 }

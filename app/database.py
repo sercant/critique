@@ -516,3 +516,37 @@ class Connection(object):
         # Process the response. Only one possible row is expected.
         row = cur.fetchone()
         return self._create_user_object(row)
+
+    # Ratings API
+    def get_ratings(self):
+        '''
+        Extracts ratings in the database for a user
+
+        :returns: ratings for each user 
+            contains following keys: ``id`` (integer), ``timestamp``
+            (long representing UNIX timestamp), ``sender`` (str), ``receiver`` (str) and ``rating`` (integer). 
+            None is returned if the database has no users.
+
+        '''
+
+        # Create the SQL Statements
+        # SQL Statement for retrieving the users
+        query = 'SELECT rating.*, sender_id.*, receiver_id.*, FROM users, ratings \
+                 WHERE users.user_id = ratings.sender_id \
+                 AND users.user_id = ratings.receiver_id'
+        # Activate foreign key support
+        self.set_foreign_keys_support()
+        # Create the cursor
+        self.con.row_factory = sqlite3.Row
+        cur = self.con.cursor()
+        # Execute main SQL Statement
+        cur.execute(query)
+        # Process the results
+        rows = cur.fetchall()
+        if rows is None:
+            return None
+        # Process the response.
+        rating = []
+        for row in rows:
+            rating.append(self._create_ratings_list(row))
+        return rating
