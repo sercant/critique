@@ -46,19 +46,19 @@ POST0 = {   'post_id':0,
             'timestamp':1362017481,
             'sender_id':1,
             'receiver_id': 2,
-            'reply_to': NULL,
+            'reply_to': None,
             'post_text': 'She is scary and used to love me in highscool.',
             'rating': 3,
             'anonymous': 0,
             'public': 1}
 
-POST1_ID = 1
+POST1_ID = 2
 
 POST1 =  {  'post_id':2,
             'timestamp':1362017281,
             'sender_id':1,
             'receiver_id': 4,
-            'reply_to': NULL,
+            'reply_to': None,
             'post_text': 'This dude is good at video games!',
             'rating': 4,
             'anonymous': 0,
@@ -179,19 +179,19 @@ class PostDBAPITestCase(unittest.TestCase):
         #Test with an existing message
         post = self.connection.get_post(POST0_ID)
         self.assertDictContainsSubset(post, POST0)
-        post = self.connection.get_message(POST1_ID)
+        post = self.connection.get_post(POST1_ID)
         self.assertDictContainsSubset(post, POST1)
         
     # TODO : make test for malformed post_id after implementing the format of the post (post-#######)
 
-    def test_get_posts(self):
+    def test_get_posts_by_user(self):
         '''
-        Test that get_posts work correctly
+        Test that get_posts_by_user work correctly
         '''
-        print('('+self.test_get_posts.__name__+')', self.test_get_posts.__doc__)
-        posts = self.connection.get_posts()
+        print('('+self.test_get_posts_by_user.__name__+')', self.test_get_posts_by_user.__doc__)
+        posts = self.connection.get_posts_by_user(1)
         #Check that the size is correct
-        self.assertEqual(len(posts), INITIAL_SIZE)
+        self.assertEqual(len(posts), 4)
         #Iterate through posts and check if the posts with POST0_ID and
         #POST1_ID are correct:
         for post in posts:
