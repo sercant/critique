@@ -43,7 +43,7 @@ class Engine(object):
         timestamp INTEGER NOT NULL,\
         sender_id INTEGER NOT NULL,\
         receiver_id INTEGER NOT NULL,\
-        reply_to TEXT,\
+        reply_to INTEGER,\
         post_text TEXT NOT NULL,\
         rating INTEGER,\
         anonymous INTEGER NOT NULL,\
