@@ -264,54 +264,51 @@ class RatingDBAPITestCase(unittest.TestCase):
         resp = self.connection.modify_rating(WRONG_RATING_ID, 5)
         self.assertIsNone(resp)
 
-    # def test_create_rating(self):
-    #     '''
-    #     Test that a new rating can be created
-    #     '''
-    #     print('('+self.test_create_ratings.__name__+')',\
-    #           self.test_create_ratings.__doc__)
-    #     ratingid = self.connection.create_ratings("new title", "new body",
-    #                                                "Koodari")
-    #     self.assertIsNotNone(ratingid)
-    #     #Get the expected modified rating
-    #     new_rating = {}
-    #     new_rating['title'] = 'new title'
-    #     new_rating['body'] = 'new body'
-    #     new_rating['sender'] = 'Koodari'
-    #     #Check that the ratings has been really modified through a get
-    #     resp2 = self.connection.get_message(ratingid)
-    #     self.assertDictContainsSubset(new_rating, resp2)
-    #     #CHECK NOW NOT REGISTERED USER
-    #     ratingid = self.connection.create_rating("new title", "new body",
-    #                                                "anonymous_User")
-    #     self.assertIsNotNone(ratingid)
-    #     #Get the expected modified rating
-    #     new_rating = {}
-    #     new_rating['title'] = 'new title'
-    #     new_rating['body'] = 'new body'
-    #     new_rating['sender'] = 'anonymous_User'
-    #     #Check that the ratings has been really modified through a get
-    #     resp2 = self.connection.get_message(ratingid)
-    #     self.assertDictContainsSubset(new_rating, resp2)
+    def test_create_rating(self):
+        '''
+        Test that a new rating can be created
+        '''
+        print('('+self.test_create_rating.__name__+')',\
+              self.test_create_rating.__doc__)
+        rating_id = self.connection.create_rating("Knives", "Kim", 3)
+        self.assertIsNotNone(rating_id)
+        #Get the expected modified rating
+        new_rating = {}
+        new_rating['sender'] = 'Knives'
+        new_rating['receiver'] = 'Kim'
+        new_rating['rating'] = 3
+        #Check that the ratings has been really modified through a get
+        resp2 = self.connection.get_rating(rating_id)
+        self.assertDictContainsSubset(new_rating, resp2)
 
-    # def test_not_contains_ratings(self):
-    #     '''
-    #     Check if the database does not contain ratings with id rating-200
+    def test_crate_rating_unregistered_user(self):
+        '''
+        Test that a new rating can not be created with unregistered user
+        '''
+        print('('+self.test_create_rating.__name__+')',
+              self.test_create_rating.__doc__)
+        #Check unregistered user (REE) can't rate
+        with self.assertRaises(ValueError):
+            rating_id = self.connection.create_rating("REE", "Kim", 3)
 
-    #     '''
-    #     print('('+self.test_contains_ratings.__name__+')', \
-    #           self.test_contains_ratings.__doc__)
-    #     self.assertFalse(self.connection.contains_ratings(WRONG_MESSAGE_ID))
+    def test_not_contains_rating(self):
+        '''
+        Check if the database does not contain rating with id rating-200
 
-    # def test_contains_ratings(self):
-    #     '''
-    #     Check if the database contains ratings with id rating-1 and rating-10
+        '''
+        print('('+self.test_not_contains_rating.__name__+')',
+              self.test_not_contains_rating.__doc__)
+        self.assertFalse(self.connection.contains_rating(WRONG_RATING_ID))
 
-    #     '''
-    #     print('('+self.test_contains_ratings.__name__+')', \
-    #           self.test_contains_ratings.__doc__)
-    #     self.assertTrue(self.connection.contains_ratings(RATING1_ID))
-    #     self.assertTrue(self.connection.contains_ratings(RATING2_ID))
+    def test_contains_rating(self):
+        '''
+        Check if the database contains ratings with id rating-1 and rating-2
+
+        '''
+        print('('+self.test_contains_rating.__name__+')', \
+              self.test_contains_rating.__doc__)
+        self.assertTrue(self.connection.contains_rating(RATING1_ID))
+        self.assertTrue(self.connection.contains_rating(RATING2_ID))
 
 if __name__ == '__main__':
     print('Start running rating tests')

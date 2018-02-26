@@ -557,12 +557,14 @@ class Connection(object):
 
         pval = None
         if sender is not None or receiver is not None:
-            query = query + " WHERE "
+            query += " WHERE "
             if sender is not None:
-                query = query + "sender = ?"
+                query += "sender = ?"
                 pval = (sender,)
             if receiver is not None:
-                query = query + "receiver = ?"
+                if sender is not None:
+                    query += " AND "
+                query += "receiver = ?"
                 if pval is not None:
                     pval = (sender, receiver)
                 else:
@@ -696,6 +698,79 @@ class Connection(object):
         except sqlite3.Error as e:
             print("Error %s:" % (e.args[0]))
         return bool(cur.rowcount)
+
+    def create_rating(self, sender, receiver, rating):
+        '''
+        Create a new rating with the data provided as arguments.
+
+        :param str sender: the nickname of the person who is sending this
+            rating.
+        :param str receiver: the nickname of the person who is receiving this
+            rating.
+        :param int rating: rating given to the receiver.
+
+        :return: the id of the created rating or None if the rating created.
+            Note that it is a string with the format rating-\d+.
+
+        :raises DatabaseError: if the database could not be modified.
+
+        :raises ValueError: if the sender or receiver was not found or rating is already given.
+
+        '''
+
+        # check if the rating is given to the user already by the sender
+        ratings = self.get_ratings(sender=sender, receiver=receiver)
+        if ratings is not None and len(ratings) is not 0:
+            raise ValueError('rating is already given by this sender to the receiver. try modifying the rating.')
+
+        #Create the SQL statment
+        #SQL Statement for getting the user id given a nickname
+        query_user_id = 'SELECT user_id from users WHERE nickname = ?'
+        #SQL Statement for inserting the data
+        stmnt = 'INSERT INTO ratings(timestamp,sender_id,receiver_id,rating) \
+                 VALUES(?,?,?,?)'
+        #Variables for the statement.
+        #sender_id is obtained from first statement.
+        sender_id = None
+        #receiver_id is obtained from first statement.
+        receiver_id = None
+        timestamp = time.mktime(datetime.now().timetuple())
+        #Activate foreign key support
+        self.set_foreign_keys_support()
+        #Cursor and row initialization
+        self.con.row_factory = sqlite3.Row
+        cur = self.con.cursor()
+        #Provide support for foreign keys
+        #Execute SQL Statement to get user_id given nickname
+        pvalue = (sender,)
+        cur.execute(query_user_id, pvalue)
+        #Extract user id
+        row = cur.fetchone()
+        if row is not None:
+            sender_id = row["user_id"]
+
+        #Execute SQL Statement to get user_id given nickname
+        pvalue = (receiver,)
+        cur.execute(query_user_id, pvalue)
+        #Extract user id
+        row = cur.fetchone()
+        if row is not None:
+            receiver_id = row["user_id"]
+
+        if sender_id is None or receiver_id is None:
+            raise ValueError('sender or receiver nickname is not found')
+
+        #Generate the values for SQL statement
+        pvalue = (timestamp, sender_id, receiver_id, rating)
+        #Execute the statement
+        cur.execute(stmnt, pvalue)
+        self.con.commit()
+        #Extract the id of the added rating
+        lid = cur.lastrowid
+        #Return the id in
+        if lid is None:
+            return None
+        return 'rating-' + str(lid)
 
     def _create_post_object(self, row):
         '''
@@ -1126,3 +1201,11 @@ class Connection(object):
         :returns: ``True`` if the user is in the database else ``False``
         '''
         return self.get_user_id(nickname) is not None
+
+    def contains_rating(self, rating_id):
+        '''
+        :returns: ``True`` if the rating is in the database else ``False``
+        '''
+        rating = self.get_rating(rating_id)
+
+        return rating is not None
