@@ -169,7 +169,7 @@ class PostDBAPITestCase(unittest.TestCase):
         
         #Create the SQL Statement
         keys_on = 'PRAGMA foreign_keys = ON'
-        query = 'SELECT * FROM posts WHERE post_id = 0'
+        query = 'SELECT posts.*, sender.nickname sender, receiver.nickname receiver FROM posts INNER JOIN users sender ON sender.user_id = posts.sender_id INNER JOIN users receiver ON receiver.user_id = posts.receiver_id WHERE post_id = 0 '
         #Get the sqlite3 con from the Connection instance
         con = self.connection.con
         with con:
@@ -229,16 +229,44 @@ class PostDBAPITestCase(unittest.TestCase):
         #Check that the messages has been really deleted throug a get
         resp2 = self.connection.get_post(POST0_ID)
         self.assertIsNone(resp2)
-"""
+
     def test_modify_post(self):
         '''
         #Test that the post POST0 is modifed
         '''
         print('('+self.test_modify_post.__name__+')', \
               self.test_modify_post.__doc__)
-        resp = self.connection.modify_post(POST0_ID, "")
+        resp = self.connection.modify_post(POST0_ID, 'new text')
+        self.assertEqual(resp, POST0_ID)
+        #Check that the messages has been really modified through a get
+        resp2 = self.connection.get_post(POST0_ID)
+        self.assertDictContainsSubset(resp2, POST0_MODIFIED)
 
-"""
+    def test_create_post(self):
+        '''
+        Test that a new post can be created
+        '''
+        print('('+self.test_create_post.__name__+')',\
+              self.test_create_post.__doc__)
+        post_id = self.connection.create_post("Scott", "Knives",5,
+                                                   "This is a newly-created post",1,1)
+        self.assertIsNotNone(post_id)
+        #Get the expected modified post
+        new_post = {}
+        new_post['post_id'] = post_id
+        new_post['reply_to'] = 5
+        new_post['post_text'] = "This is a newly-created post"
+
+        #Check that the messages has been really modified through a get
+        resp2 = self.connection.get_post(post_id)
+        self.assertDictContainsSubset(new_post, resp2)
+        #CHECK NOW NOT REGISTERED USER
+        post_id = self.connection.create_post("Mina", "Knives",5,
+                                                "This is the non-registered user",1,1)
+        self.assertIsNone(post_id)
+        
+
+
 if __name__ == '__main__':
     print('Start running posts tests...')
     unittest.main()

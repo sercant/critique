@@ -1246,20 +1246,129 @@ class Connection(object):
         rating = self.get_rating(rating_id)
 
         return rating is not None
-        
-    def modify_post(self, post_id, body, editor):
+
+    def modify_post(self, post_id, body):
         '''
         Modify the body text with the id ``post_id``
 
         :param int post_id: The id of the post to remove.
         :param str body: the post's content
-        :param str editor: default 'Anonymous'. The nickname of the person
-            who is editing this message. If it is not provided "Anonymous"
-            will be stored in db.
-        :return: the id of the edited message or None if the message was
-              not found. The id of the message has the format ``msg-\d{1,3}``,
-              where \d{1,3} is the id of the message in the database.
-        :raises ValueError: if the messageid has a wrong format.
+        :return: the id of the edited post or None if the post was
+              not found.
+        :raises ValueError: if the post id not input.
 
         '''
-        return
+        #SQL Statement to update the messages table
+        query = 'UPDATE posts SET post_text = ? WHERE post_id = ?'
+        #Activate foreign key support
+        self.set_foreign_keys_support()
+        #Cursor and row initialization
+        self.con.row_factory = sqlite3.Row
+
+        try:
+            cur = self.con.cursor()
+            #Execute the statement to extract the id associated to a nickname
+            pvalue = (body, post_id)
+            cur.execute(query, pvalue)
+            self.con.commit()
+        except sqlite3.Error as excp:
+            print("Error %s:" % excp.args[0])
+            return None
+        #Check that I have modified the user
+        if cur.rowcount < 1:
+            print("I am making NONE")
+            return None
+        return post_id
+
+    def create_post(self, sender_nickname=None, receiver_nickname=None, reply_to=None, post_text=None, anonymous=None, public=None):
+        '''
+        Create a new post with the data provided as arguments.
+
+        :param str sender_nickname: the post's sender
+        :param str receiver_nickname: the post's receiver
+        :param int reply_to: the id of the parent post (if any)
+        :param str post_text: the body text of the post
+        :param int anonymous: the anonymity of the post, 0 is False,
+                            1 is True.
+        :param int public: the publicity of the post, 0 is False,
+                            1 is True.
+        :return: the id of the created post or None if the reply_to post was
+            not found.
+
+        :raises ForumDatabaseError: if the database could not be modified.
+        :raises ValueError: if the replyto has a wrong format.
+
+        '''
+        # it should be initialized to a rating of zero
+        rating = 0
+        if sender_nickname is None:
+            raise ValueError("No input Sender nickname")
+        if receiver_nickname is None:
+            raise ValueError("No input Receiver nickname")
+        if post_text is None:
+            raise ValueError("Empty post")
+
+        if anonymous is None:
+            anonymous = 1
+        if public is None:
+            public = 1
+
+        #Create the SQL statment
+          #SQL to test that the message which I am answering does exist
+        query1 = 'SELECT * from posts WHERE post_id = ?'
+          #SQL Statement for getting the user id given a nickname
+        query2 = 'SELECT user_id from users WHERE nickname = ?'
+          #SQL Statement for inserting the data
+        stmnt = 'INSERT INTO posts (timestamp,sender_id,receiver_id,reply_to, \
+                 post_text,rating,anonymous,public) \
+                 VALUES(?,?,?,?,?,?,?,?)'
+        #Variables for the statement.
+        #sender_id is obtained from executing query2 statement.
+        #and timestamp is calculated with a function
+        sender_id = None
+        receiver_id = None
+        timestamp = time.mktime(datetime.now().timetuple())
+
+        #Activate foreign key support
+        self.set_foreign_keys_support()
+        #Cursor and row initialization
+        self.con.row_factory = sqlite3.Row
+        cur = self.con.cursor()
+        
+        #If exists the replyto argument, check that the post exists in
+        #the database table
+        if reply_to is not None:
+            pvalue = (reply_to,)
+            cur.execute(query1, pvalue)
+            posts = cur.fetchall()
+            if len(posts) < 1:
+                return None
+        #Execute SQL Statement to get sender id given nickname
+        pvalue = (sender_nickname,)
+        cur.execute(query2, pvalue)
+        #Extract user id
+        row = cur.fetchone()
+        if row is not None:
+            sender_id = row["user_id"]
+        else:
+            return None
+        #Execute SQL Statement to get sender id given nickname
+        pvalue = (receiver_nickname,)
+        cur.execute(query2, pvalue)
+        #Extract user id
+        row = cur.fetchone()
+        if row is not None:
+            receiver_id = row["user_id"]
+        else:
+            return None                
+
+        #Generate the values for SQL statement
+        pvalue = (timestamp,sender_id,receiver_id,reply_to, \
+                 post_text,rating,anonymous,public)
+        #Execute the statement
+        cur.execute(stmnt, pvalue)
+        self.con.commit()
+        #Extract the id of the added message
+        lid = cur.lastrowid
+        #Return the id in
+        return lid if lid is not None else None
