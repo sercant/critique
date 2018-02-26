@@ -578,7 +578,7 @@ class Connection(object):
         # Execute main SQL Statement
 
         if pval is None:
-        cur.execute(query)
+            cur.execute(query)
         else:
             cur.execute(query, pval)
         # Process the results
@@ -807,10 +807,10 @@ class Connection(object):
         post = {
             'post_id': row['post_id'],
             'timestamp': row['timestamp'],
-            'sender_id': row['sender_id'],
-            'receiver_id': row['receiver_id'],
+            'sender': row['sender'],
+            'receiver': row['receiver'],
             'reply_to': row['reply_to'],
-            'post_text': str(row['post_text']),
+            'post_text': row['post_text'],
             'rating': row['rating'],
             'anonymous': row['anonymous'],
             'public': row['public'],
@@ -842,7 +842,8 @@ class Connection(object):
         # setting foreign keys support
         self.set_foreign_keys_support()
         # initializing the SQL query
-        query = 'SELECT * FROM posts WHERE post_id = ?'
+        query = 'SELECT posts.*, sender.nickname sender, receiver.nickname receiver FROM posts INNER JOIN users sender ON sender.user_id = posts.sender_id INNER JOIN users receiver ON receiver.user_id = posts.receiver_id WHERE post_id = ? '
+        # query = 'SELECT * FROM posts WHERE post_id = ?'
         # using cursor and row initalization to enable
         # reading and returning the data in a dictionary
         # format, with key-value pairs
@@ -1118,7 +1119,7 @@ class Connection(object):
             :return: a dictionary with the following keys:
 
                 * ``post_id``: id of the post from the row input
-                * ``receiver_id``: the receiver of the post
+                * ``receiver``: the receiver of the post
                 * ``timestamp``: (int) timestamp of the post
                 * ``reply_to``: id of the parent post
                 * ``post_text``: text of the post
@@ -1131,10 +1132,10 @@ class Connection(object):
         '''
         post = {
             'post_id': str(row['post_id']),
-            'receiver_id': str(row['receiver_id']),
+            'receiver': row['receiver'],
             'timestamp': row['timestamp'],
             'reply_to': str(row['reply_to']),
-            'post_text': str(row['post_text']),
+            'post_text': row['post_text'],
             'rating': row['rating'],
             'anonymous': row['anonymous'],
             'public': row['public']
@@ -1170,7 +1171,7 @@ class Connection(object):
         queryParameter = (user_id, )
         # create the SQL query
         # TODO : this might need to change format
-        query = 'SELECT * FROM posts WHERE sender_id = ? ORDER BY timestamp DESC'
+        query = 'SELECT posts.*, sender.nickname sender, receiver.nickname receiver FROM posts INNER JOIN users sender ON sender.user_id = posts.sender_id INNER JOIN users receiver ON receiver.user_id = posts.receiver_id WHERE sender_id = ? ORDER BY timestamp DESC'
         # set foreign keys support
         self.set_foreign_keys_support()
         # using cursor and row initalization to enable
@@ -1245,3 +1246,20 @@ class Connection(object):
         rating = self.get_rating(rating_id)
 
         return rating is not None
+        
+    def modify_post(self, post_id, body, editor):
+        '''
+        Modify the body text with the id ``post_id``
+
+        :param int post_id: The id of the post to remove.
+        :param str body: the post's content
+        :param str editor: default 'Anonymous'. The nickname of the person
+            who is editing this message. If it is not provided "Anonymous"
+            will be stored in db.
+        :return: the id of the edited message or None if the message was
+              not found. The id of the message has the format ``msg-\d{1,3}``,
+              where \d{1,3} is the id of the message in the database.
+        :raises ValueError: if the messageid has a wrong format.
+
+        '''
+        return

@@ -8,8 +8,8 @@ A post object is a dictionary which contains the following keys:
     -    post_id: (int) id of the post
     -    timestamp: UNIX timestamp (long integer) that specifies when the
                     post was created.
-    -    sender_id: (int) id of the owner of the post.
-    -    receiver_id: (int) id of the receiver of the post.
+    -    sender: (int) id of the owner of the post.
+    -    receiver: (int) id of the receiver of the post.
     -    reply_to: (int) id of the parent post.
     -    post_text: post's text.
     -    rating: (int) represents the rating of the post
@@ -19,9 +19,9 @@ A post object is a dictionary which contains the following keys:
                     0 is False, 1 is True
 
 A posts' list has the following format:
-[   {'post_id':'', 'timestamp':'', 'receiver_id':'', 'reply_to':'',
+[   {'post_id':'', 'timestamp':'', 'receiver':'', 'reply_to':'',
      'post_text':'', 'rating':'', 'anonymous':'', 'public':''},
-    {'post_id':'', 'timestamp':'', 'receiver_id':'', 'reply_to':'',
+    {'post_id':'', 'timestamp':'', 'receiver':'', 'reply_to':'',
      'post_text':'', 'rating':'', 'anonymous':'', 'public':''},
      ...  ]
 
@@ -50,7 +50,9 @@ POST0 = {   'post_id':0,
             'post_text': 'She is scary and used to love me in highscool.',
             'rating': 3,
             'anonymous': 0,
-            'public': 1}
+            'public': 1,
+            'receiver':'Kim',
+            'sender':'Scott'}
 
 POST0_MODIFIED = {   'post_id':0,
             'timestamp':1362017481,
@@ -60,7 +62,9 @@ POST0_MODIFIED = {   'post_id':0,
             'post_text': 'new text',
             'rating': 3,
             'anonymous': 0,
-            'public': 1}
+            'public': 1,
+            'receiver':'Kim',
+            'sender':'Scott'}
 
 POST1_ID = 2
 
@@ -72,7 +76,9 @@ POST1 =  {  'post_id':2,
             'post_text': 'This dude is good at video games!',
             'rating': 4,
             'anonymous': 0,
-            'public': 1}
+            'public': 1,
+            'receiver':'Young',
+            'sender':'Scott'}
 
 WRONG_POST_ID = 200
 
@@ -223,16 +229,16 @@ class PostDBAPITestCase(unittest.TestCase):
         #Check that the messages has been really deleted throug a get
         resp2 = self.connection.get_post(POST0_ID)
         self.assertIsNone(resp2)
-
+"""
     def test_modify_post(self):
         '''
-        Test that the post POST0 is modifed
+        #Test that the post POST0 is modifed
         '''
         print('('+self.test_modify_post.__name__+')', \
               self.test_modify_post.__doc__)
         resp = self.connection.modify_post(POST0_ID, "")
 
-
+"""
 if __name__ == '__main__':
     print('Start running posts tests...')
     unittest.main()
