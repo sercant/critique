@@ -94,6 +94,9 @@ class Engine(object):
 
     def __init__(self, db_path=None):
         '''
+        :references:
+
+        :[1]: Exercise1, forum.database.py
         '''
 
         super(Engine, self).__init__()
@@ -106,6 +109,10 @@ class Engine(object):
         '''
         Creates a connection to the database.
 
+        :references:
+
+        :[1]: Exercise1, forum.database.py
+
         :returns: A Connection instance
         :rtype: Connection
 
@@ -116,6 +123,9 @@ class Engine(object):
         '''
         Removes the database file from the filesystem.
 
+        :references:
+
+        :[1]: Exercise1, forum.database.py
         '''
         if os.path.exists(self.db_path):
             # THIS REMOVES THE DATABASE STRUCTURE
@@ -125,6 +135,10 @@ class Engine(object):
         '''
         Purge the database removing all records from the tables. However,
         it keeps the database schema (meaning the table structure)
+
+        :references:
+
+        :[1]: Exercise1, forum.database.py
 
         '''
         keys_on = 'PRAGMA foreign_keys = ON'
@@ -147,6 +161,10 @@ class Engine(object):
         :param schema: path to the .sql schema file. If this parmeter is
             None, then *db/critique_schema_dump.sql* is utilized.
 
+        :references:
+
+        :[1]: Exercise1, forum.database.py
+
         '''
         con = sqlite3.connect(self.db_path)
         if schema is None:
@@ -165,6 +183,10 @@ class Engine(object):
 
         :param dump:  path to the .sql dump file. If this parmeter is
             None, then *db/critique_data_dump.sql* is utilized.
+
+        :references:
+
+        :[1]: Exercise1, forum.database.py
 
         '''
         keys_on = 'PRAGMA foreign_keys = ON'
@@ -273,24 +295,42 @@ class Connection(object):
     A :py:class:`Connection` **MUST** always be closed once when it is not going to be
     utilized anymore in order to release internal locks.
 
+    :references:
+
+    :[1]: Exercise1, forum.database.py
+
     :param db_path: Location of the database file.
     :type dbpath: str
 
     '''
 
     def __init__(self, db_path):
+        '''
+        :references:
+
+        :[1]: Exercise1, forum.database.py
+
+        '''
         super(Connection, self).__init__()
         self.con = sqlite3.connect(db_path)
         self._isclosed = False
 
     def isclosed(self):
         '''
+        :references:
+
+        :[1]: Exercise1, forum.database.py
+
         :returns: ``True`` if connection has already being closed.
         '''
         return self._isclosed
 
     def close(self):
         '''
+        :references:
+
+        :[1]: Exercise1, forum.database.py
+
         Closes the database connection, commiting all changes.
 
         '''
@@ -303,6 +343,11 @@ class Connection(object):
     def check_foreign_keys_status(self):
         '''
         Check if the foreign keys has been activated.
+
+        :references:
+
+        :[1]: Exercise1, forum.database.py
+
 
         :returns: ``True`` if  foreign_keys is activated and ``False`` otherwise.
         :raises sqlite3.Error: when a sqlite3 error happen. In this case the
@@ -328,6 +373,10 @@ class Connection(object):
         '''
         Activate the support for foreign keys.
 
+        :references:
+
+        :[1]: Exercise1, forum.database.py
+
         :returns: ``True`` if operation succeed and ``False`` otherwise.
 
         '''
@@ -346,6 +395,10 @@ class Connection(object):
     def unset_foreign_keys_support(self):
         '''
         Deactivate the support for foreign keys.
+
+        :references:
+
+        :[1]: Exercise1, forum.database.py
 
         :returns: ``True`` if operation succeed and ``False`` otherwise.
 
@@ -1021,7 +1074,6 @@ class Connection(object):
         # timestamp will be used for lastlogin and regDate if not provided.
         timestamp = time.mktime(datetime.now().timetuple())
 
-
         summary = user.get('summary', None)
         details = user.get('details', None)
 
@@ -1142,7 +1194,7 @@ class Connection(object):
         }
         return post
 
-    def get_posts_by_user(self, user_id = None, number_of_messages = None):
+    def get_posts_by_user(self, user_id=None, number_of_messages=None):
         '''
         Used to retrieve some posts posted by a user.
 
@@ -1192,7 +1244,7 @@ class Connection(object):
             post = self._create_post_list_object(row)
             posts.append(post)
             if number_of_messages is not None:
-                postsCounter +=1
+                postsCounter += 1
                 if (postsCounter == number_of_messages):
                     break
         return posts
@@ -1334,7 +1386,7 @@ class Connection(object):
         #Cursor and row initialization
         self.con.row_factory = sqlite3.Row
         cur = self.con.cursor()
-        
+
         #If exists the replyto argument, check that the post exists in
         #the database table
         if reply_to is not None:
@@ -1360,7 +1412,7 @@ class Connection(object):
         if row is not None:
             receiver_id = row["user_id"]
         else:
-            return None                
+            return None
 
         #Generate the values for SQL statement
         pvalue = (timestamp,sender_id,receiver_id,reply_to, \

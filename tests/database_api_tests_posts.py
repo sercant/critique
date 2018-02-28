@@ -95,6 +95,10 @@ class PostDBAPITestCase(unittest.TestCase):
         '''
             Creates the database structure. Removes
             first any pre-existing database files.
+
+            :references:
+
+            :[1]: Exercise1, forum.database.py
         '''
         print("Testing ", cls.__name__)
         ENGINE.remove_database()
@@ -104,6 +108,10 @@ class PostDBAPITestCase(unittest.TestCase):
     def tearDownClass(cls):
         '''
             Remove the testing database
+
+            :references:
+
+            :[1]: Exercise1, forum.database.py
         '''
         print("Testing ENDED for ", cls.__name__)
         ENGINE.remove_database()
@@ -111,6 +119,10 @@ class PostDBAPITestCase(unittest.TestCase):
     def setUp(self):
         '''
             Populates the database
+
+            :references:
+
+            :[1]: Exercise1, forum.database.py
         '''
         try:
           #This method load the initial values from critique_data_dump.sql
@@ -124,6 +136,10 @@ class PostDBAPITestCase(unittest.TestCase):
     def tearDown(self):
         '''
             Close underlying connection and remove all records from database
+
+            :references:
+
+            :[1]: Exercise1, forum.database.py
         '''
         self.connection.close()
         ENGINE.clear()
@@ -264,9 +280,14 @@ class PostDBAPITestCase(unittest.TestCase):
         post_id = self.connection.create_post("Mina", "Knives",5,
                                                 "This is the non-registered user",1,1)
         self.assertIsNone(post_id)
-        
+
 
 
 if __name__ == '__main__':
+    '''
+    :references:
+
+    :[1]: Exercise1, forum.database.py
+    '''
     print('Start running posts tests...')
     unittest.main()

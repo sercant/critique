@@ -68,8 +68,13 @@ class RatingDBAPITestCase(unittest.TestCase):
     #INITIATION AND TEARDOWN METHODS
     @classmethod
     def setUpClass(cls):
-        ''' Creates the database structure. Removes first any preexisting
+        '''
+        Creates the database structure. Removes first any preexisting
             database file
+
+        :references:
+
+        :[1]: Exercise1, forum.database.py
         '''
         print("Testing ", cls.__name__)
         ENGINE.remove_database()
@@ -77,13 +82,23 @@ class RatingDBAPITestCase(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        '''Remove the testing database'''
+        '''
+        Remove the testing database
+
+        :references:
+
+        :[1]: Exercise1, forum.database.py
+        '''
         print("Testing ENDED for ", cls.__name__)
         ENGINE.remove_database()
 
     def setUp(self):
         '''
         Populates the database
+
+        :references:
+
+        :[1]: Exercise1, forum.database.py
         '''
         try:
           #This method load the initial values from critique_data_dump.sql
@@ -97,6 +112,10 @@ class RatingDBAPITestCase(unittest.TestCase):
     def tearDown(self):
         '''
         Close underlying connection and remove all records from database
+
+        :references:
+
+        :[1]: Exercise1, forum.database.py
         '''
         self.connection.close()
         ENGINE.clear()
@@ -313,5 +332,11 @@ class RatingDBAPITestCase(unittest.TestCase):
         self.assertTrue(self.connection.contains_rating(RATING2_ID))
 
 if __name__ == '__main__':
+    '''
+
+    :references:
+
+    :[1]: Exercise1, forum.database.py
+    '''
     print('Start running rating tests')
     unittest.main()

@@ -171,12 +171,21 @@ USER_WRONG_NICKNAME = 'REEE'
 class UserDBAPITestCase(unittest.TestCase):
     '''
     Test cases for the Users related methods.
+
+    :references:
+
+    :[1]: Exercise1, forum.database.py
     '''
     # INITIATION AND TEARDOWN METHODS
     @classmethod
     def setUpClass(cls):
-        ''' Creates the database structure. Removes first any preexisting
+        '''
+        Creates the database structure. Removes first any preexisting
             database file
+
+        :references:
+
+        :[1]: Exercise1, forum.database.py
         '''
         print("Testing ", cls.__name__)
         ENGINE.remove_database()
@@ -184,13 +193,23 @@ class UserDBAPITestCase(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        '''Remove the testing database'''
+        '''
+        Remove the testing database
+
+        :references:
+
+        :[1]: Exercise1, forum.database.py
+        '''
         print("Testing ENDED for ", cls.__name__)
         ENGINE.remove_database()
 
     def setUp(self):
         '''
         Populates the database
+
+        :references:
+
+        :[1]: Exercise1, forum.database.py
         '''
         # This method load the initial values from critique_data_dump.sql
         ENGINE.populate_tables()
@@ -200,6 +219,10 @@ class UserDBAPITestCase(unittest.TestCase):
     def tearDown(self):
         '''
         Close underlying connection and remove all records from database
+
+        :references:
+
+        :[1]: Exercise1, forum.database.py
         '''
         self.connection.close()
         ENGINE.clear()
@@ -209,6 +232,10 @@ class UserDBAPITestCase(unittest.TestCase):
         Checks that the table initially contains 5 users (check
         critique_data_dump.sql). NOTE: Do not use Connection instance but
         call directly SQL.
+
+        :references:
+
+        :[1]: Exercise1, forum.database.py
         '''
         print('('+self.test_users_table_created.__name__+')',
               self.test_users_table_created.__doc__)
@@ -454,5 +481,11 @@ class UserDBAPITestCase(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    '''
+
+    :references:
+
+    :[1]: Exercise1, forum.database.py
+    '''
     print('Start running user tests')
     unittest.main()
