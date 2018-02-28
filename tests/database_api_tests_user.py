@@ -39,6 +39,8 @@ List of users has the following data model:
 
 
 @author: sercant
+REFERENCEs:
+-   Programmable Web Projects, Exercise 1, database_api_tests_users.py
 '''
 
 import sqlite3

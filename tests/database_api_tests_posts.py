@@ -33,7 +33,7 @@ REFERENCEs:
 import sqlite3, unittest
 
 #   load the database
-from app import database 
+from app import database
 
 #   path to the database file.
 DB_PATH = 'db/critique_test.db'
@@ -117,7 +117,7 @@ class PostDBAPITestCase(unittest.TestCase):
             ENGINE.populate_tables()
           #Creates a Connection instance to use the API
             self.connection = ENGINE.connect()
-        except Exception as e: 
+        except Exception as e:
         #For instance if there is an error while populating the tables
             ENGINE.clear()
 
@@ -159,14 +159,14 @@ class PostDBAPITestCase(unittest.TestCase):
     def test_create_post_object(self):
         '''
         Check that the method _create_post_object works return adequate
-        values for the first database row. 
-        
+        values for the first database row.
+
         NOTE: Do not use Connection instace
             to extract data from database but call directly SQL.
         '''
         print('('+self.test_create_post_object.__name__+')', \
                 self.test_create_post_object.__doc__)
-        
+
         #Create the SQL Statement
         keys_on = 'PRAGMA foreign_keys = ON'
         query = 'SELECT posts.*, sender.nickname sender, receiver.nickname receiver FROM posts INNER JOIN users sender ON sender.user_id = posts.sender_id INNER JOIN users receiver ON receiver.user_id = posts.receiver_id WHERE post_id = 0 '
@@ -197,7 +197,7 @@ class PostDBAPITestCase(unittest.TestCase):
         self.assertDictContainsSubset(post, POST0)
         post = self.connection.get_post(POST1_ID)
         self.assertDictContainsSubset(post, POST1)
-        
+
     # TODO : make test for malformed post_id after implementing the format of the post (post-#######)
 
     def test_get_posts_by_user(self):

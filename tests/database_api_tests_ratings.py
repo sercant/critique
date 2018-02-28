@@ -14,6 +14,8 @@ A rating' list has the following format:
 [{'rating_id':'', 'timestamp':, 'sender':'', 'receiver':'', 'rating':''},{'rating_id':'', 'timestamp':, 'sender':'', 'receiver':'', 'rating':''}]
 
 @author: moamen
+REFERENCEs:
+-   Programmable Web Projects, Exercise 1, database_api_tests_messages.py
 '''
 
 import sqlite3, unittest
