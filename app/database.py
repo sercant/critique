@@ -1332,7 +1332,7 @@ class Connection(object):
             return None
         return post_id
 
-    def create_post(self, sender_nickname=None, receiver_nickname=None, reply_to=None, post_text=None, anonymous=None, public=None):
+    def create_post(self, sender_nickname=None, receiver_nickname=None, reply_to=None, post_text=None, anonymous=None, public=None, rating=None):
         '''
         Create a new post with the data provided as arguments.
 
@@ -1351,8 +1351,10 @@ class Connection(object):
         :raises ValueError: if the replyto has a wrong format.
 
         '''
-        # it should be initialized to a rating of zero
-        rating = 0
+        if reply_to is not None:
+            # there can not be a rating.
+            rating = None
+
         if sender_nickname is None:
             raise ValueError("No input Sender nickname")
         if receiver_nickname is None:
@@ -1415,7 +1417,7 @@ class Connection(object):
             return None
 
         #Generate the values for SQL statement
-        pvalue = (timestamp,sender_id,receiver_id,reply_to, \
+        pvalue = (timestamp,sender_id,receiver_id,reply_to,
                  post_text,rating,anonymous,public)
         #Execute the statement
         cur.execute(stmnt, pvalue)
