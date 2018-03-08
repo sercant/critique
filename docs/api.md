@@ -2,6 +2,8 @@
 
 ## GET /users/
 
+### Responses
+
 ```json
 200:
     HEADER
@@ -12,6 +14,17 @@
 ```
 
 ## POST /users/
+
+### Request
+
+```json
+    HEADER
+        Content-Type: application/json
+    BODY
+        TODO
+```
+
+### Responses
 
 ```json
 201:
@@ -60,6 +73,8 @@
 
 ## GET /users/{nickname}/
 
+### Responses
+
 ```json
 201:
     HEADER
@@ -79,6 +94,17 @@
 ```
 
 ## PUT /users/{nickname}/
+
+### Request
+
+```json
+    HEADER
+        Content-Type: application/json
+    BODY
+        TODO
+```
+
+### Responses
 
 ```json
 204:
@@ -136,6 +162,8 @@
 
 ## DELETE /users/{nickname}/
 
+### Responses
+
 ```json
 204:
     HEADER
@@ -165,6 +193,8 @@
 
 ## GET /users/{nickname}/ratings/
 
+### Responses
+
 ```json
 200:
     HEADER
@@ -184,6 +214,8 @@
 ```
 
 ## GET /users/{nickname}/river/
+
+### Responses
 
 ```json
 200:
@@ -205,6 +237,8 @@
 
 ## GET /posts/
 
+### Responses
+
 ```json
 200:
     HEADER
@@ -215,6 +249,17 @@
 ```
 
 ## POST /posts/
+
+### Request
+
+```json
+    HEADER
+        Content-Type: application/json
+    BODY
+        TODO
+```
+
+### Responses
 
 ```json
 201:
@@ -263,6 +308,8 @@
 
 ## GET /posts/{postId}/
 
+### Responses
+
 ```json
 201:
     HEADER
@@ -287,6 +334,17 @@
 --------------------
 
 ## POST /posts/
+
+### Request
+
+```json
+    HEADER
+        Content-Type: application/json
+    BODY
+        TODO
+```
+
+### Responses
 
 ```json
 201:
@@ -344,6 +402,17 @@
 
 ## PUT /posts/{postId}/
 
+### Request
+
+```json
+    HEADER
+        Content-Type: application/json
+    BODY
+        TODO
+```
+
+### Responses
+
 ```json
 204:
     HEADER
@@ -391,6 +460,8 @@
 
 ## DELETE /posts/{postId}/
 
+### Responses
+
 ```json
 204:
     HEADER
@@ -419,6 +490,17 @@
 ```
 
 ## POST /ratings/
+
+### Request
+
+```json
+    HEADER
+        Content-Type: application/json
+    BODY
+        TODO
+```
+
+### Responses
 
 ```json
 201:
@@ -467,6 +549,8 @@
 
 ## GET /ratings/{ratingId}/
 
+### Responses
+
 ```json
 201:
     HEADER
@@ -486,6 +570,17 @@
 ```
 
 ## PUT /ratings/{ratingId}/
+
+### Request
+
+```json
+    HEADER
+        Content-Type: application/json
+    BODY
+        TODO
+```
+
+### Responses
 
 ```json
 204:
@@ -533,6 +628,8 @@
 ```
 
 ## DELETE /ratings/{ratingId}/
+
+### Responses
 
 ```json
 204:
