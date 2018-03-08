@@ -10,7 +10,13 @@
         Response: 200 (Successful.)
         Content-Type: application/vnd.mason+json
     BODY
-        TODO
+        Profile: TODO
+        Example:
+            TODO
+    LINKS
+        Self: TODO
+        Profile: TODO
+        TODO OTHER LINKS
 ```
 
 ## POST /users/
@@ -20,7 +26,9 @@
 ```json
     HEADER
         Content-Type: application/json
-    BODY
+    PARAMETERS
+        TODO
+    EXAMPLE
         TODO
 ```
 
@@ -32,7 +40,13 @@
         Response: 201 (User created successfully.)
         Content-Type: application/vnd.mason+json
     BODY
-        TODO
+        Profile: TODO
+        Example:
+            TODO
+    LINKS
+        Self: TODO
+        Profile: TODO
+        TODO OTHER LINKS
 
 400:
     HEADER
@@ -81,7 +95,13 @@
         Response: 201 (Successful.)
         Content-Type: application/vnd.mason+json
     BODY
-        TODO
+        Profile: TODO
+        Example:
+            TODO
+    LINKS
+        Self: TODO
+        Profile: TODO
+        TODO OTHER LINKS
 
 404:
     HEADER
@@ -100,7 +120,9 @@
 ```json
     HEADER
         Content-Type: application/json
-    BODY
+    PARAMETERS
+        TODO
+    EXAMPLE
         TODO
 ```
 
@@ -112,7 +134,13 @@
         Response: 204 (User modified successfully.)
         Content-Type: application/vnd.mason+json
     BODY
-        TODO
+        Profile: TODO
+        Example:
+            TODO
+    LINKS
+        Self: TODO
+        Profile: TODO
+        TODO OTHER LINKS
 
 400:
     HEADER
@@ -170,7 +198,13 @@
         Response: 204 (User deleted successfully.)
         Content-Type: application/vnd.mason+json
     BODY
-        TODO
+        Profile: TODO
+        Example:
+            TODO
+    LINKS
+        Self: TODO
+        Profile: TODO
+        TODO OTHER LINKS
 
 404:
     HEADER
@@ -201,7 +235,13 @@
         Response: 200 (Successful.)
         Content-Type: application/vnd.mason+json
     BODY
-        TODO
+        Profile: TODO
+        Example:
+            TODO
+    LINKS
+        Self: TODO
+        Profile: TODO
+        TODO OTHER LINKS
 
 404:
     HEADER
@@ -223,7 +263,13 @@
         Response: 200 (Successful.)
         Content-Type: application/vnd.mason+json
     BODY
-        TODO
+        Profile: TODO
+        Example:
+            TODO
+    LINKS
+        Self: TODO
+        Profile: TODO
+        TODO OTHER LINKS
 
 404:
     HEADER
@@ -245,7 +291,13 @@
         Response: 200 (Successful)
         Content-Type: application/vnd.mason+json
     BODY
-        TODO
+        Profile: TODO
+        Example:
+            TODO
+    LINKS
+        Self: TODO
+        Profile: TODO
+        TODO OTHER LINKS
 ```
 
 ## POST /posts/
@@ -255,7 +307,9 @@
 ```json
     HEADER
         Content-Type: application/json
-    BODY
+    PARAMETERS
+        TODO
+    EXAMPLE
         TODO
 ```
 
@@ -267,7 +321,13 @@
         Response: 201 (Post created successfully.)
         Content-Type: application/vnd.mason+json
     BODY
-        TODO
+        Profile: TODO
+        Example:
+            TODO
+    LINKS
+        Self: TODO
+        Profile: TODO
+        TODO OTHER LINKS
 
 400:
     HEADER
@@ -316,7 +376,13 @@
         Response: 201 (Successful.)
         Content-Type: application/vnd.mason+json
     BODY
-        TODO
+        Profile: TODO
+        Example:
+            TODO
+    LINKS
+        Self: TODO
+        Profile: TODO
+        TODO OTHER LINKS
 
 404:
     HEADER
@@ -335,7 +401,9 @@
 ```json
     HEADER
         Content-Type: application/json
-    BODY
+    PARAMETERS
+        TODO
+    EXAMPLE
         TODO
 ```
 
@@ -347,7 +415,13 @@
         Response: 201 (Post created successfully.)
         Content-Type: application/vnd.mason+json
     BODY
-        TODO
+        Profile: TODO
+        Example:
+            TODO
+    LINKS
+        Self: TODO
+        Profile: TODO
+        TODO OTHER LINKS
 
 400:
     HEADER
@@ -402,7 +476,9 @@
 ```json
     HEADER
         Content-Type: application/json
-    BODY
+    PARAMETERS
+        TODO
+    EXAMPLE
         TODO
 ```
 
@@ -414,7 +490,13 @@
         Response: 204 (Post modified successfully.)
         Content-Type: application/vnd.mason+json
     BODY
-        TODO
+        Profile: TODO
+        Example:
+            TODO
+    LINKS
+        Self: TODO
+        Profile: TODO
+        TODO OTHER LINKS
 
 400:
     HEADER
@@ -463,7 +545,13 @@
         Response: 204 (Post deleted successfully.)
         Content-Type: application/vnd.mason+json
     BODY
-        TODO
+        Profile: TODO
+        Example:
+            TODO
+    LINKS
+        Self: TODO
+        Profile: TODO
+        TODO OTHER LINKS
 
 404:
     HEADER
@@ -491,7 +579,9 @@
 ```json
     HEADER
         Content-Type: application/json
-    BODY
+    PARAMETERS
+        TODO
+    EXAMPLE
         TODO
 ```
 
@@ -503,7 +593,13 @@
         Response: 201 (Rating created successfully.)
         Content-Type: application/vnd.mason+json
     BODY
-        TODO
+        Profile: TODO
+        Example:
+            TODO
+    LINKS
+        Self: TODO
+        Profile: TODO
+        TODO OTHER LINKS
 
 400:
     HEADER
@@ -552,7 +648,13 @@
         Response: 201 (Successful.)
         Content-Type: application/vnd.mason+json
     BODY
-        TODO
+        Profile: TODO
+        Example:
+            TODO
+    LINKS
+        Self: TODO
+        Profile: TODO
+        TODO OTHER LINKS
 
 404:
     HEADER
@@ -571,7 +673,9 @@
 ```json
     HEADER
         Content-Type: application/json
-    BODY
+    PARAMETERS
+        TODO
+    EXAMPLE
         TODO
 ```
 
@@ -583,7 +687,13 @@
         Response: 204 (Rating modified successfully.)
         Content-Type: application/vnd.mason+json
     BODY
-        TODO
+        Profile: TODO
+        Example:
+            TODO
+    LINKS
+        Self: TODO
+        Profile: TODO
+        TODO OTHER LINKS
 
 400:
     HEADER
@@ -632,7 +742,13 @@
         Response: 204 (Rating deleted successfully.)
         Content-Type: application/vnd.mason+json
     BODY
-        TODO
+        Profile: TODO
+        Example:
+            TODO
+    LINKS
+        Self: TODO
+        Profile: TODO
+        TODO OTHER LINKS
 
 404:
     HEADER
