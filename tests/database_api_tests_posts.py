@@ -82,6 +82,9 @@ POST1 =  {  'post_id':2,
 
 WRONG_POST_ID = 200
 
+INVALID_USER_NICKNAME = "NONONON"
+VALID_USER_NICKNAME = "Scott"
+
 INITIAL_SIZE = 12
 
 
@@ -281,6 +284,27 @@ class PostDBAPITestCase(unittest.TestCase):
                                                 "This is the non-registered user",1,1)
         self.assertIsNone(post_id)
 
+    def test_create_post_invalid_sender_receiver(self):
+        '''
+        Test that post can not be created if sender or receiver is invalid.
+        '''
+        print('('+self.test_create_post_invalid_sender_receiver.__name__+')',\
+              self.test_create_post_invalid_sender_receiver.__doc__)
+
+        # try invalid - invalid
+        post_id = self.connection.create_post(INVALID_USER_NICKNAME, INVALID_USER_NICKNAME,5,
+                                                   "This is a newly-created post",1,1)
+        self.assertIsNone(post_id)
+
+        # try invalid - valid
+        post_id = self.connection.create_post(INVALID_USER_NICKNAME, VALID_USER_NICKNAME,5,
+                                                   "This is a newly-created post",1,1)
+        self.assertIsNone(post_id)
+
+        # try valid - invalid
+        post_id = self.connection.create_post(VALID_USER_NICKNAME, INVALID_USER_NICKNAME,5,
+                                                   "This is a newly-created post",1,1)
+        self.assertIsNone(post_id)
 
 
 if __name__ == '__main__':
