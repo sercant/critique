@@ -103,9 +103,11 @@ class RatingDBAPITestCase(unittest.TestCase):
         try:
           #This method load the initial values from critique_data_dump.sql
           ENGINE.populate_tables()
+
           #Creates a Connection instance to use the API
           self.connection = ENGINE.connect()
         except Exception as e:
+
         #For instance if there is an error while populating the tables
           ENGINE.clear()
 
@@ -130,20 +132,25 @@ class RatingDBAPITestCase(unittest.TestCase):
         '''
         print('('+self.test_ratings_table_created.__name__+')', \
                   self.test_ratings_table_created.__doc__)
+
         #Create the SQL Statement
         keys_on = 'PRAGMA foreign_keys = ON'
         query = 'SELECT * FROM ratings'
+
         #Get the sqlite3 con from the Connection instance
         con = self.connection.con
         with con:
             #Cursor and row initialization
             con.row_factory = sqlite3.Row
             cur = con.cursor()
+
             #Provide support for foreign keys
             cur.execute(keys_on)
+
             #Execute main SQL Statement
             cur.execute(query)
             ratings = cur.fetchall()
+
             #Assert
             self.assertEqual(len(ratings), INITIAL_SIZE)
 
@@ -155,21 +162,27 @@ class RatingDBAPITestCase(unittest.TestCase):
         '''
         print('('+self.test_create_rating_object.__name__+')', \
               self.test_create_rating_object.__doc__)
+
         #Create the SQL Statement
         keys_on = 'PRAGMA foreign_keys = ON'
         query = 'SELECT ratings.*, sender.nickname sender, receiver.nickname receiver FROM ratings INNER JOIN users sender on sender.user_id = ratings.sender_id INNER JOIN users receiver on receiver.user_id = ratings.receiver_id WHERE ratings.rating_id = 1'
+
         #Get the sqlite3 con from the Connection instance
         con = self.connection.con
         with con:
             #Cursor and row initialization
             con.row_factory = sqlite3.Row
             cur = con.cursor()
+
             #Provide support for foreign keys
             cur.execute(keys_on)
+
             #Execute main SQL Statement
             cur.execute(query)
+
             #Extrac the row
             row = cur.fetchone()
+
         #Test the method
         ratings = self.connection._create_rating_object(row)
         self.assertDictContainsSubset(ratings, RATING1)
@@ -180,6 +193,7 @@ class RatingDBAPITestCase(unittest.TestCase):
         '''
         print('('+self.test_get_ratings.__name__+')', \
               self.test_get_ratings.__doc__)
+
         #Test with an existing rating
         rating = self.connection.get_rating(RATING1_ID)
         self.assertDictContainsSubset(rating, RATING1)
@@ -192,6 +206,7 @@ class RatingDBAPITestCase(unittest.TestCase):
         '''
         print('('+self.test_get_rating_malformedid.__name__+')', \
               self.test_get_rating_malformedid.__doc__)
+
         #Test with an existing rating
         with self.assertRaises(ValueError):
             self.connection.get_rating('1')
@@ -202,6 +217,7 @@ class RatingDBAPITestCase(unittest.TestCase):
         '''
         print('('+self.test_get_rating_noexistingid.__name__+')',\
               self.test_get_rating_noexistingid.__doc__)
+
         #Test with an existing rating
         rating = self.connection.get_rating(WRONG_RATING_ID)
         self.assertIsNone(rating)
@@ -212,8 +228,10 @@ class RatingDBAPITestCase(unittest.TestCase):
         '''
         print('('+self.test_get_ratings.__name__+')', self.test_get_ratings.__doc__)
         ratings = self.connection.get_ratings()
+
         #Check that the size is correct
         self.assertEqual(len(ratings), INITIAL_SIZE)
+
         #Iterate through ratings and check if the ratings with RATING1_ID and
         #RATING2_ID are correct:
         for rating in ratings:
@@ -233,6 +251,7 @@ class RatingDBAPITestCase(unittest.TestCase):
               self.test_get_ratings_for_specific_user.__doc__)
         ratings = self.connection.get_ratings(receiver="Scott")
         self.assertEqual(len(ratings), 4)
+
         #Ratings id are 5, 9, 13 and 17
         for rating in ratings:
             self.assertIn(rating['rating_id'],
@@ -247,6 +266,7 @@ class RatingDBAPITestCase(unittest.TestCase):
               self.test_get_ratings_of_specific_user.__doc__)
         ratings = self.connection.get_ratings(sender="Scott")
         self.assertEqual(len(ratings), 4)
+
         #Ratings id are 1, 2, 3 and 4
         for rating in ratings:
             self.assertIn(rating['rating_id'],
@@ -261,6 +281,7 @@ class RatingDBAPITestCase(unittest.TestCase):
         resp = self.connection.modify_rating(
             RATING1_ID, RATING1_MODIFIED['rating'])
         self.assertEqual(resp, RATING1_ID)
+
         #Check that the ratings has been really modified through a get
         resp2 = self.connection.get_rating(RATING1_ID)
         self.assertDictContainsSubset(resp2, RATING1_MODIFIED)
@@ -271,6 +292,7 @@ class RatingDBAPITestCase(unittest.TestCase):
         '''
         print('('+self.test_modify_ratings_malformedid.__name__+')',
               self.test_modify_ratings_malformedid.__doc__)
+
         #Test with an existing rating
         with self.assertRaises(ValueError):
             self.connection.modify_rating('2', 2)
@@ -281,6 +303,7 @@ class RatingDBAPITestCase(unittest.TestCase):
         '''
         print('('+self.test_modify_ratings_noexistingid.__name__+')',\
               self.test_modify_ratings_noexistingid.__doc__)
+
         #Test with an existing rating
         resp = self.connection.modify_rating(WRONG_RATING_ID, 5)
         self.assertIsNone(resp)
@@ -293,11 +316,13 @@ class RatingDBAPITestCase(unittest.TestCase):
               self.test_create_rating.__doc__)
         rating_id = self.connection.create_rating("Knives", "Kim", 3)
         self.assertIsNotNone(rating_id)
+
         #Get the expected modified rating
         new_rating = {}
         new_rating['sender'] = 'Knives'
         new_rating['receiver'] = 'Kim'
         new_rating['rating'] = 3
+
         #Check that the ratings has been really modified through a get
         resp2 = self.connection.get_rating(rating_id)
         self.assertDictContainsSubset(new_rating, resp2)
@@ -308,6 +333,7 @@ class RatingDBAPITestCase(unittest.TestCase):
         '''
         print('('+self.test_create_rating.__name__+')',
               self.test_create_rating.__doc__)
+
         #Check unregistered user (REE) can't rate
         with self.assertRaises(ValueError):
             rating_id = self.connection.create_rating("REE", "Kim", 3)

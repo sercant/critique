@@ -213,6 +213,7 @@ class UserDBAPITestCase(unittest.TestCase):
         '''
         # This method load the initial values from critique_data_dump.sql
         ENGINE.populate_tables()
+
         # Creates a Connection instance to use the API
         self.connection = ENGINE.connect()
 
@@ -239,26 +240,34 @@ class UserDBAPITestCase(unittest.TestCase):
         '''
         print('('+self.test_users_table_created.__name__+')',
               self.test_users_table_created.__doc__)
+
         # Create the SQL Statement
         keys_on = 'PRAGMA foreign_keys = ON'
         query1 = 'SELECT * FROM users'
         query2 = 'SELECT * FROM users_profile'
+
         # Connects to the database.
         con = self.connection.con
         with con:
+
             # Cursor and row initialization
             con.row_factory = sqlite3.Row
             cur = con.cursor()
+
             # Provide support for foreign keys
             cur.execute(keys_on)
+
             # Execute main SQL Statement
             cur.execute(query1)
             users = cur.fetchall()
+
             # Assert
             self.assertEqual(len(users), INITIAL_SIZE)
+
             # Check the users_profile:
             cur.execute(query2)
             users = cur.fetchall()
+
             # Assert
             self.assertEqual(len(users), INITIAL_SIZE)
 
@@ -270,26 +279,34 @@ class UserDBAPITestCase(unittest.TestCase):
         '''
         print('('+self.test_create_user_object.__name__+')',
               self.test_create_user_object.__doc__)
+
         # Create the SQL Statement
         keys_on = 'PRAGMA foreign_keys = ON'
         query = 'SELECT users.*, users_profile.* FROM users, users_profile \
                  WHERE users.user_id = users_profile.user_id'
+
         # Get the sqlite3 con from the Connection instance
         con = self.connection.con
+
         # I am doing operations after with, so I must explicitly close the
         # the connection to be sure that no locks are kept. The with, close
+
         # the connection when it has gone out of scope
         # try:
         with con:
             # Cursor and row initialization
             con.row_factory = sqlite3.Row
             cur = con.cursor()
+
             # Provide support for foreign keys
             cur.execute(keys_on)
+
             # Execute main SQL Statement
             cur.execute(query)
+
             # Extrac the row
             row = cur.fetchone()
+
         # Test the method
         user = self.connection._create_user_object(row)
         self.assertDictContainsSubset(user, USER1)
@@ -325,8 +342,10 @@ class UserDBAPITestCase(unittest.TestCase):
         print('('+self.test_get_users.__name__+')',
               self.test_get_users.__doc__)
         users = self.connection.get_users()
+
         # Check that the size is correct
         self.assertEqual(len(users), INITIAL_SIZE)
+
         # Iterate through users and check if the users with USER1_ID and
         # USER2_ID are correct:
         for user in users:
@@ -343,13 +362,15 @@ class UserDBAPITestCase(unittest.TestCase):
               self.test_delete_user.__doc__)
         resp = self.connection.delete_user(USER1['summary']['nickname'])
         self.assertTrue(resp)
+
         # Check that the users has been really deleted through a get
         resp2 = self.connection.get_user(USER1['summary']['nickname'])
         self.assertIsNone(resp2)
-        # TODO (sercant): enable when posts implemented
+
         # # Check that the user does not have associated any message
-        # resp3 = self.connection.get_posts(nickname=USER1['nickname'])
-        # self.assertEqual(len(resp3), 0)
+        resp3 = self.connection.get_posts_by_user(
+            nickname=USER1['summary']['nickname'])
+        self.assertEqual(len(resp3), 0)
 
     def test_delete_user_noexistingnickname(self):
         '''
@@ -357,6 +378,7 @@ class UserDBAPITestCase(unittest.TestCase):
         '''
         print('('+self.test_delete_user_noexistingnickname.__name__+')',
               self.test_delete_user_noexistingnickname.__doc__)
+
         # Test with an existing user
         resp = self.connection.delete_user(USER_WRONG_NICKNAME)
         self.assertFalse(resp)
@@ -367,6 +389,7 @@ class UserDBAPITestCase(unittest.TestCase):
         '''
         print('('+self.test_modify_user.__name__+')',
               self.test_modify_user.__doc__)
+
         # Get the modified user
         resp = self.connection.modify_user(
             USER1['summary']['nickname'], MODIFIED_USER1['summary'], MODIFIED_USER1['details'])
@@ -395,6 +418,7 @@ class UserDBAPITestCase(unittest.TestCase):
         '''
         print('('+self.test_modify_user_noexistingnickname.__name__+')',
               self.test_modify_user_noexistingnickname.__doc__)
+
         # Test with an existing user
         resp = self.connection.modify_user(
             USER_WRONG_NICKNAME, USER1['summary'], USER1['details'])
@@ -410,6 +434,7 @@ class UserDBAPITestCase(unittest.TestCase):
             NEW_USER['summary']['nickname'], NEW_USER)
         self.assertIsNotNone(nickname)
         self.assertEqual(nickname, NEW_USER['summary']['nickname'])
+
         # Check that the messages has been really modified through a get
         resp2 = self.connection.get_user(nickname)
         self.assertDictContainsSubset(NEW_USER['summary'],

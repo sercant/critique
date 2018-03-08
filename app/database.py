@@ -141,13 +141,14 @@ class Engine(object):
         :[1]: Exercise1, forum.database.py
 
         '''
-        keys_on = 'PRAGMA foreign_keys = ON'
         # THIS KEEPS THE SCHEMA AND REMOVE VALUES
+        keys_on = 'PRAGMA foreign_keys = ON'
+
         con = sqlite3.connect(self.db_path)
         # Activate foreing keys support
-        cur = con.cursor()
-        cur.execute(keys_on)
         with con:
+            cur = con.cursor()
+            cur.execute(keys_on)
             cur = con.cursor()
             # NOTE Since we have delete on cascade on all the tables to users
             # deleting the user will also delete all other entries
@@ -191,9 +192,11 @@ class Engine(object):
         '''
         keys_on = 'PRAGMA foreign_keys = ON'
         con = sqlite3.connect(self.db_path)
-        # Activate foreing keys support
         cur = con.cursor()
+
+        # Activate foreing keys support
         cur.execute(keys_on)
+
         # Populate database from dump
         if dump is None:
             dump = DEFAULT_DATA_DUMP
@@ -357,8 +360,10 @@ class Connection(object):
         try:
             # Create a cursor to receive the database values
             cur = self.con.cursor()
+
             # Execute the pragma command
             cur.execute('PRAGMA foreign_keys')
+
             # We know we retrieve just one record: use fetchone()
             data = cur.fetchone()
             is_activated = data == (1,)
@@ -385,6 +390,7 @@ class Connection(object):
             # Get the cursor object.
             # It allows to execute SQL code and traverse the result set
             cur = self.con.cursor()
+
             # execute the pragma command, ON
             cur.execute(keys_on)
             return True
@@ -408,6 +414,7 @@ class Connection(object):
             # Get the cursor object.
             # It allows to execute SQL code and traverse the result set
             cur = self.con.cursor()
+
             # execute the pragma command, OFF
             cur.execute(keys_on)
             return True
@@ -535,17 +542,22 @@ class Connection(object):
         # SQL Statement for retrieving the users
         query = 'SELECT users.*, users_profile.* FROM users, users_profile \
                  WHERE users.user_id = users_profile.user_id'
+
         # Activate foreign key support
         self.set_foreign_keys_support()
+
         # Create the cursor
         self.con.row_factory = sqlite3.Row
         cur = self.con.cursor()
+
         # Execute main SQL Statement
         cur.execute(query)
+
         # Process the results
         rows = cur.fetchall()
         if rows is None:
             return None
+
         # Process the response.
         users = []
         for row in rows:
@@ -562,32 +574,41 @@ class Connection(object):
 
         '''
         # Create the SQL Statements
+
         # SQL Statement for retrieving the user given a nickname
         query1 = 'SELECT user_id from users WHERE nickname = ?'
+
         # SQL Statement for retrieving the user information
         query2 = 'SELECT users.*, users_profile.* FROM users, users_profile \
                   WHERE users.user_id = ? \
                   AND users_profile.user_id = users.user_id'
+
         # Variable to be used in the second query.
         user_id = None
+
         # Activate foreign key support
         self.set_foreign_keys_support()
+
         # Cursor and row initialization
         self.con.row_factory = sqlite3.Row
         cur = self.con.cursor()
+
         # Execute SQL Statement to retrieve the id given a nickname
         pvalue = (nickname,)
         cur.execute(query1, pvalue)
+
         # Extract the user id
         row = cur.fetchone()
         if row is None:
             return None
         user_id = row["user_id"]
+
         # Execute the SQL Statement to retrieve the user information.
         # Create first the valuse
         pvalue = (user_id, )
         # execute the statement
         cur.execute(query2, pvalue)
+
         # Process the response. Only one possible row is expected.
         row = cur.fetchone()
         return self._create_user_object(row)
@@ -625,19 +646,22 @@ class Connection(object):
 
         # Activate foreign key support
         self.set_foreign_keys_support()
+
         # Create the cursor
         self.con.row_factory = sqlite3.Row
         cur = self.con.cursor()
-        # Execute main SQL Statement
 
+        # Execute main SQL Statement
         if pval is None:
             cur.execute(query)
         else:
             cur.execute(query, pval)
+
         # Process the results
         rows = cur.fetchall()
         if rows is None:
             return None
+
         # Process the response.
         rating = []
         for row in rows:
@@ -672,11 +696,14 @@ class Connection(object):
 
         # Activate foreign key support
         self.set_foreign_keys_support()
+
         # Create the cursor
         self.con.row_factory = sqlite3.Row
         cur = self.con.cursor()
+
         # Execute main SQL Statement
         cur.execute(query, (rating_id,))
+
         # Process the results
         row = cur.fetchone()
         if row is None:
@@ -707,8 +734,10 @@ class Connection(object):
 
         #SQL Statement to update the ratings table
         query = 'UPDATE ratings SET rating = ? WHERE rating_id = ?'
+
         #Activate foreign key support
         self.set_foreign_keys_support()
+
         #Cursor and row initialization
         self.con.row_factory = sqlite3.Row
 
@@ -721,6 +750,7 @@ class Connection(object):
         except sqlite3.Error as excp:
             print("Error %s:" % excp.args[0])
             return None
+
         #Check that I have modified the user
         if cur.rowcount < 1:
             return None
@@ -738,8 +768,10 @@ class Connection(object):
         # Create the SQL Statements
         # SQL Statement for deleting the user with nickname
         query = 'DELETE from users WHERE nickname = ?'
+
         # Activate foreign key support
         self.set_foreign_keys_support()
+
         # Cursor and row initialization
         self.con.row_factory = sqlite3.Row
         cur = self.con.cursor()
@@ -779,24 +811,31 @@ class Connection(object):
         #Create the SQL statment
         #SQL Statement for getting the user id given a nickname
         query_user_id = 'SELECT user_id from users WHERE nickname = ?'
+
         #SQL Statement for inserting the data
         stmnt = 'INSERT INTO ratings(timestamp,sender_id,receiver_id,rating) \
                  VALUES(?,?,?,?)'
+
         #Variables for the statement.
         #sender_id is obtained from first statement.
         sender_id = None
+
         #receiver_id is obtained from first statement.
         receiver_id = None
         timestamp = time.mktime(datetime.now().timetuple())
+
         #Activate foreign key support
         self.set_foreign_keys_support()
+
         #Cursor and row initialization
         self.con.row_factory = sqlite3.Row
         cur = self.con.cursor()
+
         #Provide support for foreign keys
         #Execute SQL Statement to get user_id given nickname
         pvalue = (sender,)
         cur.execute(query_user_id, pvalue)
+
         #Extract user id
         row = cur.fetchone()
         if row is not None:
@@ -805,6 +844,7 @@ class Connection(object):
         #Execute SQL Statement to get user_id given nickname
         pvalue = (receiver,)
         cur.execute(query_user_id, pvalue)
+
         #Extract user id
         row = cur.fetchone()
         if row is not None:
@@ -815,11 +855,14 @@ class Connection(object):
 
         #Generate the values for SQL statement
         pvalue = (timestamp, sender_id, receiver_id, rating)
+
         #Execute the statement
         cur.execute(stmnt, pvalue)
         self.con.commit()
+
         #Extract the id of the added rating
         lid = cur.lastrowid
+
         #Return the id in
         if lid is None:
             return None
@@ -892,25 +935,30 @@ class Connection(object):
         # first check if the input is valid
         if post_id is None:
             raise ValueError("No input post id")
+
         # setting foreign keys support
         self.set_foreign_keys_support()
+
         # initializing the SQL query
         query = 'SELECT posts.*, sender.nickname sender, receiver.nickname receiver FROM posts INNER JOIN users sender ON sender.user_id = posts.sender_id INNER JOIN users receiver ON receiver.user_id = posts.receiver_id WHERE post_id = ? '
-        # query = 'SELECT * FROM posts WHERE post_id = ?'
+
         # using cursor and row initalization to enable
         # reading and returning the data in a dictionary
         # format, with key-value pairs
         self.con.row_factory = sqlite3.Row
         cur = self.con.cursor()
+
         # putting the query parameter in a tuple
         # to be able to execute.
         queryPostId = (post_id,)
         cur.execute(query, queryPostId)
+
         # checking if the returned value contains a post
         # or not. if not, function will return None
         row = cur.fetchone()
         if row is None:
             return None
+
         # however, in case it has returned an actual post
         # it has to be parsed before returning
         return self._create_post_object(row)
@@ -983,9 +1031,11 @@ class Connection(object):
 
         # Activate foreign key support
         self.set_foreign_keys_support()
+
         # Cursor and row initialization
         self.con.row_factory = sqlite3.Row
         cur = self.con.cursor()
+
         # execute the main statement
         pvalue = (
             _firstname,
@@ -1000,6 +1050,7 @@ class Connection(object):
         )
         cur.execute(query, pvalue)
         self.con.commit()
+
         # Check that I have modified the user
         if cur.rowcount < 1:
             return None
@@ -1065,12 +1116,14 @@ class Connection(object):
         # SQL Statement to create the row in  users table
         query1 = 'INSERT INTO users(nickname,regDate,lastLoginDate)\
                   VALUES(?,?,?)'
+
         # SQL Statement to create the row in user_profile table
         query2 = 'INSERT INTO users_profile (user_id,firstname,lastname, \
                                              email,mobile, \
                                              gender,avatar, \
                                              birthdate,bio)\
                   VALUES (?,?,?,?,?,?,?,?,?)'
+
         # timestamp will be used for lastlogin and regDate if not provided.
         timestamp = time.mktime(datetime.now().timetuple())
 
@@ -1098,9 +1151,11 @@ class Connection(object):
 
         # Activate foreign key support
         self.set_foreign_keys_support()
+
         # Cursor and row initialization
         self.con.row_factory = sqlite3.Row
         cur = self.con.cursor()
+
         # Add the row in users table
         # Execute the statement
         pvalue = (
@@ -1109,8 +1164,10 @@ class Connection(object):
             _lastlogindate
         )
         cur.execute(query1, pvalue)
+
         # Extrat the rowid => user-id
         lid = cur.lastrowid
+
         # Add the row in users_profile table
         # Execute the statement
         pvalue = (
@@ -1144,19 +1201,24 @@ class Connection(object):
 
         '''
         query = 'SELECT user_id FROM users WHERE nickname = ?'
+
         # Activate foreign key support
         self.set_foreign_keys_support()
+
         # Cursor and row initialization
         self.con.row_factory = sqlite3.Row
         cur = self.con.cursor()
+
         # Execute the  main SQL statement
         pvalue = (nickname,)
         cur.execute(query, pvalue)
+
         # Process the response.
         # Just one row is expected
         row = cur.fetchone()
         if row is None:
             return None
+
         # Build the return object
         else:
             return row[0]
@@ -1194,14 +1256,14 @@ class Connection(object):
         }
         return post
 
-    def get_posts_by_user(self, user_id=None, number_of_messages=None):
+    def get_posts_by_user(self, nickname=None, number_of_messages=None):
         '''
         Used to retrieve some posts posted by a user.
 
         :param user_id: default is None, takes the user id of the user
             that you want the posts of. if the parameter is None, it
             will raise a ValueError exception.
-        :type user_id: integer
+        :type nickname: nickname of the user
         :param number_of_messages: sets the number of maximum window of
             messages returned. if None, it returns a list of all the
             posts made by the requested user.
@@ -1216,28 +1278,35 @@ class Connection(object):
         '''
         postsCounter = 1
         # check if the user_id is not None
-        if user_id is None:
-            raise ValueError("No input user ID input")
+        if nickname is None:
+            raise ValueError("No input user nickname input")
 
         # initialize the query parameter as a tuple
-        queryParameter = (user_id, )
+        queryParameter = (nickname, )
+
         # create the SQL query
         # TODO : this might need to change format
-        query = 'SELECT posts.*, sender.nickname sender, receiver.nickname receiver FROM posts INNER JOIN users sender ON sender.user_id = posts.sender_id INNER JOIN users receiver ON receiver.user_id = posts.receiver_id WHERE sender_id = ? ORDER BY timestamp DESC'
+        query = 'SELECT posts.*, sender.nickname sender, receiver.nickname receiver FROM posts INNER JOIN users sender ON sender.user_id = posts.sender_id INNER JOIN users receiver ON receiver.user_id = posts.receiver_id WHERE sender = ? ORDER BY timestamp DESC'
+
         # set foreign keys support
         self.set_foreign_keys_support()
+
         # using cursor and row initalization to enable
         # reading and returning the data in a dictionary
         # format, with key-value pairs
         self.con.row_factory = sqlite3.Row
         cur = self.con.cursor()
+
         # execute the SQL query
         cur.execute(query, queryParameter)
+
         # fetching the results
         rows = cur.fetchall()
+
         # check if there are posts fetched or not
         if rows is None:
             return None
+
         # initiate the list object to hold the returned posts
         posts = []
         for row in rows:
@@ -1262,12 +1331,16 @@ class Connection(object):
         if post_id is None:
             raise ValueError("No post ID inserted to delete.")
         queryParameter = (post_id, )
+
         #Create the SQL Statement
         query = 'DELETE FROM posts WHERE post_id = ?'
+
         #Activate foreign key support
         self.set_foreign_keys_support()
+
         #Cursor and row initialization
         self.con.row_factory = sqlite3.Row
+
         #Execute main SQL Statement
         try:
             #Get the cursor object.
@@ -1312,8 +1385,10 @@ class Connection(object):
         '''
         #SQL Statement to update the messages table
         query = 'UPDATE posts SET post_text = ? WHERE post_id = ?'
+
         #Activate foreign key support
         self.set_foreign_keys_support()
+
         #Cursor and row initialization
         self.con.row_factory = sqlite3.Row
 
@@ -1326,6 +1401,7 @@ class Connection(object):
         except sqlite3.Error as excp:
             print("Error %s:" % excp.args[0])
             return None
+
         #Check that I have modified the user
         if cur.rowcount < 1:
             print("I am making NONE")
@@ -1368,14 +1444,17 @@ class Connection(object):
             public = 1
 
         #Create the SQL statment
-          #SQL to test that the message which I am answering does exist
+        #SQL to test that the message which I am answering does exist
         query1 = 'SELECT * from posts WHERE post_id = ?'
-          #SQL Statement for getting the user id given a nickname
+
+        #SQL Statement for getting the user id given a nickname
         query2 = 'SELECT user_id from users WHERE nickname = ?'
-          #SQL Statement for inserting the data
+
+        #SQL Statement for inserting the data
         stmnt = 'INSERT INTO posts (timestamp,sender_id,receiver_id,reply_to, \
                  post_text,rating,anonymous,public) \
                  VALUES(?,?,?,?,?,?,?,?)'
+
         #Variables for the statement.
         #sender_id is obtained from executing query2 statement.
         #and timestamp is calculated with a function
@@ -1385,6 +1464,7 @@ class Connection(object):
 
         #Activate foreign key support
         self.set_foreign_keys_support()
+
         #Cursor and row initialization
         self.con.row_factory = sqlite3.Row
         cur = self.con.cursor()
@@ -1397,18 +1477,22 @@ class Connection(object):
             posts = cur.fetchall()
             if len(posts) < 1:
                 return None
+
         #Execute SQL Statement to get sender id given nickname
         pvalue = (sender_nickname,)
         cur.execute(query2, pvalue)
+
         #Extract user id
         row = cur.fetchone()
         if row is not None:
             sender_id = row["user_id"]
         else:
             return None
+
         #Execute SQL Statement to get sender id given nickname
         pvalue = (receiver_nickname,)
         cur.execute(query2, pvalue)
+
         #Extract user id
         row = cur.fetchone()
         if row is not None:
@@ -1419,10 +1503,13 @@ class Connection(object):
         #Generate the values for SQL statement
         pvalue = (timestamp,sender_id,receiver_id,reply_to,
                  post_text,rating,anonymous,public)
+
         #Execute the statement
         cur.execute(stmnt, pvalue)
         self.con.commit()
+
         #Extract the id of the added message
         lid = cur.lastrowid
+
         #Return the id in
         return lid if lid is not None else None

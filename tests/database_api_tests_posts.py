@@ -128,12 +128,13 @@ class PostDBAPITestCase(unittest.TestCase):
             :[1]: Exercise1, forum.database.py
         '''
         try:
-          #This method load the initial values from critique_data_dump.sql
+          # This method load the initial values from critique_data_dump.sql
             ENGINE.populate_tables()
-          #Creates a Connection instance to use the API
+
+          # Creates a Connection instance to use the API
             self.connection = ENGINE.connect()
         except Exception as e:
-        #For instance if there is an error while populating the tables
+        # For instance if there is an error while populating the tables
             ENGINE.clear()
 
     def tearDown(self):
@@ -161,17 +162,21 @@ class PostDBAPITestCase(unittest.TestCase):
         #   Create the SQL Statement
         keys_on = 'PRAGMA foreign_keys = ON'
         query = 'SELECT * FROM posts'
+
         #   Get the sqlite3 con from the Connection instance
         con = self.connection.con
         with con:
             #   Cursor and row initialization
             con.row_factory = sqlite3.Row
             cur = con.cursor()
+
             #   Provide support for foreign keys
             cur.execute(keys_on)
+
             #   Execute main SQL Statement
             cur.execute(query)
             users = cur.fetchall()
+
             #   Assert
             self.assertEqual(len(users), INITIAL_SIZE)
 
@@ -186,22 +191,27 @@ class PostDBAPITestCase(unittest.TestCase):
         print('('+self.test_create_post_object.__name__+')', \
                 self.test_create_post_object.__doc__)
 
-        #Create the SQL Statement
+        # Create the SQL Statement
         keys_on = 'PRAGMA foreign_keys = ON'
         query = 'SELECT posts.*, sender.nickname sender, receiver.nickname receiver FROM posts INNER JOIN users sender ON sender.user_id = posts.sender_id INNER JOIN users receiver ON receiver.user_id = posts.receiver_id WHERE post_id = 0 '
-        #Get the sqlite3 con from the Connection instance
+
+        # Get the sqlite3 con from the Connection instance
         con = self.connection.con
         with con:
-            #Cursor and row initialization
+            # Cursor and row initialization
             con.row_factory = sqlite3.Row
             cur = con.cursor()
-            #Provide support for foreign keys
+
+            # Provide support for foreign keys
             cur.execute(keys_on)
-            #Execute main SQL Statement
+
+            # Execute main SQL Statement
             cur.execute(query)
-            #Extrac the row
+
+            # Extrac the row
             row = cur.fetchone()
-        #Test the method
+
+        # Test the method
         post = self.connection._create_post_object(row)
         self.assertDictContainsSubset(post, POST0)
 
@@ -211,7 +221,8 @@ class PostDBAPITestCase(unittest.TestCase):
         '''
         print('('+self.test_get_post.__name__+')', \
               self.test_get_post.__doc__)
-        #Test with an existing message
+
+        # Test with an existing message
         post = self.connection.get_post(POST0_ID)
         self.assertDictContainsSubset(post, POST0)
         post = self.connection.get_post(POST1_ID)
@@ -224,11 +235,13 @@ class PostDBAPITestCase(unittest.TestCase):
         Test that get_posts_by_user work correctly
         '''
         print('('+self.test_get_posts_by_user.__name__+')', self.test_get_posts_by_user.__doc__)
-        posts = self.connection.get_posts_by_user(1)
-        #Check that the size is correct
+        posts = self.connection.get_posts_by_user(VALID_USER_NICKNAME)
+
+        # Check that the size is correct
         self.assertEqual(len(posts), 4)
-        #Iterate through posts and check if the posts with POST0_ID and
-        #POST1_ID are correct:
+
+        # Iterate through posts and check if the posts with POST0_ID and
+        # POST1_ID are correct:
         for post in posts:
             if post['post_id'] == POST0_ID:
                 self.assertEqual(len(post), 8)
@@ -245,19 +258,21 @@ class PostDBAPITestCase(unittest.TestCase):
               self.test_delete_post.__doc__)
         resp = self.connection.delete_post(POST0_ID)
         self.assertTrue(resp)
-        #Check that the messages has been really deleted throug a get
+
+        # Check that the messages has been really deleted throug a get
         resp2 = self.connection.get_post(POST0_ID)
         self.assertIsNone(resp2)
 
     def test_modify_post(self):
         '''
-        #Test that the post POST0 is modifed
+        # Test that the post POST0 is modifed
         '''
         print('('+self.test_modify_post.__name__+')', \
               self.test_modify_post.__doc__)
         resp = self.connection.modify_post(POST0_ID, 'new text')
         self.assertEqual(resp, POST0_ID)
-        #Check that the messages has been really modified through a get
+
+        # Check that the messages has been really modified through a get
         resp2 = self.connection.get_post(POST0_ID)
         self.assertDictContainsSubset(resp2, POST0_MODIFIED)
 
@@ -270,16 +285,18 @@ class PostDBAPITestCase(unittest.TestCase):
         post_id = self.connection.create_post("Scott", "Knives",5,
                                                    "This is a newly-created post",1,1)
         self.assertIsNotNone(post_id)
-        #Get the expected modified post
+
+        # Get the expected modified post
         new_post = {}
         new_post['post_id'] = post_id
         new_post['reply_to'] = 5
         new_post['post_text'] = "This is a newly-created post"
 
-        #Check that the messages has been really modified through a get
+        # Check that the messages has been really modified through a get
         resp2 = self.connection.get_post(post_id)
         self.assertDictContainsSubset(new_post, resp2)
-        #CHECK NOW NOT REGISTERED USER
+
+        # CHECK NOW NOT REGISTERED USER
         post_id = self.connection.create_post("Mina", "Knives",5,
                                                 "This is the non-registered user",1,1)
         self.assertIsNone(post_id)
