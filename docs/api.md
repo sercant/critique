@@ -249,6 +249,7 @@ REQUEST
 
     HEADER
         Content-Type: application/json
+        Accept: application/vnd.mason+json
     PARAMETERS
         TODO
     EXAMPLE
@@ -275,7 +276,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "User info is not well formed or entity body is missing."
+            "@error": {
+                "@message": "User info is not well formed or entity body is missing."
+            },
+            "resource_url": "TODO"
         }
 
 415:
@@ -284,7 +288,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "Format of the input is not json."
+            "@error": {
+                "@message": "Format of the input is not json."
+            },
+            "resource_url": "TODO"
         }
 
 422:
@@ -293,7 +300,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "Nickname, email, or mobile already exist in the users list."
+            "@error": {
+                "@message": "Nickname, email, or mobile already exist in the users list."
+            },
+            "resource_url": "TODO"
         }
 
 500:
@@ -302,7 +312,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "The system has failed. Please, contact the administrator."
+            "@error": {
+                "@message": "The system has failed. Please, contact the administrator."
+            },
+            "resource_url": "TODO"
         }
 ```
 
@@ -334,7 +347,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "User not found."
+            "@error": {
+                "@message": "User not found."
+            },
+            "resource_url": "TODO"
         }
 ```
 
@@ -345,6 +361,7 @@ REQUEST
 
     HEADER
         Content-Type: application/json
+        Accept: application/vnd.mason+json
     PARAMETERS
         TODO
     EXAMPLE
@@ -371,7 +388,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "User info is not well formed or it is empty."
+            "@error": {
+                "@message": "User info is not well formed or it is empty."
+            },
+            "resource_url": "TODO"
         }
 
 404:
@@ -380,7 +400,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "User not found."
+            "@error": {
+                "@message": "User not found."
+            },
+            "resource_url": "TODO"
         }
 
 415:
@@ -389,7 +412,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "Format of the input is not json."
+            "@error": {
+                "@message": "Format of the input is not json."
+            },
+            "resource_url": "TODO"
         }
 
 422:
@@ -398,7 +424,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "Nickname, email, or mobile already exist in the users list."
+            "@error": {
+                "@message": "Nickname, email, or mobile already exist in the users list."
+            },
+            "resource_url": "TODO"
         }
 
 500:
@@ -407,7 +436,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "The system has failed. Please, contact the administrator."
+            "@error": {
+                "@message": "The system has failed. Please, contact the administrator."
+            },
+            "resource_url": "TODO"
         }
 ```
 
@@ -433,7 +465,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "User not found."
+            "@error": {
+                "@message": "User not found."
+            },
+            "resource_url": "TODO"
         }
 
 500:
@@ -442,7 +477,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "The system has failed. Please, contact the administrator."
+            "@error": {
+                "@message": "The system has failed. Please, contact the administrator."
+            },
+            "resource_url": "TODO"
         }
 ```
 
@@ -474,7 +512,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "User not found."
+            "@error": {
+                "@message": "User not found."
+            },
+            "resource_url": "TODO"
         }
 ```
 
@@ -506,7 +547,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "User not found."
+            "@error": {
+                "@message": "User not found."
+            },
+            "resource_url": "TODO"
         }
 ```
 
@@ -538,7 +582,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "User not found."
+            "@error": {
+                "@message": "User not found."
+            },
+            "resource_url": "TODO"
         }
 ```
 
@@ -576,6 +623,7 @@ REQUEST
 
     HEADER
         Content-Type: application/json
+        Accept: application/vnd.mason+json
     PARAMETERS
         TODO
     EXAMPLE
@@ -602,7 +650,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "Post info is not well formed or entity body is missing."
+            "@error": {
+                "@message": "Post info is not well formed or entity body is missing."
+            },
+            "resource_url": "TODO"
         }
 
 415:
@@ -611,7 +662,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "Format of the input is not json."
+            "@error": {
+                "@message": "Format of the input is not json."
+            },
+            "resource_url": "TODO"
         }
 
 422:
@@ -620,7 +674,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "Sender or receiver not found."
+            "@error": {
+                "@message": "Sender or receiver not found."
+            },
+            "resource_url": "TODO"
         }
 
 500:
@@ -629,7 +686,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "The system has failed. Please, contact the administrator."
+            "@error": {
+                "@message": "The system has failed. Please, contact the administrator."
+            },
+            "resource_url": "TODO"
         }
 ```
 
@@ -661,7 +721,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "Post not found."
+            "@error": {
+                "@message": "Post not found."
+            },
+            "resource_url": "TODO"
         }
 ```
 
@@ -672,6 +735,7 @@ REQUEST
 
     HEADER
         Content-Type: application/json
+        Accept: application/vnd.mason+json
     PARAMETERS
         TODO
     EXAMPLE
@@ -698,7 +762,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "Post info is not well formed or entity body is missing."
+            "@error": {
+                "@message": "Post info is not well formed or entity body is missing."
+            },
+            "resource_url": "TODO"
         }
 
 415:
@@ -707,7 +774,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "Format of the input is not json."
+            "@error": {
+                "@message": "Format of the input is not json."
+            },
+            "resource_url": "TODO"
         }
 
 404:
@@ -716,7 +786,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "Post not found."
+            "@error": {
+                "@message": "Post not found."
+            },
+            "resource_url": "TODO"
         }
 
 422:
@@ -725,7 +798,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "Sender not found."
+            "@error": {
+                "@message": "Sender not found."
+            },
+            "resource_url": "TODO"
         }
 
 500:
@@ -734,7 +810,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "The system has failed. Please, contact the administrator."
+            "@error": {
+                "@message": "The system has failed. Please, contact the administrator."
+            },
+            "resource_url": "TODO"
         }
 ```
 
@@ -745,6 +824,7 @@ REQUEST
 
     HEADER
         Content-Type: application/json
+        Accept: application/vnd.mason+json
     PARAMETERS
         TODO
     EXAMPLE
@@ -771,7 +851,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "Post info is not well formed or it is empty."
+            "@error": {
+                "@message": "Post info is not well formed or it is empty."
+            },
+            "resource_url": "TODO"
         }
 
 404:
@@ -780,7 +863,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "Post not found."
+            "@error": {
+                "@message": "Post not found."
+            },
+            "resource_url": "TODO"
         }
 
 415:
@@ -789,7 +875,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "Format of the input is not json."
+            "@error": {
+                "@message": "Format of the input is not json."
+            },
+            "resource_url": "TODO"
         }
 
 500:
@@ -798,7 +887,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "The system has failed. Please, contact the administrator."
+            "@error": {
+                "@message": "The system has failed. Please, contact the administrator."
+            },
+            "resource_url": "TODO"
         }
 ```
 
@@ -824,7 +916,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "Post not found."
+            "@error": {
+                "@message": "Post not found."
+            },
+            "resource_url": "TODO"
         }
 
 500:
@@ -833,7 +928,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "The system has failed. Please, contact the administrator."
+            "@error": {
+                "@message": "The system has failed. Please, contact the administrator."
+            },
+            "resource_url": "TODO"
         }
 ```
 
@@ -848,6 +946,7 @@ REQUEST
 
     HEADER
         Content-Type: application/json
+        Accept: application/vnd.mason+json
     PARAMETERS
         TODO
     EXAMPLE
@@ -874,7 +973,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "Rating info is not well formed or entity body is missing."
+            "@error": {
+                "@message": "Rating info is not well formed or entity body is missing."
+            },
+            "resource_url": "TODO"
         }
 
 415:
@@ -883,7 +985,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "Format of the input is not json."
+            "@error": {
+                "@message": "Format of the input is not json."
+            },
+            "resource_url": "TODO"
         }
 
 422:
@@ -892,7 +997,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "Sender or receiver not found."
+            "@error": {
+                "@message": "Sender or receiver not found."
+            },
+            "resource_url": "TODO"
         }
 
 500:
@@ -901,7 +1009,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "The system has failed. Please, contact the administrator."
+            "@error": {
+                "@message": "The system has failed. Please, contact the administrator."
+            },
+            "resource_url": "TODO"
         }
 ```
 
@@ -933,7 +1044,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "Rating not found."
+            "@error": {
+                "@message": "Rating not found."
+            },
+            "resource_url": "TODO"
         }
 ```
 
@@ -944,6 +1058,7 @@ REQUEST
 
     HEADER
         Content-Type: application/json
+        Accept: application/vnd.mason+json
     PARAMETERS
         TODO
     EXAMPLE
@@ -970,7 +1085,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "Rating info is not well formed or it is empty."
+            "@error": {
+                "@message": "Rating info is not well formed or it is empty."
+            },
+            "resource_url": "TODO"
         }
 
 404:
@@ -979,7 +1097,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "Rating not found."
+            "@error": {
+                "@message": "Rating not found."
+            },
+            "resource_url": "TODO"
         }
 
 415:
@@ -988,7 +1109,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "Format of the input is not json."
+            "@error": {
+                "@message": "Format of the input is not json."
+            },
+            "resource_url": "TODO"
         }
 
 500:
@@ -997,7 +1121,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "The system has failed. Please, contact the administrator."
+            "@error": {
+                "@message": "The system has failed. Please, contact the administrator."
+            },
+            "resource_url": "TODO"
         }
 ```
 
@@ -1023,7 +1150,10 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "Rating not found."
+            "@error": {
+                "@message": "Rating not found."
+            },
+            "resource_url": "TODO"
         }
 
 500:
@@ -1032,6 +1162,9 @@ POSSIBLE RESPONSES
         Content-Type: application/json
     BODY
         {
-            "error": "The system has failed. Please, contact the administrator."
+            "@error": {
+                "@message": "The system has failed. Please, contact the administrator."
+            },
+            "resource_url": "TODO"
         }
 ```
