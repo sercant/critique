@@ -273,7 +273,7 @@ POSSIBLE RESPONSES
 400:
     HEADER
         Response: 400
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -285,7 +285,7 @@ POSSIBLE RESPONSES
 415:
     HEADER
         Response: 415
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -297,7 +297,7 @@ POSSIBLE RESPONSES
 422:
     HEADER
         Response: 422
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -309,7 +309,7 @@ POSSIBLE RESPONSES
 500:
     HEADER
         Response: 500
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -344,7 +344,7 @@ POSSIBLE RESPONSES
 404:
     HEADER
         Response: 404
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -385,7 +385,7 @@ POSSIBLE RESPONSES
 400:
     HEADER
         Response: 400
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -397,7 +397,7 @@ POSSIBLE RESPONSES
 404:
     HEADER
         Response: 404
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -409,7 +409,7 @@ POSSIBLE RESPONSES
 415:
     HEADER
         Response: 415
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -421,7 +421,7 @@ POSSIBLE RESPONSES
 422:
     HEADER
         Response: 422
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -433,7 +433,7 @@ POSSIBLE RESPONSES
 500:
     HEADER
         Response: 500
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -462,7 +462,7 @@ POSSIBLE RESPONSES
 404:
     HEADER
         Response: 404
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -474,7 +474,7 @@ POSSIBLE RESPONSES
 500:
     HEADER
         Response: 500
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -509,7 +509,7 @@ POSSIBLE RESPONSES
 404:
     HEADER
         Response: 404
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -544,7 +544,7 @@ POSSIBLE RESPONSES
 404:
     HEADER
         Response: 404
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -579,7 +579,7 @@ POSSIBLE RESPONSES
 404:
     HEADER
         Response: 404
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -647,7 +647,7 @@ POSSIBLE RESPONSES
 400:
     HEADER
         Response: 400
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -659,7 +659,7 @@ POSSIBLE RESPONSES
 415:
     HEADER
         Response: 415
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -671,7 +671,7 @@ POSSIBLE RESPONSES
 422:
     HEADER
         Response: 422
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -683,7 +683,7 @@ POSSIBLE RESPONSES
 500:
     HEADER
         Response: 500
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -718,7 +718,7 @@ POSSIBLE RESPONSES
 404:
     HEADER
         Response: 404
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -759,7 +759,7 @@ POSSIBLE RESPONSES
 400:
     HEADER
         Response: 400
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -771,7 +771,7 @@ POSSIBLE RESPONSES
 415:
     HEADER
         Response: 415
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -783,7 +783,7 @@ POSSIBLE RESPONSES
 404:
     HEADER
         Response: 404
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -795,7 +795,7 @@ POSSIBLE RESPONSES
 422:
     HEADER
         Response: 422
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -807,7 +807,7 @@ POSSIBLE RESPONSES
 500:
     HEADER
         Response: 500
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -848,7 +848,7 @@ POSSIBLE RESPONSES
 400:
     HEADER
         Response: 400
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -860,7 +860,7 @@ POSSIBLE RESPONSES
 404:
     HEADER
         Response: 404
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -872,7 +872,7 @@ POSSIBLE RESPONSES
 415:
     HEADER
         Response: 415
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -884,7 +884,7 @@ POSSIBLE RESPONSES
 500:
     HEADER
         Response: 500
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -913,7 +913,7 @@ POSSIBLE RESPONSES
 404:
     HEADER
         Response: 404
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -925,7 +925,7 @@ POSSIBLE RESPONSES
 500:
     HEADER
         Response: 500
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -970,7 +970,7 @@ POSSIBLE RESPONSES
 400:
     HEADER
         Response: 400
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -982,7 +982,7 @@ POSSIBLE RESPONSES
 415:
     HEADER
         Response: 415
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -994,7 +994,7 @@ POSSIBLE RESPONSES
 422:
     HEADER
         Response: 422
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -1006,7 +1006,7 @@ POSSIBLE RESPONSES
 500:
     HEADER
         Response: 500
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -1041,7 +1041,7 @@ POSSIBLE RESPONSES
 404:
     HEADER
         Response: 404
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -1082,7 +1082,7 @@ POSSIBLE RESPONSES
 400:
     HEADER
         Response: 400
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -1094,7 +1094,7 @@ POSSIBLE RESPONSES
 404:
     HEADER
         Response: 404
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -1106,7 +1106,7 @@ POSSIBLE RESPONSES
 415:
     HEADER
         Response: 415
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -1118,7 +1118,7 @@ POSSIBLE RESPONSES
 500:
     HEADER
         Response: 500
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -1147,7 +1147,7 @@ POSSIBLE RESPONSES
 404:
     HEADER
         Response: 404
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
@@ -1159,7 +1159,7 @@ POSSIBLE RESPONSES
 500:
     HEADER
         Response: 500
-        Content-Type: application/json
+        Content-Type: application/vnd.mason+json
     BODY
         {
             "@error": {
