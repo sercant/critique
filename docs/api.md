@@ -6,7 +6,7 @@
 
 Creates a new user via `POST`.
 
-#### GET /link-relations/add-user
+#### GET /critique/link-relations/add-user
 
 Return the link relation description in HTML format.
 
@@ -23,7 +23,7 @@ POSSIBLE RESPONSES
 
 Returns the posts sent to the user which are currently not public via `GET`.
 
-#### GET /link-relations/user-inbox
+#### GET /critique/link-relations/user-inbox
 
 Return the link relation description in HTML format.
 
@@ -40,7 +40,7 @@ POSSIBLE RESPONSES
 
 Returns the posts sent to the user which are currently public via `GET`.
 
-#### GET /link-relations/user-river
+#### GET /critique/link-relations/user-river
 
 Return the link relation description in HTML format.
 
@@ -57,7 +57,7 @@ POSSIBLE RESPONSES
 
 Returns the ratings sent to the user via `GET`.
 
-#### GET /link-relations/ratings
+#### GET /critique/link-relations/ratings
 
 Return the link relation description in HTML format.
 
@@ -74,7 +74,7 @@ POSSIBLE RESPONSES
 
 Deletes the current context. Use via `DELETE`.
 
-#### GET /link-relations/delete
+#### GET /critique/link-relations/delete
 
 Return the link relation description in HTML format.
 
@@ -98,7 +98,7 @@ Profile definition for all user resources. Related [profile call](#get-profilesu
 This profile inherits:
 
 - Some semantic descriptors from [Person](http://schema.org/Person)
-- Some link relations from IANA Web linking [RFC5988](https://www.iana.org/assignments/link-relations/link-relations.xhtml)
+- Some link relations from IANA Web linking [RFC5988](https://www.iana.org//assignmentscritique/link-/relationscritique/link-relations.xhtml)
 
 #### User Relations
 
@@ -131,7 +131,7 @@ Inherited from [Person](http://schema.org/Person):
 - [`telephone`](http://schema.org/telephone) (string): Optional in representations in which a new user is generated.
 - [`gender`](http://schema.org/gender) (string): Optional in representations in which a new user is generated.
 
-### GET /profiles/user_profile
+### GET /critique/profiles/user_profile
 
 Return the User Profile in HTML format.
 
@@ -146,9 +146,19 @@ POSSIBLE RESPONSES
 
 ## Users
 
-TODO description
+All these resources use the [User Profile](#user-profile).
 
-### GET /critique/users/
+In addition all error messages follow the [Error Profile](#error-profile).
+
+### GET /critique/api/users/
+
+A list of all users in the platform.
+
+```json
+REQUEST
+    HEADER
+        Accept: application/vnd.mason+json
+```
 
 ```json
 POSSIBLE RESPONSES
@@ -158,16 +168,81 @@ POSSIBLE RESPONSES
         Response: 200 (Successful.)
         Content-Type: application/vnd.mason+json
     BODY
-        Profile: TODO
-        Example:
-            TODO
-    LINKS
-        Self: TODO
-        Profile: TODO
-        TODO OTHER LINKS
+        {
+            "items": [
+                {
+                    "givenName": "Scott",
+                    "familyName": "Pilgrim",
+                    "bio": "Best bass in town. Ramona <3",
+                    "avatar": "photo1.jpg",
+                    "@controls": {
+                        "self": {
+                            "href": "/critique/api/users/Scott/"
+                        },
+                        "profile": {
+                            "href": "/critique/profiles/user-profile/"
+                        }
+                    }
+                },
+                {
+                    "givenName": "Kim",
+                    "familyName": "Pine",
+                    "bio": "Drums! Dont irritate me...",
+                    "avatar": "photo3.jpg",
+                    "@controls": {
+                        "self": {
+                            "href": "/critique/api/users/Kim/"
+                        },
+                        "profile": {
+                            "href": "/critique/profiles/user-profile/"
+                        }
+                    }
+                }
+            ],
+            "@namespaces": {
+                "critique": {
+                    "name": "/critique/link-relations/"
+                }
+            },
+            "@controls": {
+                "self": {
+                    "href": "/forum/api/users/"
+                },
+                "critique:add-user": {
+                    "href": "/forum/api/users/",
+                    "encoding": "json",
+                    "method": "POST",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "nickname": {
+                                "title": "Nickname",
+                                "description": "User nickname",
+                                "type": "string"
+                            },
+                            "givenName": {
+                                "title": "Given name",
+                                "description": "User given name",
+                                "type": "string"
+                            },
+                            "email": {
+                                "title": "Email",
+                                "description": "User email",
+                                "type": "string"
+                            },
+                        },
+                        "required": ["nickname", "givenName", "email"]
+                    }
+                }
+            }
+        }
+    RELATIONS
+        self
+        profile
+        add-user
 ```
 
-### POST /critique/users/
+### POST /critique/api/users/
 
 ```json
 REQUEST
@@ -188,10 +263,8 @@ POSSIBLE RESPONSES
         Response: 201 (User created successfully.)
         Content-Type: application/vnd.mason+json
     BODY
-        Profile: TODO
-        Example:
-            TODO
-    LINKS
+        TODO
+    RELATIONS
         Self: TODO
         Profile: TODO
         TODO OTHER LINKS
@@ -233,7 +306,13 @@ POSSIBLE RESPONSES
         }
 ```
 
-### GET /critique/users/{nickname}/
+### GET /critique/api/users/{nickname}/
+
+```json
+REQUEST
+    HEADER
+        Accept: application/vnd.mason+json
+```
 
 ```json
 POSSIBLE RESPONSES
@@ -243,10 +322,8 @@ POSSIBLE RESPONSES
         Response: 201 (Successful.)
         Content-Type: application/vnd.mason+json
     BODY
-        Profile: TODO
-        Example:
-            TODO
-    LINKS
+        TODO
+    RELATIONS
         Self: TODO
         Profile: TODO
         TODO OTHER LINKS
@@ -261,7 +338,7 @@ POSSIBLE RESPONSES
         }
 ```
 
-### PUT /critique/users/{nickname}/
+### PUT /critique/api/users/{nickname}/
 
 ```json
 REQUEST
@@ -282,10 +359,8 @@ POSSIBLE RESPONSES
         Response: 204 (User modified successfully.)
         Content-Type: application/vnd.mason+json
     BODY
-        Profile: TODO
-        Example:
-            TODO
-    LINKS
+        TODO
+    RELATIONS
         Self: TODO
         Profile: TODO
         TODO OTHER LINKS
@@ -336,7 +411,7 @@ POSSIBLE RESPONSES
         }
 ```
 
-### DELETE /critique/users/{nickname}/
+### DELETE /critique/api/users/{nickname}/
 
 ```json
 POSSIBLE RESPONSES
@@ -346,10 +421,8 @@ POSSIBLE RESPONSES
         Response: 204 (User deleted successfully.)
         Content-Type: application/vnd.mason+json
     BODY
-        Profile: TODO
-        Example:
-            TODO
-    LINKS
+        TODO
+    RELATIONS
         Self: TODO
         Profile: TODO
         TODO OTHER LINKS
@@ -373,7 +446,13 @@ POSSIBLE RESPONSES
         }
 ```
 
-### GET /critique/users/{nickname}/ratings/
+### GET /critique/api/users/{nickname}/ratings/
+
+```json
+REQUEST
+    HEADER
+        Accept: application/vnd.mason+json
+```
 
 ```json
 POSSIBLE RESPONSES
@@ -383,10 +462,8 @@ POSSIBLE RESPONSES
         Response: 200 (Successful.)
         Content-Type: application/vnd.mason+json
     BODY
-        Profile: TODO
-        Example:
-            TODO
-    LINKS
+        TODO
+    RELATIONS
         Self: TODO
         Profile: TODO
         TODO OTHER LINKS
@@ -401,7 +478,13 @@ POSSIBLE RESPONSES
         }
 ```
 
-### GET /critique/users/{nickname}/river/
+### GET /critique/api/users/{nickname}/river/
+
+```json
+REQUEST
+    HEADER
+        Accept: application/vnd.mason+json
+```
 
 ```json
 POSSIBLE RESPONSES
@@ -411,10 +494,8 @@ POSSIBLE RESPONSES
         Response: 200 (Successful.)
         Content-Type: application/vnd.mason+json
     BODY
-        Profile: TODO
-        Example:
-            TODO
-    LINKS
+        TODO
+    RELATIONS
         Self: TODO
         Profile: TODO
         TODO OTHER LINKS
@@ -429,7 +510,13 @@ POSSIBLE RESPONSES
         }
 ```
 
-### GET /critique/users/{nickname}/inbox/
+### GET /critique/api/users/{nickname}/inbox/
+
+```json
+REQUEST
+    HEADER
+        Accept: application/vnd.mason+json
+```
 
 ```json
 POSSIBLE RESPONSES
@@ -439,10 +526,8 @@ POSSIBLE RESPONSES
         Response: 200 (Successful.)
         Content-Type: application/vnd.mason+json
     BODY
-        Profile: TODO
-        Example:
-            TODO
-    LINKS
+        TODO
+    RELATIONS
         Self: TODO
         Profile: TODO
         TODO OTHER LINKS
@@ -461,7 +546,13 @@ POSSIBLE RESPONSES
 
 TODO description
 
-### GET /critique/posts/
+### GET /critique/api/posts/
+
+```json
+REQUEST
+    HEADER
+        Accept: application/vnd.mason+json
+```
 
 ```json
 POSSIBLE RESPONSES
@@ -471,16 +562,14 @@ POSSIBLE RESPONSES
         Response: 200 (Successful)
         Content-Type: application/vnd.mason+json
     BODY
-        Profile: TODO
-        Example:
-            TODO
-    LINKS
+        TODO
+    RELATIONS
         Self: TODO
         Profile: TODO
         TODO OTHER LINKS
 ```
 
-### POST /critique/posts/
+### POST /critique/api/posts/
 
 ```json
 REQUEST
@@ -501,10 +590,8 @@ POSSIBLE RESPONSES
         Response: 201 (Post created successfully.)
         Content-Type: application/vnd.mason+json
     BODY
-        Profile: TODO
-        Example:
-            TODO
-    LINKS
+        TODO
+    RELATIONS
         Self: TODO
         Profile: TODO
         TODO OTHER LINKS
@@ -546,7 +633,13 @@ POSSIBLE RESPONSES
         }
 ```
 
-### GET /critique/posts/{postId}/
+### GET /critique/api/posts/{postId}/
+
+```json
+REQUEST
+    HEADER
+        Accept: application/vnd.mason+json
+```
 
 ```json
 POSSIBLE RESPONSES
@@ -556,10 +649,8 @@ POSSIBLE RESPONSES
         Response: 201 (Successful.)
         Content-Type: application/vnd.mason+json
     BODY
-        Profile: TODO
-        Example:
-            TODO
-    LINKS
+        TODO
+    RELATIONS
         Self: TODO
         Profile: TODO
         TODO OTHER LINKS
@@ -574,7 +665,7 @@ POSSIBLE RESPONSES
         }
 ```
 
-### POST /critique/posts/{postId}/
+### POST /critique/api/posts/{postId}/
 
 ```json
 REQUEST
@@ -595,10 +686,8 @@ POSSIBLE RESPONSES
         Response: 201 (Post created successfully.)
         Content-Type: application/vnd.mason+json
     BODY
-        Profile: TODO
-        Example:
-            TODO
-    LINKS
+        TODO
+    RELATIONS
         Self: TODO
         Profile: TODO
         TODO OTHER LINKS
@@ -649,7 +738,7 @@ POSSIBLE RESPONSES
         }
 ```
 
-### PUT /critique/posts/{postId}/
+### PUT /critique/api/posts/{postId}/
 
 ```json
 REQUEST
@@ -670,10 +759,8 @@ POSSIBLE RESPONSES
         Response: 204 (Post modified successfully.)
         Content-Type: application/vnd.mason+json
     BODY
-        Profile: TODO
-        Example:
-            TODO
-    LINKS
+        TODO
+    RELATIONS
         Self: TODO
         Profile: TODO
         TODO OTHER LINKS
@@ -715,7 +802,7 @@ POSSIBLE RESPONSES
         }
 ```
 
-### DELETE /critique/posts/{postId}/
+### DELETE /critique/api/posts/{postId}/
 
 ```json
 POSSIBLE RESPONSES
@@ -725,10 +812,8 @@ POSSIBLE RESPONSES
         Response: 204 (Post deleted successfully.)
         Content-Type: application/vnd.mason+json
     BODY
-        Profile: TODO
-        Example:
-            TODO
-    LINKS
+        TODO
+    RELATIONS
         Self: TODO
         Profile: TODO
         TODO OTHER LINKS
@@ -756,7 +841,7 @@ POSSIBLE RESPONSES
 
 TODO description
 
-### POST /critique/ratings/
+### POST /critique/api/ratings/
 
 ```json
 REQUEST
@@ -777,10 +862,8 @@ POSSIBLE RESPONSES
         Response: 201 (Rating created successfully.)
         Content-Type: application/vnd.mason+json
     BODY
-        Profile: TODO
-        Example:
-            TODO
-    LINKS
+        TODO
+    RELATIONS
         Self: TODO
         Profile: TODO
         TODO OTHER LINKS
@@ -822,7 +905,13 @@ POSSIBLE RESPONSES
         }
 ```
 
-### GET /critique/ratings/{ratingId}/
+### GET /critique/api/ratings/{ratingId}/
+
+```json
+REQUEST
+    HEADER
+        Accept: application/vnd.mason+json
+```
 
 ```json
 POSSIBLE RESPONSES
@@ -832,10 +921,8 @@ POSSIBLE RESPONSES
         Response: 201 (Successful.)
         Content-Type: application/vnd.mason+json
     BODY
-        Profile: TODO
-        Example:
-            TODO
-    LINKS
+        TODO
+    RELATIONS
         Self: TODO
         Profile: TODO
         TODO OTHER LINKS
@@ -850,7 +937,7 @@ POSSIBLE RESPONSES
         }
 ```
 
-### PUT /critique/ratings/{ratingId}/
+### PUT /critique/api/ratings/{ratingId}/
 
 ```json
 REQUEST
@@ -871,10 +958,8 @@ POSSIBLE RESPONSES
         Response: 204 (Rating modified successfully.)
         Content-Type: application/vnd.mason+json
     BODY
-        Profile: TODO
-        Example:
-            TODO
-    LINKS
+        TODO
+    RELATIONS
         Self: TODO
         Profile: TODO
         TODO OTHER LINKS
@@ -916,7 +1001,7 @@ POSSIBLE RESPONSES
         }
 ```
 
-### DELETE /critique/ratings/{ratingId}/
+### DELETE /critique/api/ratings/{ratingId}/
 
 ```json
 POSSIBLE RESPONSES
@@ -926,10 +1011,8 @@ POSSIBLE RESPONSES
         Response: 204 (Rating deleted successfully.)
         Content-Type: application/vnd.mason+json
     BODY
-        Profile: TODO
-        Example:
-            TODO
-    LINKS
+        TODO
+    RELATIONS
         Self: TODO
         Profile: TODO
         TODO OTHER LINKS
