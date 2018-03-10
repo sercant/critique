@@ -340,9 +340,9 @@ REQUEST
 ```json
 POSSIBLE RESPONSES
 
-201:
+200:
     HEADER
-        Response: 201 (Successful.)
+        Response: 200 (Successful.)
         Content-Type: application/vnd.mason+json
     BODY
         {
@@ -809,9 +809,9 @@ REQUEST
 ```json
 POSSIBLE RESPONSES
 
-201:
+200:
     HEADER
-        Response: 201 (Successful.)
+        Response: 200 (Successful.)
         Content-Type: application/vnd.mason+json
     BODY
         TODO
