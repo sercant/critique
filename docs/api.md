@@ -229,7 +229,7 @@ POSSIBLE RESPONSES
                                 "title": "Email",
                                 "description": "User email",
                                 "type": "string"
-                            },
+                            }
                         },
                         "required": ["nickname", "givenName", "email"]
                     }
@@ -244,16 +244,32 @@ POSSIBLE RESPONSES
 
 ### POST /critique/api/users/
 
+Create a new user.
+
 ```json
 REQUEST
 
     HEADER
         Content-Type: application/json
         Accept: application/vnd.mason+json
-    PARAMETERS
-        TODO
-    EXAMPLE
-        TODO
+    BODY
+        {
+            "nickname": {
+                "title": "Nickname",
+                "description": "User nickname",
+                "type": "string"
+            },
+            "givenName": {
+                "title": "Given name",
+                "description": "User given name",
+                "type": "string"
+            },
+            "email": {
+                "title": "Email",
+                "description": "User email",
+                "type": "string"
+            }
+        }
 ```
 
 ```json
@@ -262,13 +278,7 @@ POSSIBLE RESPONSES
 201:
     HEADER
         Response: 201 (User created successfully.)
-        Content-Type: application/vnd.mason+json
-    BODY
-        TODO
-    RELATIONS
-        Self: TODO
-        Profile: TODO
-        TODO OTHER LINKS
+        Location: URL of the newly created resource.
 
 400:
     HEADER
@@ -335,11 +345,106 @@ POSSIBLE RESPONSES
         Response: 201 (Successful.)
         Content-Type: application/vnd.mason+json
     BODY
-        TODO
+        {
+            "givenName": "Scott",
+            "familyName": "Pilgrim",
+            "avatar": "photo1.jpg",
+            "bio": "Best bass in town. Ramona <3",
+            "email": "scott@outlook.com",
+            "birthdate": "1998-01-22",
+            "telephone": null,
+            "gender": "male",
+            "@namespaces": {
+                "critique": {
+                    "name": "/critique/link-relations/"
+                }
+            },
+            "@controls": {
+                "self": {
+                    "href": "/critique/api/users/Scott/"
+                },
+                "profile": {
+                    "href": "/critique/profiles/user-profile/"
+                },
+                "collection": {
+                    "href": "/forum/api/users/"
+                },
+                "edit": {
+                    "title": "Edit this user",
+                    "href": "/forum/api/users/Scott/",
+                    "encoding": "json",
+                    "method": "PUT",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "givenName": {
+                                "title": "given name",
+                                "description": "user given name",
+                                "type": "string"
+                            },
+                            "familyName": {
+                                "title": "family name",
+                                "description": "user family name",
+                                "type": "string"
+                            },
+                            "avatar": {
+                                "title": "avatar",
+                                "description": "user avatar",
+                                "type": "string"
+                            },
+                            "bio": {
+                                "title": "bio",
+                                "description": "user bio",
+                                "type": "string"
+                            },
+                            "email": {
+                                "title": "email",
+                                "description": "user email",
+                                "type": "string"
+                            },
+                            "birthdate": {
+                                "title": "birthdate",
+                                "description": "user birthdate",
+                                "type": "string"
+                            },
+                            "telephone": {
+                                "title": "telephone",
+                                "description": "user telephone",
+                                "type": "string"
+                            },
+                            "gender": {
+                                "title": "gender",
+                                "description": "user gender",
+                                "type": "string"
+                            }
+                        },
+                        "required": [ ]
+                    }
+                },
+                "critique:delete": {
+                    "href": "/critique/api/users/Scott/",
+                    "method": "DELETE"
+                },
+                "critique:user-inbox": {
+                    "href": "/critique/api/users/Scott/inbox"
+                },
+                "critique:user-river": {
+                    "href": "/critique/api/users/Scott/river"
+                },
+                "critique:user-ratings": {
+                    "href": "/critique/api/users/Scott/ratings"
+                }
+            }
+        }
     RELATIONS
-        Self: TODO
-        Profile: TODO
-        TODO OTHER LINKS
+        self
+        profile
+        collection
+        edit
+        delete
+        user-inbox
+        user-river
+        user-ratings
 
 404:
     HEADER
@@ -364,7 +469,7 @@ REQUEST
         Accept: application/vnd.mason+json
     PARAMETERS
         TODO
-    EXAMPLE
+    BODY
         TODO
 ```
 
@@ -626,7 +731,7 @@ REQUEST
         Accept: application/vnd.mason+json
     PARAMETERS
         TODO
-    EXAMPLE
+    BODY
         TODO
 ```
 
@@ -738,7 +843,7 @@ REQUEST
         Accept: application/vnd.mason+json
     PARAMETERS
         TODO
-    EXAMPLE
+    BODY
         TODO
 ```
 
@@ -827,7 +932,7 @@ REQUEST
         Accept: application/vnd.mason+json
     PARAMETERS
         TODO
-    EXAMPLE
+    BODY
         TODO
 ```
 
@@ -949,7 +1054,7 @@ REQUEST
         Accept: application/vnd.mason+json
     PARAMETERS
         TODO
-    EXAMPLE
+    BODY
         TODO
 ```
 
@@ -1061,7 +1166,7 @@ REQUEST
         Accept: application/vnd.mason+json
     PARAMETERS
         TODO
-    EXAMPLE
+    BODY
         TODO
 ```
 
