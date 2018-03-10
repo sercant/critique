@@ -1,5 +1,41 @@
 # Critique
 
+## Link Relations
+
+### add-user
+
+Creates a new user via `POST`.
+
+#### GET /link-relations/add-user
+
+Return the link relation description in HTML format.
+
+```json
+POSSIBLE RESPONSES
+
+200:
+    HEADER
+        Response: 200
+        Content-Type: text/html
+```
+
+### delete
+
+Deletes the current context. Use via `DELETE`.
+
+#### GET /link-relations/delete
+
+Return the link relation description in HTML format.
+
+```json
+POSSIBLE RESPONSES
+
+200:
+    HEADER
+        Response: 200
+        Content-Type: text/html
+```
+
 ## Profiles
 
 ### User Profile
@@ -15,7 +51,7 @@ This profile inherits:
 
 #### Link Relations
 
-- [`create`](#create)
+- [`add-user`](#adduser)
 - [`delete`](#delete)
 
 Inherited from IANA RFC5988:
@@ -45,9 +81,11 @@ Inherited from [Person](http://schema.org/Person):
 
 ### GET /profiles/user_profile
 
-#### Possible Responses
+Return the User Profile in HTML format.
 
 ```json
+POSSIBLE RESPONSES
+
 200:
     HEADER
         Response: 200
@@ -58,9 +96,9 @@ Inherited from [Person](http://schema.org/Person):
 
 ### GET /critique/users/
 
-#### Possible Responses
-
 ```json
+POSSIBLE RESPONSES
+
 200:
     HEADER
         Response: 200 (Successful.)
@@ -77,9 +115,9 @@ Inherited from [Person](http://schema.org/Person):
 
 ### POST /critique/users/
 
-#### Request
-
 ```json
+REQUEST
+
     HEADER
         Content-Type: application/json
     PARAMETERS
@@ -88,9 +126,9 @@ Inherited from [Person](http://schema.org/Person):
         TODO
 ```
 
-#### Possible Responses
-
 ```json
+POSSIBLE RESPONSES
+
 201:
     HEADER
         Response: 201 (User created successfully.)
@@ -143,9 +181,9 @@ Inherited from [Person](http://schema.org/Person):
 
 ### GET /critique/users/{nickname}/
 
-#### Possible Responses
-
 ```json
+POSSIBLE RESPONSES
+
 201:
     HEADER
         Response: 201 (Successful.)
@@ -171,9 +209,9 @@ Inherited from [Person](http://schema.org/Person):
 
 ### PUT /critique/users/{nickname}/
 
-#### Request
-
 ```json
+REQUEST
+
     HEADER
         Content-Type: application/json
     PARAMETERS
@@ -182,9 +220,9 @@ Inherited from [Person](http://schema.org/Person):
         TODO
 ```
 
-#### Possible Responses
-
 ```json
+POSSIBLE RESPONSES
+
 204:
     HEADER
         Response: 204 (User modified successfully.)
@@ -246,9 +284,9 @@ Inherited from [Person](http://schema.org/Person):
 
 ### DELETE /critique/users/{nickname}/
 
-#### Possible Responses
-
 ```json
+POSSIBLE RESPONSES
+
 204:
     HEADER
         Response: 204 (User deleted successfully.)
@@ -283,9 +321,9 @@ Inherited from [Person](http://schema.org/Person):
 
 ### GET /critique/users/{nickname}/ratings/
 
-#### Possible Responses
-
 ```json
+POSSIBLE RESPONSES
+
 200:
     HEADER
         Response: 200 (Successful.)
@@ -311,9 +349,9 @@ Inherited from [Person](http://schema.org/Person):
 
 ### GET /critique/users/{nickname}/river/
 
-#### Possible Responses
-
 ```json
+POSSIBLE RESPONSES
+
 200:
     HEADER
         Response: 200 (Successful.)
@@ -339,9 +377,9 @@ Inherited from [Person](http://schema.org/Person):
 
 ### GET /critique/posts/
 
-#### Possible Responses
-
 ```json
+POSSIBLE RESPONSES
+
 200:
     HEADER
         Response: 200 (Successful)
@@ -358,9 +396,9 @@ Inherited from [Person](http://schema.org/Person):
 
 ### POST /critique/posts/
 
-#### Request
-
 ```json
+REQUEST
+
     HEADER
         Content-Type: application/json
     PARAMETERS
@@ -369,9 +407,9 @@ Inherited from [Person](http://schema.org/Person):
         TODO
 ```
 
-#### Possible Responses
-
 ```json
+POSSIBLE RESPONSES
+
 201:
     HEADER
         Response: 201 (Post created successfully.)
@@ -424,9 +462,9 @@ Inherited from [Person](http://schema.org/Person):
 
 ### GET /critique/posts/{postId}/
 
-#### Possible Responses
-
 ```json
+POSSIBLE RESPONSES
+
 201:
     HEADER
         Response: 201 (Successful.)
@@ -452,9 +490,9 @@ Inherited from [Person](http://schema.org/Person):
 
 ### POST /critique/posts/
 
-#### Request
-
 ```json
+REQUEST
+
     HEADER
         Content-Type: application/json
     PARAMETERS
@@ -463,9 +501,9 @@ Inherited from [Person](http://schema.org/Person):
         TODO
 ```
 
-#### Possible Responses
-
 ```json
+POSSIBLE RESPONSES
+
 201:
     HEADER
         Response: 201 (Post created successfully.)
@@ -527,9 +565,9 @@ Inherited from [Person](http://schema.org/Person):
 
 ### PUT /critique/posts/{postId}/
 
-#### Request
-
 ```json
+REQUEST
+
     HEADER
         Content-Type: application/json
     PARAMETERS
@@ -538,9 +576,9 @@ Inherited from [Person](http://schema.org/Person):
         TODO
 ```
 
-#### Possible Responses
-
 ```json
+POSSIBLE RESPONSES
+
 204:
     HEADER
         Response: 204 (Post modified successfully.)
@@ -593,9 +631,9 @@ Inherited from [Person](http://schema.org/Person):
 
 ### DELETE /critique/posts/{postId}/
 
-#### Possible Responses
-
 ```json
+POSSIBLE RESPONSES
+
 204:
     HEADER
         Response: 204 (Post deleted successfully.)
@@ -630,9 +668,9 @@ Inherited from [Person](http://schema.org/Person):
 
 ### POST /critique/ratings/
 
-#### Request
-
 ```json
+REQUEST
+
     HEADER
         Content-Type: application/json
     PARAMETERS
@@ -641,9 +679,9 @@ Inherited from [Person](http://schema.org/Person):
         TODO
 ```
 
-#### Possible Responses
-
 ```json
+POSSIBLE RESPONSES
+
 201:
     HEADER
         Response: 201 (Rating created successfully.)
@@ -696,9 +734,9 @@ Inherited from [Person](http://schema.org/Person):
 
 ### GET /critique/ratings/{ratingId}/
 
-#### Possible Responses
-
 ```json
+POSSIBLE RESPONSES
+
 201:
     HEADER
         Response: 201 (Successful.)
@@ -724,9 +762,9 @@ Inherited from [Person](http://schema.org/Person):
 
 ### PUT /critique/ratings/{ratingId}/
 
-#### Request
-
 ```json
+REQUEST
+
     HEADER
         Content-Type: application/json
     PARAMETERS
@@ -735,9 +773,9 @@ Inherited from [Person](http://schema.org/Person):
         TODO
 ```
 
-#### Possible Responses
-
 ```json
+POSSIBLE RESPONSES
+
 204:
     HEADER
         Response: 204 (Rating modified successfully.)
@@ -790,9 +828,9 @@ Inherited from [Person](http://schema.org/Person):
 
 ### DELETE /critique/ratings/{ratingId}/
 
-#### Possible Responses
-
 ```json
+POSSIBLE RESPONSES
+
 204:
     HEADER
         Response: 204 (Rating deleted successfully.)
