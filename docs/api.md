@@ -42,14 +42,14 @@ POSSIBLE RESPONSES
 
 Profile definition for all user resources. Related [profile call](#get-profilesuser_profile).
 
-#### Dependencies
+#### User Dependencies
 
 This profile inherits:
 
 - Some semantic descriptors from [Person](http://schema.org/Person)
 - Some link relations from IANA Web linking [RFC5988](https://www.iana.org/assignments/link-relations/link-relations.xhtml)
 
-#### Link Relations
+#### User Relations
 
 - [`add-user`](#adduser)
 - [`delete`](#delete)
@@ -60,7 +60,7 @@ Inherited from IANA RFC5988:
 - [`edit`](https://tools.ietf.org/html/rfc5023#section-11.1): This link allows editing the user via `PUT`.
 - [`profile`](https://tools.ietf.org/html/rfc6906): The link contains the location of the resource profile.
 
-#### Semantic Descriptors
+#### User Semantic Descriptors
 
 ##### Data Type User
 
@@ -77,8 +77,6 @@ Inherited from [Person](http://schema.org/Person):
 - [`telephone`](http://schema.org/telephone) (string): Optional in representations in which a new user is generated.
 - [`gender`](http://schema.org/gender) (string): Optional in representations in which a new user is generated.
 
-## Profile Responses
-
 ### GET /profiles/user_profile
 
 Return the User Profile in HTML format.
@@ -92,7 +90,9 @@ POSSIBLE RESPONSES
         Content-Type: text/html
 ```
 
-## API Responses
+## Users
+
+TODO description
 
 ### GET /critique/users/
 
@@ -375,6 +375,10 @@ POSSIBLE RESPONSES
         }
 ```
 
+## Posts
+
+TODO description
+
 ### GET /critique/posts/
 
 ```json
@@ -488,7 +492,7 @@ POSSIBLE RESPONSES
         }
 ```
 
-### POST /critique/posts/
+### POST /critique/posts/{postId}/
 
 ```json
 REQUEST
@@ -665,6 +669,10 @@ POSSIBLE RESPONSES
             "error": "The system has failed. Please, contact the administrator."
         }
 ```
+
+## Ratings
+
+TODO description
 
 ### POST /critique/ratings/
 
