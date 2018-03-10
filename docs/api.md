@@ -55,7 +55,7 @@ POSSIBLE RESPONSES
 
 ### user-ratings
 
-Returns the ratings sent to the user `GET`.
+Returns the ratings sent to the user via `GET`.
 
 #### GET /link-relations/ratings
 
