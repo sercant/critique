@@ -19,6 +19,57 @@ POSSIBLE RESPONSES
         Content-Type: text/html
 ```
 
+### user-inbox
+
+Returns the posts sent to the user which are currently not public via `GET`.
+
+#### GET /link-relations/user-inbox
+
+Return the link relation description in HTML format.
+
+```json
+POSSIBLE RESPONSES
+
+200:
+    HEADER
+        Response: 200
+        Content-Type: text/html
+```
+
+### user-river
+
+Returns the posts sent to the user which are currently public via `GET`.
+
+#### GET /link-relations/user-river
+
+Return the link relation description in HTML format.
+
+```json
+POSSIBLE RESPONSES
+
+200:
+    HEADER
+        Response: 200
+        Content-Type: text/html
+```
+
+### user-ratings
+
+Returns the ratings sent to the user `GET`.
+
+#### GET /link-relations/ratings
+
+Return the link relation description in HTML format.
+
+```json
+POSSIBLE RESPONSES
+
+200:
+    HEADER
+        Response: 200
+        Content-Type: text/html
+```
+
 ### delete
 
 Deletes the current context. Use via `DELETE`.
@@ -51,8 +102,11 @@ This profile inherits:
 
 #### User Relations
 
-- [`add-user`](#adduser)
+- [`add-user`](#add-user)
 - [`delete`](#delete)
+- [`user-inbox`](#user-inbox)
+- [`user-river`](#user-river)
+- [`user-ratings`](#user-ratings)
 
 Inherited from IANA RFC5988:
 
@@ -348,6 +402,34 @@ POSSIBLE RESPONSES
 ```
 
 ### GET /critique/users/{nickname}/river/
+
+```json
+POSSIBLE RESPONSES
+
+200:
+    HEADER
+        Response: 200 (Successful.)
+        Content-Type: application/vnd.mason+json
+    BODY
+        Profile: TODO
+        Example:
+            TODO
+    LINKS
+        Self: TODO
+        Profile: TODO
+        TODO OTHER LINKS
+
+404:
+    HEADER
+        Response: 404
+        Content-Type: application/json
+    BODY
+        {
+            "error": "User not found."
+        }
+```
+
+### GET /critique/users/{nickname}/inbox/
 
 ```json
 POSSIBLE RESPONSES
