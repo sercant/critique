@@ -4,7 +4,7 @@
 
 ### User Profile
 
-Profile definition for all user resources. Related [profile call](###GET-/profiles/user_profile).
+Profile definition for all user resources. Related [profile call](#get-profilesuser_profile).
 
 #### Dependencies
 
@@ -15,8 +15,8 @@ This profile inherits:
 
 #### Link Relations
 
-- [`create`](###create)
-- [`delete`](###delete)
+- [`create`](#create)
+- [`delete`](#delete)
 
 Inherited from IANA RFC5988:
 
