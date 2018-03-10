@@ -254,21 +254,9 @@ REQUEST
         Accept: application/vnd.mason+json
     BODY
         {
-            "nickname": {
-                "title": "Nickname",
-                "description": "User nickname",
-                "type": "string"
-            },
-            "givenName": {
-                "title": "Given name",
-                "description": "User given name",
-                "type": "string"
-            },
-            "email": {
-                "title": "Email",
-                "description": "User email",
-                "type": "string"
-            }
+            "nickname": "alkila",
+            "givenName": "Sercan",
+            "email": "sercan@mail.com"
         }
 ```
 
@@ -289,7 +277,7 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "User info is not well formed or entity body is missing."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/users/"
         }
 
 415:
@@ -301,7 +289,7 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "Format of the input is not json."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/users/"
         }
 
 422:
@@ -313,7 +301,7 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "Nickname, email, or mobile already exist in the users list."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/users/"
         }
 
 500:
@@ -325,11 +313,18 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "The system has failed. Please, contact the administrator."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/users/"
         }
 ```
 
 ### GET /critique/api/users/{nickname}/
+
+Receives the information of a particular user.
+
+```json
+PARAMETERS
+    nickname: The nickname of the user. Example, Scott.
+```
 
 ```json
 REQUEST
@@ -455,11 +450,18 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "User not found."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/users/{nickname}/"
         }
 ```
 
 ### PUT /critique/api/users/{nickname}/
+
+Edit the information of a particular user.
+
+```json
+PARAMETERS
+    nickname: The nickname of the user. Example, Scott.
+```
 
 ```json
 REQUEST
@@ -467,10 +469,17 @@ REQUEST
     HEADER
         Content-Type: application/json
         Accept: application/vnd.mason+json
-    PARAMETERS
-        TODO
     BODY
-        TODO
+        {
+            "givenName": "Scott",
+            "familyName": "Pilgrim",
+            "avatar": "photo1.jpg",
+            "bio": "Best bass in town. Ramona <3",
+            "email": "scott@outlook.com",
+            "birthdate": "1998-01-22",
+            "telephone": null,
+            "gender": "male"
+        }
 ```
 
 ```json
@@ -479,13 +488,7 @@ POSSIBLE RESPONSES
 204:
     HEADER
         Response: 204 (User modified successfully.)
-        Content-Type: application/vnd.mason+json
-    BODY
-        TODO
-    RELATIONS
-        Self: TODO
-        Profile: TODO
-        TODO OTHER LINKS
+        Location: URL of the newly edited resource.
 
 400:
     HEADER
@@ -496,7 +499,7 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "User info is not well formed or it is empty."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/users/{nickname}/"
         }
 
 404:
@@ -508,7 +511,7 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "User not found."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/users/{nickname}/"
         }
 
 415:
@@ -520,7 +523,7 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "Format of the input is not json."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/users/{nickname}/"
         }
 
 422:
@@ -532,7 +535,7 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "Nickname, email, or mobile already exist in the users list."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/users/{nickname}/"
         }
 
 500:
@@ -544,11 +547,16 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "The system has failed. Please, contact the administrator."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/users/{nickname}/"
         }
 ```
 
 ### DELETE /critique/api/users/{nickname}/
+
+```json
+PARAMETERS
+    nickname: The nickname of the user. Example, Scott.
+```
 
 ```json
 POSSIBLE RESPONSES
@@ -556,13 +564,6 @@ POSSIBLE RESPONSES
 204:
     HEADER
         Response: 204 (User deleted successfully.)
-        Content-Type: application/vnd.mason+json
-    BODY
-        TODO
-    RELATIONS
-        Self: TODO
-        Profile: TODO
-        TODO OTHER LINKS
 
 404:
     HEADER
@@ -573,7 +574,7 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "User not found."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/users/{nickname}/"
         }
 
 500:
@@ -585,13 +586,18 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "The system has failed. Please, contact the administrator."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/users/{nickname}/"
         }
 ```
 
 ### GET /critique/api/users/{nickname}/ratings/
 
 ```json
+PARAMETERS
+    TODO
+```
+
+```json
 REQUEST
     HEADER
         Accept: application/vnd.mason+json
@@ -620,13 +626,18 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "User not found."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/users/{nickname}/ratings/"
         }
 ```
 
 ### GET /critique/api/users/{nickname}/river/
 
 ```json
+PARAMETERS
+    TODO
+```
+
+```json
 REQUEST
     HEADER
         Accept: application/vnd.mason+json
@@ -655,13 +666,18 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "User not found."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/users/{nickname}/river/"
         }
 ```
 
 ### GET /critique/api/users/{nickname}/inbox/
 
 ```json
+PARAMETERS
+    TODO
+```
+
+```json
 REQUEST
     HEADER
         Accept: application/vnd.mason+json
@@ -690,7 +706,7 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "User not found."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/users/{nickname}/inbox/"
         }
 ```
 
@@ -711,7 +727,7 @@ POSSIBLE RESPONSES
 
 200:
     HEADER
-        Response: 200 (Successful)
+        Response: 200 (Successful.)
         Content-Type: application/vnd.mason+json
     BODY
         TODO
@@ -722,6 +738,11 @@ POSSIBLE RESPONSES
 ```
 
 ### POST /critique/api/posts/
+
+```json
+PARAMETERS
+    TODO
+```
 
 ```json
 REQUEST
@@ -741,13 +762,7 @@ POSSIBLE RESPONSES
 201:
     HEADER
         Response: 201 (Post created successfully.)
-        Content-Type: application/vnd.mason+json
-    BODY
-        TODO
-    RELATIONS
-        Self: TODO
-        Profile: TODO
-        TODO OTHER LINKS
+        Location: URL of the newly created resource.
 
 400:
     HEADER
@@ -758,7 +773,7 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "Post info is not well formed or entity body is missing."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/posts/"
         }
 
 415:
@@ -770,7 +785,7 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "Format of the input is not json."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/posts/"
         }
 
 422:
@@ -782,7 +797,7 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "Sender or receiver not found."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/posts/"
         }
 
 500:
@@ -794,11 +809,16 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "The system has failed. Please, contact the administrator."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/posts/"
         }
 ```
 
 ### GET /critique/api/posts/{postId}/
+
+```json
+PARAMETERS
+    TODO
+```
 
 ```json
 REQUEST
@@ -829,11 +849,16 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "Post not found."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/posts/{postId}/"
         }
 ```
 
 ### POST /critique/api/posts/{postId}/
+
+```json
+PARAMETERS
+    TODO
+```
 
 ```json
 REQUEST
@@ -853,13 +878,7 @@ POSSIBLE RESPONSES
 201:
     HEADER
         Response: 201 (Post created successfully.)
-        Content-Type: application/vnd.mason+json
-    BODY
-        TODO
-    RELATIONS
-        Self: TODO
-        Profile: TODO
-        TODO OTHER LINKS
+        Location: URL of the newly created resource.
 
 400:
     HEADER
@@ -870,7 +889,7 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "Post info is not well formed or entity body is missing."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/posts/{postId}/"
         }
 
 415:
@@ -882,7 +901,7 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "Format of the input is not json."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/posts/{postId}/"
         }
 
 404:
@@ -894,7 +913,7 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "Post not found."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/posts/{postId}/"
         }
 
 422:
@@ -906,7 +925,7 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "Sender not found."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/posts/{postId}/"
         }
 
 500:
@@ -918,11 +937,16 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "The system has failed. Please, contact the administrator."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/posts/{postId}/"
         }
 ```
 
 ### PUT /critique/api/posts/{postId}/
+
+```json
+PARAMETERS
+    TODO
+```
 
 ```json
 REQUEST
@@ -942,13 +966,7 @@ POSSIBLE RESPONSES
 204:
     HEADER
         Response: 204 (Post modified successfully.)
-        Content-Type: application/vnd.mason+json
-    BODY
-        TODO
-    RELATIONS
-        Self: TODO
-        Profile: TODO
-        TODO OTHER LINKS
+        Location: URL of the newly edited resource.
 
 400:
     HEADER
@@ -959,7 +977,7 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "Post info is not well formed or it is empty."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/posts/{postId}/"
         }
 
 404:
@@ -971,7 +989,7 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "Post not found."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/posts/{postId}/"
         }
 
 415:
@@ -983,7 +1001,7 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "Format of the input is not json."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/posts/{postId}/"
         }
 
 500:
@@ -995,11 +1013,16 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "The system has failed. Please, contact the administrator."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/posts/{postId}/"
         }
 ```
 
 ### DELETE /critique/api/posts/{postId}/
+
+```json
+PARAMETERS
+    TODO
+```
 
 ```json
 POSSIBLE RESPONSES
@@ -1007,13 +1030,6 @@ POSSIBLE RESPONSES
 204:
     HEADER
         Response: 204 (Post deleted successfully.)
-        Content-Type: application/vnd.mason+json
-    BODY
-        TODO
-    RELATIONS
-        Self: TODO
-        Profile: TODO
-        TODO OTHER LINKS
 
 404:
     HEADER
@@ -1024,7 +1040,7 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "Post not found."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/posts/{postId}/"
         }
 
 500:
@@ -1036,7 +1052,7 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "The system has failed. Please, contact the administrator."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/posts/{postId}/"
         }
 ```
 
@@ -1064,13 +1080,7 @@ POSSIBLE RESPONSES
 201:
     HEADER
         Response: 201 (Rating created successfully.)
-        Content-Type: application/vnd.mason+json
-    BODY
-        TODO
-    RELATIONS
-        Self: TODO
-        Profile: TODO
-        TODO OTHER LINKS
+        Location: URL of the newly created resource.
 
 400:
     HEADER
@@ -1081,7 +1091,7 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "Rating info is not well formed or entity body is missing."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/ratings/"
         }
 
 415:
@@ -1093,7 +1103,7 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "Format of the input is not json."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/ratings/"
         }
 
 422:
@@ -1105,7 +1115,7 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "Sender or receiver not found."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/ratings/"
         }
 
 500:
@@ -1117,11 +1127,16 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "The system has failed. Please, contact the administrator."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/ratings/"
         }
 ```
 
 ### GET /critique/api/ratings/{ratingId}/
+
+```json
+PARAMETERS
+    TODO
+```
 
 ```json
 REQUEST
@@ -1152,11 +1167,16 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "Rating not found."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/ratings/{ratingId}/"
         }
 ```
 
 ### PUT /critique/api/ratings/{ratingId}/
+
+```json
+PARAMETERS
+    TODO
+```
 
 ```json
 REQUEST
@@ -1176,13 +1196,7 @@ POSSIBLE RESPONSES
 204:
     HEADER
         Response: 204 (Rating modified successfully.)
-        Content-Type: application/vnd.mason+json
-    BODY
-        TODO
-    RELATIONS
-        Self: TODO
-        Profile: TODO
-        TODO OTHER LINKS
+        Location: URL of the newly edited resource.
 
 400:
     HEADER
@@ -1193,7 +1207,7 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "Rating info is not well formed or it is empty."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/ratings/{ratingId}/"
         }
 
 404:
@@ -1205,7 +1219,7 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "Rating not found."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/ratings/{ratingId}/"
         }
 
 415:
@@ -1217,7 +1231,7 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "Format of the input is not json."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/ratings/{ratingId}/"
         }
 
 500:
@@ -1229,11 +1243,16 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "The system has failed. Please, contact the administrator."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/ratings/{ratingId}/"
         }
 ```
 
 ### DELETE /critique/api/ratings/{ratingId}/
+
+```json
+PARAMETERS
+    TODO
+```
 
 ```json
 POSSIBLE RESPONSES
@@ -1241,13 +1260,6 @@ POSSIBLE RESPONSES
 204:
     HEADER
         Response: 204 (Rating deleted successfully.)
-        Content-Type: application/vnd.mason+json
-    BODY
-        TODO
-    RELATIONS
-        Self: TODO
-        Profile: TODO
-        TODO OTHER LINKS
 
 404:
     HEADER
@@ -1258,7 +1270,7 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "Rating not found."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/ratings/{ratingId}/"
         }
 
 500:
@@ -1270,6 +1282,6 @@ POSSIBLE RESPONSES
             "@error": {
                 "@message": "The system has failed. Please, contact the administrator."
             },
-            "resource_url": "TODO"
+            "resource_url": "/critique/api/ratings/{ratingId}/"
         }
 ```
