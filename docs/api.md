@@ -89,6 +89,29 @@ POSSIBLE RESPONSES
 
 ## Profiles
 
+### Error Profile
+
+Profile definition for all errors messages in the system.
+
+#### Error Semantic Descriptors
+
+##### Data Type Error
+
+- `resource_url` (string): URL of the resource generating the error.
+
+### GET /critique/profiles/error_profile
+
+Return the User Profile in HTML format.
+
+```json
+POSSIBLE RESPONSES
+
+200:
+    HEADER
+        Response: 200
+        Content-Type: text/html
+```
+
 ### User Profile
 
 Profile definition for all user resources. Related [profile call](#get-profilesuser_profile).
