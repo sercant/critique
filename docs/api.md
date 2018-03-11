@@ -91,7 +91,7 @@ POSSIBLE RESPONSES
 
 ### Error Profile
 
-Profile definition for all errors messages in the system.
+Profile definition for all errors messages in the system. Related [profile call](#get-critiqueprofileserror_profile).
 
 #### Error Semantic Descriptors
 
@@ -114,7 +114,7 @@ POSSIBLE RESPONSES
 
 ### User Profile
 
-Profile definition for all user resources. Related [profile call](#get-profilesuser_profile).
+Profile definition for all user resources. Related [profile call](#get-critiqueprofilesuser_profile).
 
 #### User Dependencies
 
