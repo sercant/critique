@@ -578,3 +578,144 @@ Delete a particular user from the platform.
                 "resource_url": "/critique/api/users/{nickname}/"
             }
 
+## User's ratings [/critique/api/users/{nickname}/ratings/]
+
+TODO
+
++ Parameters
+    TODO
+
+### Receive users ratings [GET]
+
+TODO
+
++ Relation: TODO
+
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/vnd.mason+json
+
++ Response 200 (application/vnd.mason+json)
+
+    + Body
+
+        TODO
+
++ Response 404 (application/vnd.mason+json)
+
+    HEADER
+        Response: 404
+        Content-Type: applica
+            User not found.
+            tion/vnd.mason+json
+    + Body
+
+        {
+            "@error": {
+                "@message": "User not found."
+            },
+            "resource_url": "/critique/api/users/{nickname}/ratings/"
+        }
+
+## User's river [/critique/api/users/{nickname}/river/]
+
+TODO
+
++ Parameters
+    TODO
+
+### Receive user's river [GET]
+
+TODO
+
++ Relation: TODO
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.mason+json
+
++ Response 200 (application/vnd.mason+json)
+
+    + Body
+
+        TODO
+
++ Response 404 (application/vnd.mason+json)
+
+    User not found.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "User not found."
+                },
+                "resource_url": "/critique/api/users/{nickname}/river/"
+            }
+
+## User's inbox [/critique/api/users/{nickname}/inbox/]
+
+TODO
+
++ Parameters
+    TODO
+
+### Receive user's inbox [GET]
+
+TODO
+
++ Relation: TODO
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.mason+json
+
++ Response 200 (application/vnd.mason+json)
+
+    + Body
+
+        TODO
+
++ Response 404 (application/vnd.mason+json)
+
+    User not found.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "User not found."
+                },
+                "resource_url": "/critique/api/users/{nickname}/inbox/"
+            }
+
+# Group Posts
+
+All these resources use the [Post Profile](#profiles-post-profile).
+
+In addition all error messages follow the [Error Profile](#profiles-error-profile).
+
+## Posts List [/critique/api/posts/]
+
+A list of all posts in the platform.
+
+### List posts [GET]
+
+Get a list of all posts in the platform.
+
++ Relation: TODO
+
++ Response 200 (application/vnd.mason+json)
+
+    + Body
+
+            {
+
+            }
+
