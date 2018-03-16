@@ -53,3 +53,12 @@ To run the tests please make sure that you activated the virtual environment usi
 . venv/bin/activate
 ./run_database_api_tests.sh
 ```
+
+## Rendering API documentation
+
+```bash
+npm install -g aglio
+
+# will give you a link and changes in the file are updated live
+aglio -i docs/apiary.apib --server
+```
