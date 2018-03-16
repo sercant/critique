@@ -1,0 +1,580 @@
+FORMAT: 1A
+HOST: http://localhost:5000
+
+# Critique
+
+Critique is a simple API allowing interactions to the platfrom.
+
+# Group Link Relations
+
+This document uses IANA standard link relations (http://www.iana.org/assignments/link-relations/link-relations.xhtml). In addition the following link relations have been defined:
+
+## add-user [/critique/link-relations/add-user]
+
+Creates a new user via `POST`.
+
+### GET
+
+Return the link relation description in HTML format.
+
++ Response 200 (text/html)
+
+## user-inbox [/critique/link-relations/user-inbox]
+
+Returns the posts sent to the user which are currently not public via `GET`.
+
+### GET
+
+Return the link relation description in HTML format.
+
++ Response 200 (text/html)
+
+## user-river [/critique/link-relations/user-river]
+
+Returns the posts sent to the user which are currently public via `GET`.
+
+### GET
+
+Return the link relation description in HTML format.
+
++ Response 200 (text/html)
+
+## user-ratings [/critique/link-relations/ratings]
+
+Returns the ratings sent to the user via `GET`.
+
+### GET
+
+Return the link relation description in HTML format.
+
++ Response 200 (text/html)
+
+## delete [/critique/link-relations/delete]
+
+Deletes the current context. Use via `DELETE`.
+
+### GET
+
+Return the link relation description in HTML format.
+
++ Response 200 (text/html)
+
+
+
+
+# Group Profiles
+
+## Error Profile [/critique/profiles/error_profile]
+
+Profile definition for all errors messages in the system.
+
+### Semantic Descriptors
+
+#### Data Type Error
+
+ * `resource_url` (string): URL of the resource generating the error.
+
+### GET
+
+Return the User Profile in HTML format.
+
++ Response 200 (text/html)
+
+## User Profile [/critique/profiles/user_profile]
+
+Profile definition for all user resources.
+
+### Dependencies
+
+This profile inherits:
+
+ * Some semantic descriptors from [Person](http://schema.org/Person)
+ * Some link relations from IANA Web linking [RFC5988](https://www.iana.org//assignmentscritique/link-/relationscritique/link-relations.xhtml)
+
+### Link relations
+
+ * [`add-user`](#add-user)
+ * [`delete`](#delete)
+ * [`user-inbox`](#user-inbox)
+ * [`user-river`](#user-river)
+ * [`user-ratings`](#user-ratings)
+
+Inherited from IANA RFC5988:
+
+ * [`collection`](http://tools.ietf.org/html/rfc6573): Only accessible through `GET`.
+ * [`edit`](https://tools.ietf.org/html/rfc5023#section-11.1): This link allows editing the user via `PUT`.
+ * [`profile`](https://tools.ietf.org/html/rfc6906): The link contains the location of the resource profile.
+
+### Semantic Descriptors
+
+#### Data Type User
+
+ * `nickname` (string): Nickname of the user. Mandatory in representations in which a new user is generated.
+ * `avatar` (string): Avatar of the user. Optional in representations in which a new user is generated.
+ * `bio` (string): Signiture of the user. Optional in representations in which a new user is generated.
+
+Inherited from [Person](http://schema.org/Person):
+
+ * [`givenName`](http://schema.org/givenName) (string): Mandatory in representations in which a new user is generated.
+ * [`familyName`](http://schema.org/familyName) (string): Optional in representations in which a new user is generated.
+ * [`email`](http://schema.org/email) (string): Mandatory in representations in which a new user is generated.
+ * [`birthDate`](http://schema.org/birthDate) (string): Optional in representations in which a new user is generated.
+ * [`telephone`](http://schema.org/telephone) (string): Optional in representations in which a new user is generated.
+ * [`gender`](http://schema.org/gender) (string): Optional in representations in which a new user is generated.
+
+### GET
+
+Return the User Profile in HTML format.
+
++ Response 200 (text/html)
+
+
+
+# Group Users
+
+All these resources use the [User Profile](#profiles-user-profile).
+
+In addition all error messages follow the [Error Profile](#profiles-error-profile).
+
+## Users List [/critique/api/users/]
+
+A list of all users in the platform.
+
+### List Users [GET]
+
+Get a list of all users in the platform.
+
++ Relation: self
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.mason+json
+
++ Response 200 (application/vnd.mason+json)
+
+    List successful retrieved.
+
+    + Body
+
+            {
+                "items": [
+                    {
+                        "givenName": "Scott",
+                        "familyName": "Pilgrim",
+                        "bio": "Best bass in town. Ramona <3",
+                        "avatar": "photo1.jpg",
+                        "@controls": {
+                            "self": {
+                                "href": "/critique/api/users/Scott/"
+                            },
+                            "profile": {
+                                "href": "/critique/profiles/user-profile/"
+                            }
+                        }
+                    },
+                    {
+                        "givenName": "Kim",
+                        "familyName": "Pine",
+                        "bio": "Drums! Dont irritate me...",
+                        "avatar": "photo3.jpg",
+                        "@controls": {
+                            "self": {
+                                "href": "/critique/api/users/Kim/"
+                            },
+                            "profile": {
+                                "href": "/critique/profiles/user-profile/"
+                            }
+                        }
+                    }
+                ],
+                "@namespaces": {
+                    "critique": {
+                        "name": "/critique/link-relations/"
+                    }
+                },
+                "@controls": {
+                    "self": {
+                        "href": "/forum/api/users/"
+                    },
+                    "critique:add-user": {
+                        "href": "/forum/api/users/",
+                        "encoding": "json",
+                        "method": "POST",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "nickname": {
+                                    "title": "Nickname",
+                                    "description": "User nickname",
+                                    "type": "string"
+                                },
+                                "givenName": {
+                                    "title": "Given name",
+                                    "description": "User given name",
+                                    "type": "string"
+                                },
+                                "email": {
+                                    "title": "Email",
+                                    "description": "User email",
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["nickname", "givenName", "email"]
+                        }
+                    }
+                }
+            }
+
+### Create a new user [POST]
+
+Create a new user.
+
++ Relation: add-user
+
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/vnd.mason+json
+
+    + Body
+
+            {
+                "nickname": "alkila",
+                "givenName": "Sercan",
+                "email": "sercan@mail.com"
+            }
+
+
++ Response 201
+
+    User created successfully.
+
+    + Headers
+
+            Location: URL of the newly created resource.
+
+
++ Response 400 (application/vnd.mason+json)
+
+    User info is not well formed or entity body is missing.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "User info is not well formed or entity body is missing."
+                },
+                "resource_url": "/critique/api/users/"
+            }
+
++ Response 415 (application/vnd.mason+json)
+
+    Format of the input is not json.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "Format of the input is not json."
+                },
+                "resource_url": "/critique/api/users/"
+            }
+
++ Response 422 (application/vnd.mason+json)
+
+    Nickname, email, or mobile already exist in the users list.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "Nickname, email, or mobile already exist in the users list."
+                },
+                "resource_url": "/critique/api/users/"
+            }
+
++ Response 500 (application/vnd.mason+json)
+
+    The system has failed. Please, contact the administrator.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "The system has failed. Please, contact the administrator."
+                },
+                "resource_url": "/critique/api/users/"
+            }
+
+## User [/critique/api/users/{nickname}/]
+
+A user stored in the Critique database.
+
++ Parameters
+    + nickname: `Scott` (string) - The nickname of the user.
+
+### Receive user information [GET]
+
+Receives the information of a particular user.
+
++ Relation: self
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.mason+json
+
++ Response 200 (application/vnd.mason+json)
+
+    Successful.
+
+    + Body
+
+            {
+                "givenName": "Scott",
+                "familyName": "Pilgrim",
+                "avatar": "photo1.jpg",
+                "bio": "Best bass in town. Ramona <3",
+                "email": "scott@outlook.com",
+                "birthdate": "1998-01-22",
+                "telephone": null,
+                "gender": "male",
+                "@namespaces": {
+                    "critique": {
+                        "name": "/critique/link-relations/"
+                    }
+                },
+                "@controls": {
+                    "self": {
+                        "href": "/critique/api/users/Scott/"
+                    },
+                    "profile": {
+                        "href": "/critique/profiles/user-profile/"
+                    },
+                    "collection": {
+                        "href": "/forum/api/users/"
+                    },
+                    "edit": {
+                        "title": "Edit this user",
+                        "href": "/forum/api/users/Scott/",
+                        "encoding": "json",
+                        "method": "PUT",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "givenName": {
+                                    "title": "given name",
+                                    "description": "user given name",
+                                    "type": "string"
+                                },
+                                "familyName": {
+                                    "title": "family name",
+                                    "description": "user family name",
+                                    "type": "string"
+                                },
+                                "avatar": {
+                                    "title": "avatar",
+                                    "description": "user avatar",
+                                    "type": "string"
+                                },
+                                "bio": {
+                                    "title": "bio",
+                                    "description": "user bio",
+                                    "type": "string"
+                                },
+                                "email": {
+                                    "title": "email",
+                                    "description": "user email",
+                                    "type": "string"
+                                },
+                                "birthdate": {
+                                    "title": "birthdate",
+                                    "description": "user birthdate",
+                                    "type": "string"
+                                },
+                                "telephone": {
+                                    "title": "telephone",
+                                    "description": "user telephone",
+                                    "type": "string"
+                                },
+                                "gender": {
+                                    "title": "gender",
+                                    "description": "user gender",
+                                    "type": "string"
+                                }
+                            },
+                            "required": [ ]
+                        }
+                    },
+                    "critique:delete": {
+                        "href": "/critique/api/users/Scott/",
+                        "method": "DELETE"
+                    },
+                    "critique:user-inbox": {
+                        "href": "/critique/api/users/Scott/inbox"
+                    },
+                    "critique:user-river": {
+                        "href": "/critique/api/users/Scott/river"
+                    },
+                    "critique:user-ratings": {
+                        "href": "/critique/api/users/Scott/ratings"
+                    }
+                }
+            }
+
++ Response 404 (application/vnd.mason+json)
+
+    User not found.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "User not found."
+                },
+                "resource_url": "/critique/api/users/{nickname}/"
+            }
+
+
+### Edit user information [PUT]
+
+Edit the information of a particular user.
+
++ Relation: edit
+
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/vnd.mason+json
+
+    + Body
+
+            {
+                "givenName": "Scott",
+                "familyName": "Pilgrim",
+                "avatar": "photo1.jpg",
+                "bio": "Best bass in town. Ramona <3",
+                "email": "scott@outlook.com",
+                "birthdate": "1998-01-22",
+                "telephone": null,
+                "gender": "male"
+            }
+
++ Response 204 (application/vnd.mason+json)
+
+    User modified successfully.
+
+    + Headers
+
+            Location: URL of the newly edited resource.
+
++ Response 400 (application/vnd.mason+json)
+
+    User info is not well formed or it is empty.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "User info is not well formed or it is empty."
+                },
+                "resource_url": "/critique/api/users/{nickname}/"
+            }
+
++ Response 404 (application/vnd.mason+json)
+
+    User not found.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "User not found."
+                },
+                "resource_url": "/critique/api/users/{nickname}/"
+            }
+
++ Response 415 (application/vnd.mason+json)
+
+    Format of the input is not json.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "Format of the input is not json."
+                },
+                "resource_url": "/critique/api/users/{nickname}/"
+            }
+
++ Response 422 (application/vnd.mason+json)
+
+    Nickname, email, or mobile already exist in the users list.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "Nickname, email, or mobile already exist in the users list."
+                },
+                "resource_url": "/critique/api/users/{nickname}/"
+            }
+
++ Response 500 (application/vnd.mason+json)
+
+    The system has failed. Please, contact the administrator.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "The system has failed. Please, contact the administrator."
+                },
+                "resource_url": "/critique/api/users/{nickname}/"
+            }
+
+
+### Delete a user [DELETE]
+
+Delete a particular user from the platform.
+
++ Relation: delete
+
++ Response 204 (application/vnd.mason+json)
+
+    User deleted successfully.
+
+    + Headers
+
+
++ Response 404 (application/vnd.mason+json)
+
+    User not found.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "User not found."
+                },
+                "resource_url": "/critique/api/users/{nickname}/"
+            }
+
++ Response 500 (application/vnd.mason+json)
+
+    The system has failed. Please, contact the administrator.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "The system has failed. Please, contact the administrator."
+                },
+                "resource_url": "/critique/api/users/{nickname}/"
+            }
+
