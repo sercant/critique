@@ -605,19 +605,16 @@ TODO
 
 + Response 404 (application/vnd.mason+json)
 
-    HEADER
-        Response: 404
-        Content-Type: applica
-            User not found.
-            tion/vnd.mason+json
+    User not found.
+
     + Body
 
-        {
-            "@error": {
-                "@message": "User not found."
-            },
-            "resource_url": "/critique/api/users/{nickname}/ratings/"
-        }
+            {
+                "@error": {
+                    "@message": "User not found."
+                },
+                "resource_url": "/critique/api/users/{nickname}/ratings/"
+            }
 
 ## User's river [/critique/api/users/{nickname}/river/]
 
