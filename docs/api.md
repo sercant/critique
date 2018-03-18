@@ -657,7 +657,7 @@ POSSIBLE RESPONSES
 
 ```json
 PARAMETERS
-    TODO
+    nickname: The nickname of the user. for example: Scott.
 ```
 
 ```json
@@ -674,12 +674,47 @@ POSSIBLE RESPONSES
         Response: 200 (Successful.)
         Content-Type: application/vnd.mason+json
     BODY
-        TODO
-    RELATIONS
-        Self: TODO
-        Profile: TODO
-        TODO OTHER LINKS
+        {
+            "items": [
 
+                {
+                    "givenName": "Scott",
+                    "avatar": "photo1.jpg",
+                    "text":"this is a river text 01.",
+                    "@controls":{
+                        "self":{
+                            "href": "/critique/api/users/mina/river/01"
+                        },
+                        "profile": {
+                            "href": "/critique/profiles/user-profile/"
+                        },
+                        "critique:user-ratings": {
+                            "href": "/critique/api/users/Scott/ratings"
+                        }
+                    }
+                },
+                {
+                    "givenName": "Moamen",
+                    "avatar": "photoMoamen.jpg",
+                    "text":"this is a river text of Moamen.",
+                    "@controls":{
+                        "self":{
+                            "href": "/critique/api/users/mina/river/02"
+                        },
+                        "profile": {
+                            "href": "/critique/profiles/user-profile/"
+                        },
+                        "critique:user-ratings": {
+                            "href": "/critique/api/users/Moamen/ratings"
+                        }
+                    }
+                }
+            ]
+        }
+    RELATIONS
+        Self
+        Profile
+        user-ratings
 404:
     HEADER
         Response: 404
@@ -697,7 +732,7 @@ POSSIBLE RESPONSES
 
 ```json
 PARAMETERS
-    TODO
+    nickname: The nickname of the user. for example: Scott.
 ```
 
 ```json
@@ -715,6 +750,13 @@ POSSIBLE RESPONSES
         Content-Type: application/vnd.mason+json
     BODY
         TODO
+        {
+            "items": [
+                {
+                    
+                }
+            ]
+        }
     RELATIONS
         Self: TODO
         Profile: TODO
