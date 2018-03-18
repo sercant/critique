@@ -580,16 +580,17 @@ Delete a particular user from the platform.
 
 ## User's ratings [/critique/api/users/{nickname}/ratings/]
 
-TODO
+Rating of a user stored in critique database
 
 + Parameters
-    TODO
+    nickname: The nickname of the user. Example, Scott.
+
 
 ### Receive users ratings [GET]
 
-TODO
+Get the ratings of the users in the database
 
-+ Relation: TODO
++ Relation: self
 
 + Request (application/json)
 
@@ -600,8 +601,60 @@ TODO
 + Response 200 (application/vnd.mason+json)
 
     + Body
-
-        TODO
+        {
+            "items":[
+                {
+                    "ratingId":"015",
+                    "rating": "5",
+                    "@controls":{
+                        "self":{
+                            "href":"/critique/api/users/Scott/ratings/"
+                        },
+                        "profile": {
+                            "href": "/critique/api/ratings/015/"
+                        }
+                    }
+                },
+                {
+                    "ratingId": "016",
+                    "rating": "2",
+                    "@controls":{
+                        "self":{
+                            "href":"/critique/api/users/Kim/ratings/"
+                        },
+                        "profile": {
+                            "href": "/critique/api/ratings/016/"
+                        }
+                    }
+                }
+            ],
+            "@namespaces": {
+                "critique": {
+                    "name": "/critique/link-relations/"
+                }
+            },
+            "@controls": {
+                "self": {
+                    "href": "/forum/api/users/Kim/ratings/"
+                },
+                "critique:add-rating": {
+                    "href": "/forum/api/users/",
+                    "encoding": "json",
+                    "method": "POST",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "rating": {
+                                "title": "Rating",
+                                "description": "Rating for the user",
+                                "type": "integer"
+                            }
+                        },
+                        "required": ["rating"]
+                    }
+                }
+            }
+        }
 
 + Response 404 (application/vnd.mason+json)
 
@@ -716,3 +769,326 @@ Get a list of all posts in the platform.
 
             }
 
+
+
+//  CHECK
+# Ratings
+
+## Ratings list [/critique/api/ratings/]
+
+View the list that contains users ratings
+
+### List ratings [GET]
+
+Add a new rating
+
++ Relation: add-rating
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.mason+json
+
++ Response 200 (application/vnd.mason+json)
+
+    + Headers
+        Response: 201 (Rating created successfully.)
+        Location: URL of the newly created resource.
+
+    + Body
+
+        {
+            "nickname":"alkila",
+            "givenName":"Sercan",
+            "email":"sercan@mail.com",
+            "rating":"5"
+        },
+        "@namespaces": {
+            "critique": {
+            "name": "/critique/link-relations/"
+                }
+            },
+            "@controls": {
+                "self": {
+                    "href": "/critique/api/ratings/"
+                },
+                "profile": {
+                    "href": "/critique/profiles/user-profile/"
+                },
+                "collection": {
+                    "href": "/forum/api/users/"
+                },
+                "critique:add-rating":{
+                    "title":"Modify rating",
+                    "href":"/critique/api/ratings/",
+                    "encoding":"json"
+                }
+            }
+
++ Response 400 (application/vnd.mason+json)
+
+    + Headers
+        Response: 400
+        Content-Type: application/vnd.mason+json
+
+    + BODY
+        {
+            "@error": {
+                "@message": "Rating info is not well formed or entity body is missing."
+            },
+            "resource_url": "/critique/api/ratings/"
+        }
+
++ Response 415 (application/vnd.mason+json)
+
+    + Headers
+        Response: 415
+        Content-Type: application/vnd.mason+json
+
+    + BODY
+        {
+            "@error": {
+                "@message": "Format of the input is not json."
+            },
+            "resource_url": "/critique/api/ratings/"
+        }
+
++ Response 422 (application/vnd.mason+json)
+
+    + Headers
+        Response: 422
+        Content-Type: application/vnd.mason+json
+
+    + BODY
+        {
+            "@error": {
+                "@message": "Sender or receiver not found."
+            },
+            "resource_url": "/critique/api/ratings/"
+        }
+
++ Response 500 (application/vnd.mason+json)
+
+    + Headers
+        Response: 500
+        Content-Type: application/vnd.mason+json
+
+    + BODY
+        {
+            "@error": {
+                "@message": "The system has failed. Please, contact the administrator."
+            },
+            "resource_url": "/critique/api/ratings/"
+        }
+
+
+
+## Ratings of a user [/critique/api/ratings/{ratingId}/]
+
+View the rating of a specific user
+
+### View ratings [GET]
+
++ Relation: modify-rating
+
++ Parameters
+
+    RatingId is the id of the rating of the user which is an integer, example: 015
+
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.mason+json
+
+
++ Response 200 (application/vnd.mason+json)
+
+    + Headers
+        Response: 200 (Successful.)
+        Content-Type: application/vnd.mason+json
+
+    + BODY
+    {
+        "rating":"5"
+    },
+    "@namespaces": {
+        "critique": {
+        "name": "/critique/link-relations/"
+        }
+    },
+    "@controls":{
+        "self":{
+            "href":"/critique/api/ratings/015"
+        },
+        "profile":{
+            "href": "/critique/profiles/user-profile/"
+        },
+        "collection":{
+            "href": "/forum/api/users/"
+        },
+        "critique:modify-rating":{
+            "title":"modify-rating",
+            "href":"/critique/api/ratings/",
+            "encoding":"json",
+            "method": "PUT",
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "rating": {
+                        "title": "rating",
+                        "description": "given rating to the user",
+                        "type": "integer"
+                        }
+                    }
+            },
+            "required":["modify-rating"]
+        },
+        "critique:delete-rating":{
+            "href":"/critique/api/ratings/",
+            "method":"DELETE"
+        }
+    }
+
+
++ Response 404 (application/vnd.mason+json)
+
+    + Headers
+        Response: 404
+        Content-Type: application/vnd.mason+json
+    + BODY
+        {
+            "@error": {
+                "@message": "Rating not found."
+            },
+            "resource_url": "/critique/api/ratings/{ratingId}/"
+        }
+
+
+### Edit rating [PUT]
+
++ Relation: modify-rating
+
++ Parameters
+
+    RatingId is the id of the rating of the user which is an integer, example: 015
+
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.mason+json
+
+    + BODY
+        {
+            "ratingId": "015",
+            "rating": "5"
+        }
+
++ Response 204 (application/vnd.mason+json)
+
+    + Headers
+        Response: 204 (Rating modified successfully.)
+        Location: URL of the newly edited resource.
+
++ Response 400 (application/vnd.mason+json)
+
+    + Headers
+        Response: 400
+        Content-Type: application/vnd.mason+json
+    + BODY
+        {
+            "@error": {
+                "@message": "Rating info is not well formed or it is empty."
+            },
+            "resource_url": "/critique/api/ratings/{ratingId}/"
+        }
+
++ Response 404 (application/vnd.mason+json)
+
+    + Headers
+        Response: 404
+        Content-Type: application/vnd.mason+json
+    + BODY
+        {
+            "@error": {
+                "@message": "Rating not found."
+            },
+            "resource_url": "/critique/api/ratings/{ratingId}/"
+        }
+
++ Response 415 (application/vnd.mason+json)
+
+    + Headers
+        Response: 415
+        Content-Type: application/vnd.mason+json
+    + BODY
+        {
+            "@error": {
+                "@message": "Format of the input is not json."
+            },
+            "resource_url": "/critique/api/ratings/{ratingId}/"
+        }
+
++ Response 500 (application/vnd.mason+json)
+
+    + Headers
+        Response: 500
+        Content-Type: application/vnd.mason+json
+    + BODY
+        {
+            "@error": {
+                "@message": "The system has failed. Please, contact the administrator."
+            },
+            "resource_url": "/critique/api/ratings/{ratingId}/"
+        }
+
+### View ratings [GET]
+
++ Relation: modify-rating
+
++ Parameters
+
+    RatingId is the id of the rating of the user which is an integer, example: 015
+
++ Request
+
+    + Headers
+
+        Accept: application/vnd.mason+json
+
++ Response 204 (application/vnd.mason+json)
+
+    + Headers
+
+        Response: 204 (Rating deleted successfully.)
+
++ Response 404 (application/vnd.mason+json)
+
+    + Headers
+        Response: 404
+        Content-Type: application/vnd.mason+json
+    + BODY
+        {
+            "@error": {
+                "@message": "Rating not found."
+            },
+            "resource_url": "/critique/api/ratings/{ratingId}/"
+        }
+
++ Response 500 (application/vnd.mason+json)
+
+    + Headers
+
+        Response: 500
+        Content-Type: application/vnd.mason+json
+    + BODY
+        {
+            "@error": {
+                "@message": "The system has failed. Please, contact the administrator."
+            },
+            "resource_url": "/critique/api/ratings/{ratingId}/"
+        }
