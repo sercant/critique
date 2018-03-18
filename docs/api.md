@@ -1149,7 +1149,7 @@ REQUEST
         }
     BODY
         {
-            
+            "text": "I hate you, it is the edited reply"
         }
 ```
 
@@ -1212,9 +1212,11 @@ POSSIBLE RESPONSES
 
 ### DELETE /critique/api/posts/{postId}/
 
+Deletes an existing post.
+
 ```json
 PARAMETERS
-    TODO
+    postId: ID of the post to delete.
 ```
 
 ```json
