@@ -826,7 +826,6 @@ POSSIBLE RESPONSES
         Response: 200 (Successful.)
         Content-Type: application/vnd.mason+json
     BODY
-        CHECK_THIS
         {
             "items":[
                 {
@@ -977,7 +976,40 @@ POSSIBLE RESPONSES
                     "name": "/critique/link-relations/"
                 }
             },
-            "@controls": ,
+            "@controls": {
+                "self": {
+                    "href": "/critique/api/posts/113/"
+                },
+                "profile": {
+                    "href": "/critique/profiles/user-profile/"
+                },
+                "collection": {
+                    "href": "/critique/api/posts/"
+                },
+                "edit": {
+                    "title": "Edit this post",
+                    "href": "/critique/api/posts/113/",
+                    "encoding": "json",
+                    "method": "PUT",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "text": {
+                                "title": "post's text",
+                                "description": "contents of the post",
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "critique:delete":{
+                    "href": "/critique/api/posts/113",
+                    "method": "DELETE"
+                },
+                "critique:user-ratings": {
+                    "href": "/critique/api/users/Jeff/ratings"
+                }
+            },
 
         }
     RELATIONS
@@ -1003,9 +1035,11 @@ POSSIBLE RESPONSES
 
 ### POST /critique/api/posts/{postId}/
 
+add a reply to an existing post
+
 ```json
 PARAMETERS
-    TODO
+    postId: the parent post ID which gets the reply.
 ```
 
 ```json
@@ -1015,9 +1049,14 @@ REQUEST
         Content-Type: application/json
         Accept: application/vnd.mason+json
     PARAMETERS
-        TODO
+        {
+            "receiverNickname": "Hammam"
+        }
     BODY
-        TODO
+        {
+            "senderNickname": "Shazam",
+            "text": "hey man, I would really appreciate if we could meet."
+        }
 ```
 
 ```json
@@ -1091,9 +1130,11 @@ POSSIBLE RESPONSES
 
 ### PUT /critique/api/posts/{postId}/
 
+Edit an existing post.
+
 ```json
 PARAMETERS
-    TODO
+    postId: ID of specific post to edit.
 ```
 
 ```json
@@ -1103,9 +1144,13 @@ REQUEST
         Content-Type: application/json
         Accept: application/vnd.mason+json
     PARAMETERS
-        TODO
+        {
+            "postId": 113
+        }
     BODY
-        TODO
+        {
+            
+        }
 ```
 
 ```json
