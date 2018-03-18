@@ -674,6 +674,7 @@ POSSIBLE RESPONSES
         Response: 200 (Successful.)
         Content-Type: application/vnd.mason+json
     BODY
+        CHECK_THIS
         {
             "items": [
 
@@ -749,18 +750,47 @@ POSSIBLE RESPONSES
         Response: 200 (Successful.)
         Content-Type: application/vnd.mason+json
     BODY
-        TODO
+        CHECK_THIS
         {
             "items": [
                 {
-                    
+                    "givenName": "Walcott",
+                    "avatar": "photoWalcott.jpg",
+                    "text":"this is an inbox post text 01.",
+                    "@controls":{
+                        "self":{
+                            "href": "/critique/api/users/mina/inbox/"
+                        },
+                        "profile": {
+                            "href": "/critique/profiles/user-profile/"
+                        },
+                        "critique:user-ratings": {
+                            "href": "/critique/api/users/Walcott/ratings"
+                        }
+                    }
+                },
+                {
+                    "givenName": "Modric",
+                    "avatar": "photoModric.jpg",
+                    "text":"this is an inbox post text from Modric.",
+                    "@controls":{
+                        "self":{
+                            "href": "/critique/api/users/mina/river/"
+                        },
+                        "profile": {
+                            "href": "/critique/profiles/user-profile/"
+                        },
+                        "critique:user-ratings": {
+                            "href": "/critique/api/users/Modric/ratings"
+                        }
+                    }
                 }
             ]
         }
     RELATIONS
-        Self: TODO
-        Profile: TODO
-        TODO OTHER LINKS
+        Self
+        Profile
+        user-ratings
 
 404:
     HEADER
@@ -777,9 +807,10 @@ POSSIBLE RESPONSES
 
 ## Posts
 
-TODO description
-
+TODO
 ### GET /critique/api/posts/
+
+A list of all posts in the platform
 
 ```json
 REQUEST
@@ -795,19 +826,52 @@ POSSIBLE RESPONSES
         Response: 200 (Successful.)
         Content-Type: application/vnd.mason+json
     BODY
-        TODO
+        CHECK_THIS
+        {
+            "items":[
+                {
+                    "sender":"Mina",
+                    "receiver": "Sercant",
+                    "text": "Hey man, nice work on PWP.",
+                    "@controls": {
+                        "self": {
+                            "href": "/critique/api/posts/"
+                        },
+                        "profile": {
+                            "href": "/critique/profiles/user-profile/"
+                        }
+                    }
+                },
+                {
+                    "sender":"Brian",
+                    "receiver": "Armadillo",
+                    "text": "You have weird working ethics.",
+                    "@controls": {
+                        "self": {
+                            "href": "/critique/api/posts/"
+                        },
+                        "profile": {
+                            "href": "/critique/profiles/user-profile/"
+                        }
+                    }
+                }
+            ],
+            "@namespace": {
+                "critique": {
+                    "name": "/critique/link-relations/"
+                }
+            },
+
+        }
     RELATIONS
-        Self: TODO
-        Profile: TODO
-        TODO OTHER LINKS
+        Self
+        Profile
+
 ```
 
 ### POST /critique/api/posts/
 
-```json
-PARAMETERS
-    TODO
-```
+Creates a new post.
 
 ```json
 REQUEST
@@ -815,10 +879,12 @@ REQUEST
     HEADER
         Content-Type: application/json
         Accept: application/vnd.mason+json
-    PARAMETERS
-        TODO
     BODY
-        TODO
+        {
+            "sender": "lisa",
+            "receiver": "ibiza",
+            "text": "You startup is amazing, keep up the good work."
+        }
 ```
 
 ```json
@@ -880,9 +946,11 @@ POSSIBLE RESPONSES
 
 ### GET /critique/api/posts/{postId}/
 
+Gets a specific post from the platform
+
 ```json
 PARAMETERS
-    TODO
+    postId: the specific post ID required to retrieve the post. ex: 113
 ```
 
 ```json
@@ -899,11 +967,26 @@ POSSIBLE RESPONSES
         Response: 200 (Successful.)
         Content-Type: application/vnd.mason+json
     BODY
-        TODO
+        {
+            "sender": "Jeff",
+            "receiver": "Audrey",
+            "text": "I love you.",
+            "rating": 5,
+            "@namespaces": {
+                "critique": {
+                    "name": "/critique/link-relations/"
+                }
+            },
+            "@controls": ,
+
+        }
     RELATIONS
-        Self: TODO
-        Profile: TODO
-        TODO OTHER LINKS
+        Self
+        Profile
+        collection
+        edit
+        delete
+        user-ratings
 
 404:
     HEADER
