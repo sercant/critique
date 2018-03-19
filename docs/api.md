@@ -167,6 +167,56 @@ POSSIBLE RESPONSES
         Content-Type: text/html
 ```
 
+### add-post
+
+Adds a new post
+
+#### GET /critique/link-relations/add-post
+
+Return the link relation description in HTML format.
+```json
+POSSIBLE RESPONSES
+
+200:
+    HEADER
+        Response: 200
+        Content-Type: text/html
+```
+
+### add-reply
+
+Adds a reply to an existing post.
+
+#### GET /critique/link-relations/add-reply
+
+Return the link relation description in HTML format.
+
+```json
+POSSIBLE REPSONSES
+
+200:
+    HEADER
+        Response: 200
+        Content-Type: text/html
+```
+
+### posts-profile
+
+Profile definition for all posts resource
+
+#### GET /critique/link-relations/posts-profile
+
+Return the link relation description in HTML format.
+
+```json
+POSSIBLE REPSONSES
+
+200:
+    HEADER
+        Response: 200
+        Content-Type: text/html
+```
+
 ## Users
 
 All these resources use the [User Profile](#user-profile).
@@ -816,7 +866,7 @@ POSSIBLE RESPONSES
                             "href": "/critique/api/users/mina/inbox/"
                         },
                         "profile": {
-                            "href": "/critique/profiles/user-profile/"
+                            "href": "/critique/profiles/posts-profile/"
                         },
                         "critique:user-ratings": {
                             "href": "/critique/api/users/Walcott/ratings"
@@ -832,7 +882,7 @@ POSSIBLE RESPONSES
                             "href": "/critique/api/users/mina/river/"
                         },
                         "profile": {
-                            "href": "/critique/profiles/user-profile/"
+                            "href": "/critique/profiles/posts-profile/"
                         },
                         "critique:user-ratings": {
                             "href": "/critique/api/users/Modric/ratings"
@@ -891,7 +941,7 @@ POSSIBLE RESPONSES
                             "href": "/critique/api/posts/"
                         },
                         "profile": {
-                            "href": "/critique/profiles/user-profile/"
+                            "href": "/critique/profiles/posts-profile/"
                         }
                     }
                 },
@@ -904,7 +954,7 @@ POSSIBLE RESPONSES
                             "href": "/critique/api/posts/"
                         },
                         "profile": {
-                            "href": "/critique/profiles/user-profile/"
+                            "href": "/critique/profiles/posts-profile/"
                         }
                     }
                 }
@@ -1035,7 +1085,7 @@ POSSIBLE RESPONSES
                     "href": "/critique/api/posts/113/"
                 },
                 "profile": {
-                    "href": "/critique/profiles/user-profile/"
+                    "href": "/critique/profiles/posts-profile/"
                 },
                 "collection": {
                     "href": "/critique/api/posts/"
