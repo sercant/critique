@@ -617,7 +617,8 @@ POSSIBLE RESPONSES
 
 ```json
 PARAMETERS
-    TODO
+    // TODO -- check
+    nickname: The nickname of the user. Example, Scott.
 ```
 
 ```json
@@ -634,11 +635,64 @@ POSSIBLE RESPONSES
         Response: 200 (Successful.)
         Content-Type: application/vnd.mason+json
     BODY
-        TODO
+        {
+            "items":[
+                {
+                    "ratingId":"015",
+                    "rating": "5",
+                    "@controls":{
+                        "self":{
+                            "href":"/critique/api/users/Scott/ratings/"
+                        },
+                        "profile": {
+                            "href": "/critique/api/ratings/015/" // TODO -- check
+                        }
+                    }
+                },
+                {
+                    "ratingId": "016",
+                    "rating": "2",
+                    "@controls":{
+                        "self":{
+                            "href":"/critique/api/users/Kim/ratings/"
+                        },
+                        "profile": {
+                            "href": "/critique/api/ratings/016/" // TODO -- check
+                        }
+                    }
+                }
+            ],
+            "@namespaces": {
+                "critique": {
+                    "name": "/critique/link-relations/"
+                }
+            },
+            "@controls": {
+                "self": {
+                    "href": "/forum/api/users/Kim/ratings/"
+                },
+                "critique:add-rating": {
+                    "href": "/forum/api/users/", // TODO - check
+                    "encoding": "json",
+                    "method": "POST",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "rating": {
+                                "title": "Rating",
+                                "description": "Rating for the user",
+                                "type": "integer"
+                            }
+                        },
+                        "required": ["rating"]
+                    }
+                }
+            }
+        }
     RELATIONS
-        Self: TODO
-        Profile: TODO
-        TODO OTHER LINKS
+        Self
+        Profile
+        add-rating
 
 404:
     HEADER
@@ -1257,6 +1311,8 @@ TODO description
 
 ### POST /critique/api/ratings/
 
+Add a new rating:
+
 ```json
 REQUEST
 
@@ -1264,9 +1320,35 @@ REQUEST
         Content-Type: application/json
         Accept: application/vnd.mason+json
     PARAMETERS
-        TODO
+        // TODO -- check
     BODY
-        TODO
+        {
+            "nickname":"alkila",
+            "givenName":"Sercan",
+            "email":"sercan@mail.com",
+            "rating":"5"
+        },
+        "@namespaces": {
+            "critique": {
+            "name": "/critique/link-relations/"
+                }
+            },
+            "@controls": {
+                "self": {
+                    "href": "/critique/api/ratings/"
+                },
+                "profile": {
+                    "href": "/critique/profiles/user-profile/"
+                },
+                "collection": {
+                    "href": "/forum/api/users/"
+                },
+                "critique:add-rating":{
+                    "title":"Modify rating",
+                    "href":"/critique/api/ratings/",
+                    "encoding":"json"
+                }
+            }
 ```
 
 ```json
@@ -1330,7 +1412,8 @@ POSSIBLE RESPONSES
 
 ```json
 PARAMETERS
-    TODO
+    // TODO -- check
+    RatingId is the id of the rating of the user which is an integer, example: 015
 ```
 
 ```json
@@ -1347,11 +1430,51 @@ POSSIBLE RESPONSES
         Response: 200 (Successful.)
         Content-Type: application/vnd.mason+json
     BODY
-        TODO
+    {
+        "rating":"5"
+    },
+    "@namespaces": {
+        "critique": {
+        "name": "/critique/link-relations/"
+        }
+    },
+    "@controls":{
+        "self":{
+            "href":"/critique/api/ratings/015"
+        },
+        "profile":{
+            "href": "/critique/profiles/user-profile/"
+        },
+        "collection":{
+            "href": "/forum/api/users/"
+        },
+        "critique:modify-rating":{
+            "title":"modify-rating",
+            "href":"/critique/api/ratings/",
+            "encoding":"json",
+            "method": "PUT",
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "rating": {
+                        "title": "rating",
+                        "description": "given rating to the user",
+                        "type": "integer"
+                        }
+                    }
+            },
+            "required":["modify-rating"]
+        },
+        "critique:delete-rating":{
+            "href":"/critique/api/ratings/",
+            "method":"DELETE"
+        }
+    }
     RELATIONS
-        Self: TODO
-        Profile: TODO
-        TODO OTHER LINKS
+        Self
+        Profile
+        modify-rating
+        delete-rating
 
 404:
     HEADER
@@ -1370,7 +1493,8 @@ POSSIBLE RESPONSES
 
 ```json
 PARAMETERS
-    TODO
+    // TODO -- check
+    RatingId is the id of the rating of the user which is an integer, example: 015
 ```
 
 ```json
@@ -1380,9 +1504,12 @@ REQUEST
         Content-Type: application/json
         Accept: application/vnd.mason+json
     PARAMETERS
-        TODO
+        // TODO -- check
     BODY
-        TODO
+        {
+            "ratingId": "015",
+            "rating": "5"
+        }
 ```
 
 ```json
@@ -1446,7 +1573,8 @@ POSSIBLE RESPONSES
 
 ```json
 PARAMETERS
-    TODO
+    // TODO -- check
+    RatingId is the id of the rating of the user which is an integer, example: 015
 ```
 
 ```json

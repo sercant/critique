@@ -49,6 +49,16 @@ Return the link relation description in HTML format.
 
 + Response 200 (text/html)
 
+## edit-ratings [/critique/link-relations/edit-ratings]
+
+Edits the ratings sent to the user via `PUT`.
+
+### PUT
+
+Return the link relation description in HTML format.
+
++ Response 200 (text/html)
+
 ## delete [/critique/link-relations/delete]
 
 Deletes the current context. Use via `DELETE`.
@@ -128,6 +138,48 @@ Return the User Profile in HTML format.
 
 + Response 200 (text/html)
 
+
+## Ratings Profile [/critique/profiles/rating-profile]
+
+Profile definition for all rating resources.
+
+### Dependencies
+
+This profile inherits:
+
+ * Some semantic descriptors from [Person](http://schema.org/Person)
+ * Some link relations from IANA Web linking [RFC5988](https://www.iana.org//assignmentscritique/link-/relationscritique/link-relations.xhtml)
+
+### Link relations
+
+ * [`add-rating`](#add-rating)
+ * [`delete`](#delete)
+ * [`user-ratings`](#user-ratings)
+
+Inherited from IANA RFC5988:
+
+ * [`collection`](http://tools.ietf.org/html/rfc6573): Only accessible through `GET`.
+ * [`edit`](https://tools.ietf.org/html/rfc5023#section-11.1): This link allows editing the user via `PUT`.
+ * [`profile`](https://tools.ietf.org/html/rfc6906): The link contains the location of the resource profile.
+
+### Semantic Descriptors
+
+#### Data Type Rating
+
+ * `nickname` (string): Nickname of the user. Mandatory in representations in which a new user is generated.
+ * `ratingId` (string): Nickname of the user. Mandatory in representations in which a new user is generated.
+ * `rating` (string): Avatar of the user. Optional in representations in which a new user is generated.
+
+Inherited from [Person](http://schema.org/Person):
+
+ * [`givenName`](http://schema.org/givenName) (string): Mandatory in representations in which a new user is generated.
+ * [`email`](http://schema.org/email) (string): Mandatory in representations in which a new user is generated.
+
+### GET
+
+Return the User Profile in HTML format.
+
++ Response 200 (text/html)
 
 
 # Group Users
@@ -580,16 +632,17 @@ Delete a particular user from the platform.
 
 ## User's ratings [/critique/api/users/{nickname}/ratings/]
 
-TODO
+Rating of a user stored in critique database
 
 + Parameters
-    TODO
+    + nickname: `Scott` (string) - The nickname of the user.
+
 
 ### Receive users ratings [GET]
 
-TODO
+Get the ratings of the users in the database
 
-+ Relation: TODO
++ Relation: self
 
 + Request (application/json)
 
@@ -601,7 +654,60 @@ TODO
 
     + Body
 
-        TODO
+            {
+            "items":[
+                {
+                    "ratingId":"rtg-015",
+                    "rating": "5",
+                    "@controls":{
+                        "self":{
+                            "href":"/critique/api/ratings/rtg-015/"
+                        },
+                        "profile": {
+                            "href": "/critique/profiles/rating-profile/"
+                        }
+                    }
+                },
+                {
+                    "ratingId": "rtg-016",
+                    "rating": "2",
+                    "@controls":{
+                        "self":{
+                            "href":"/critique/api/ratings/rtg-016/"
+                        },
+                        "profile": {
+                            "href": "/critique/profiles/rating-profile/"
+                        }
+                    }
+                }
+            ],
+            "@namespaces": {
+                "critique": {
+                    "name": "/critique/link-relations/"
+                }
+            },
+            "@controls": {
+                "self": {
+                    "href": "/forum/api/users/Kim/ratings/"
+                },
+                "critique:add-rating": {
+                    "href": "/forum/api/ratings/",
+                    "encoding": "json",
+                    "method": "POST",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "rating": {
+                                "title": "Rating",
+                                "description": "Rating for the user",
+                                "type": "integer"
+                            }
+                        },
+                        "required": ["rating"]
+                    }
+                }
+            }
+            }
 
 + Response 404 (application/vnd.mason+json)
 
@@ -618,16 +724,16 @@ TODO
 
 ## User's river [/critique/api/users/{nickname}/river/]
 
-TODO
+NOT IMPLEMENTED
 
 + Parameters
-    TODO
+    + nickname: `Scott` (string) - The nickname of the user.
 
 ### Receive user's river [GET]
 
-TODO
+NOT IMPLEMENTED
 
-+ Relation: TODO
++ Relation: self
 
 + Request
 
@@ -639,7 +745,9 @@ TODO
 
     + Body
 
-        TODO
+            {
+                NOT IMPLEMENTED
+            }
 
 + Response 404 (application/vnd.mason+json)
 
@@ -656,16 +764,16 @@ TODO
 
 ## User's inbox [/critique/api/users/{nickname}/inbox/]
 
-TODO
+NOT IMPLEMETED
 
 + Parameters
-    TODO
+    + nickname: `Scott` (string) - The nickname of the user.
 
 ### Receive user's inbox [GET]
 
-TODO
+NOT IMPLEMETED
 
-+ Relation: TODO
++ Relation self
 
 + Request
 
@@ -677,7 +785,9 @@ TODO
 
     + Body
 
-        TODO
+            {
+                NOT IMPLEMETED
+            }
 
 + Response 404 (application/vnd.mason+json)
 
@@ -706,13 +816,319 @@ A list of all posts in the platform.
 
 Get a list of all posts in the platform.
 
-+ Relation: TODO
++ Relation: self
 
 + Response 200 (application/vnd.mason+json)
 
     + Body
 
             {
-
+                NOT IMPLEMENTED
             }
 
+
+# Group Ratings
+
+All these resources use the [Post Profile](#profiles-post-profile).
+
+In addition all error messages follow the [Error Profile](#profiles-error-profile).
+
+## Ratings list [/critique/api/ratings/]
+
+View the list that contains users ratings
+
+### List ratings [GET]
+
+Add a new rating
+
++ Relation: add-rating
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.mason+json
+
++ Response 200 (application/vnd.mason+json)
+
+    + Headers
+
+            Location: URL of the newly created resource.
+
+    + Body
+
+            {
+                "nickname":"alkila",
+                "givenName":"Sercan",
+                "email":"sercan@mail.com",
+                "rating":"5"
+                },
+                "@namespaces": {
+                "critique": {
+                "name": "/critique/link-relations/"
+                    }
+                },
+                "@controls": {
+                    "self": {
+                        "href": "/critique/api/ratings/"
+                    },
+                    "profile": {
+                        "href": "/critique/profiles/rating-profile/"
+                    },
+                    "collection": {
+                        "href": "/forum/api/ratings/"
+                    },
+                    "critique:add-rating":{
+                        "title":"add rating",
+                        "href":"/critique/api/ratings/",
+                        "encoding":"json"
+                }
+            }
+
++ Response 400 (application/vnd.mason+json)
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "Rating info is not well formed or entity body is missing."
+                },
+                "resource_url": "/critique/api/ratings/"
+            }
+
++ Response 415 (application/vnd.mason+json)
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "Format of the input is not json."
+                },
+                "resource_url": "/critique/api/ratings/"
+            }
+
++ Response 422 (application/vnd.mason+json)
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "Sender or receiver not found."
+                },
+                "resource_url": "/critique/api/ratings/"
+            }
+
++ Response 500 (application/vnd.mason+json)
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "The system has failed. Please, contact the administrator."
+                },
+                "resource_url": "/critique/api/ratings/"
+            }
+
+
+
+## Rating [/critique/api/ratings/{ratingId}/]
+
+View a specific rating information
+
+### Receive ratings information [GET]
+
+View a specific rating
+
++ Parameters
+
+    + ratingId: `rtg-015` (integer) - Rating id.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.mason+json
+
+
++ Response 200 (application/vnd.mason+json)
+
+    + Body
+
+            {
+                "rating":"5",
+                "@namespaces": {
+                    "critique": {
+                    "name": "/critique/link-relations/"
+                },
+                "@controls":{
+                    "self":{
+                        "href":"/critique/api/ratings/rtg-015"
+                    },
+                    "profile":{
+                        "href": "/critique/profiles/rating-profile/"
+                    },
+                    "collection":{
+                        "href": "/forum/api/ratings/"
+                    },
+                    "critique:edit-rating":{
+                        "title":"edit-rating",
+                        "href":"/critique/api/ratings/rtg-015",
+                        "encoding":"json",
+                        "method": "PUT",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "rating": {
+                                    "title": "rating",
+                                    "description": "given rating to the user",
+                                    "type": "integer"
+                                    }
+                                }
+                        },
+                        "required":["rating"]
+                    },
+                    "critique:delete-rating":{
+                        "href":"/critique/api/ratings/rtg-015",
+                        "method":"DELETE"
+                    }
+                }
+            }
+
+
++ Response 404 (application/vnd.mason+json)
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "Rating not found."
+                },
+                "resource_url": "/critique/api/ratings/{ratingId}/"
+            }
+
++ Response 500 (application/vnd.mason+json)
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "The system has failed. Please, contact the administrator."
+                },
+                "resource_url": "/critique/api/ratings/{ratingId}/"
+            }
+
+### Edit ratings information [PUT]
+
+Edit a spesific rating.
+
++ Relation: edit-rating
+
++ Parameters
+
+    + ratingId: `rtg-015` (integer) - Rating id.
+
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.mason+json
+
+    + Body
+
+            {
+                "rating": "5"
+            }
+
++ Response 204 (application/vnd.mason+json)
+
+    + Headers
+
+            Location: URL of the newly edited resource.
+
++ Response 400 (application/vnd.mason+json)
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "Rating info is not well formed or it is empty."
+                },
+                "resource_url": "/critique/api/ratings/{ratingId}/"
+            }
+
++ Response 404 (application/vnd.mason+json)
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "Rating not found."
+                },
+                "resource_url": "/critique/api/ratings/{ratingId}/"
+            }
+
++ Response 415 (application/vnd.mason+json)
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "Format of the input is not json."
+                },
+                "resource_url": "/critique/api/ratings/{ratingId}/"
+            }
+
++ Response 500 (application/vnd.mason+json)
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "The system has failed. Please, contact the administrator."
+                },
+                "resource_url": "/critique/api/ratings/{ratingId}/"
+            }
+
+
+### Delete ratings information [DELETE]
+
+Detete a spesific rating.
+
++ Relation: delete-rating
+
++ Parameters
+
+    + ratingId: `rtg-015` (integer) - Rating id.
+
++ Response 204 (application/vnd.mason+json)
+
+    Rating deleted successfully.
+
+    + Headers
+
++ Response 404 (application/vnd.mason+json)
+
+    + Headers
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "Rating not found."
+                },
+                "resource_url": "/critique/api/ratings/{ratingId}/"
+            }
+
++ Response 500 (application/vnd.mason+json)
+
+    + Headers
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "The system has failed. Please, contact the administrator."
+                },
+                "resource_url": "/critique/api/ratings/{ratingId}/"
+            }
