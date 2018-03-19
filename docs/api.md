@@ -1013,7 +1013,7 @@ POSSIBLE RESPONSES
 
         }
     RELATIONS
-        Self
+        self
         Profile
         collection
         edit
