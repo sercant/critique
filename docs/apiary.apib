@@ -49,9 +49,9 @@ Return the link relation description in HTML format.
 
 + Response 200 (text/html)
 
-## edit-ratings [/critique/link-relations/edit-ratings]
+## edit-rating [/critique/link-relations/edit-rating]
 
-Edits the ratings sent to the user via `PUT`.
+Edits the ratings the spesific rating via `PUT`.
 
 ### PUT
 
@@ -147,14 +147,12 @@ Profile definition for all rating resources.
 
 This profile inherits:
 
- * Some semantic descriptors from [Person](http://schema.org/Person)
  * Some link relations from IANA Web linking [RFC5988](https://www.iana.org//assignmentscritique/link-/relationscritique/link-relations.xhtml)
 
 ### Link relations
 
  * [`add-rating`](#add-rating)
  * [`delete`](#delete)
- * [`user-ratings`](#user-ratings)
 
 Inherited from IANA RFC5988:
 
@@ -166,18 +164,12 @@ Inherited from IANA RFC5988:
 
 #### Data Type Rating
 
- * `nickname` (string): Nickname of the user. Mandatory in representations in which a new user is generated.
- * `ratingId` (string): Nickname of the user. Mandatory in representations in which a new user is generated.
- * `rating` (string): Avatar of the user. Optional in representations in which a new user is generated.
-
-Inherited from [Person](http://schema.org/Person):
-
- * [`givenName`](http://schema.org/givenName) (string): Mandatory in representations in which a new user is generated.
- * [`email`](http://schema.org/email) (string): Mandatory in representations in which a new user is generated.
+ * `ratingId` (string): Rating id of the rating in `rtg-(\d+)` format. Example `rtg-1`.
+ * `rating` (integer): Rating value in 0 - 10 range.
 
 ### GET
 
-Return the User Profile in HTML format.
+Return the Rating Profile in HTML format.
 
 + Response 200 (text/html)
 
