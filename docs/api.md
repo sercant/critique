@@ -1068,7 +1068,7 @@ POSSIBLE RESPONSES
         }
     RELATIONS
         self
-        Profile
+        profile
         collection
         edit
         delete
