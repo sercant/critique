@@ -19,6 +19,16 @@ Return the link relation description in HTML format.
 
 + Response 200 (text/html)
 
+## add-rating [/critique/link-relations/add-rating]
+
+Creates a new rating via `POST`.
+
+### GET
+
+Return the link relation description in HTML format.
+
++ Response 200 (text/html)
+
 ## user-inbox [/critique/link-relations/user-inbox]
 
 Returns the posts sent to the user which are currently not public via `GET`.
@@ -53,7 +63,7 @@ Return the link relation description in HTML format.
 
 Edits the ratings the spesific rating via `PUT`.
 
-### PUT
+### GET
 
 Return the link relation description in HTML format.
 
@@ -139,7 +149,7 @@ Return the User Profile in HTML format.
 + Response 200 (text/html)
 
 
-## Ratings Profile [/critique/profiles/rating-profile]
+## Rating Profile [/critique/profiles/rating-profile]
 
 Profile definition for all rating resources.
 
@@ -165,6 +175,8 @@ Inherited from IANA RFC5988:
 #### Data Type Rating
 
  * `ratingId` (string): Rating id of the rating in `rtg-(\d+)` format. Example `rtg-1`.
+ * `sender` (string): Nickname of the sender. Example, `Scott`.
+ * `receiver` (string): Nickname of the receiver. Example, `Kim`.
  * `rating` (integer): Rating value in 0 - 10 range.
 
 ### GET
@@ -172,6 +184,7 @@ Inherited from IANA RFC5988:
 Return the Rating Profile in HTML format.
 
 + Response 200 (text/html)
+
 
 
 # Group Users
@@ -943,9 +956,9 @@ View the list that contains users ratings
 
 ### List ratings [GET]
 
-Add a new rating
+NOT IMPLEMENTED
 
-+ Relation: add-rating
++ Relation: self
 
 + Request
 
@@ -961,33 +974,7 @@ Add a new rating
 
     + Body
 
-            {
-                "nickname":"alkila",
-                "givenName":"Sercan",
-                "email":"sercan@mail.com",
-                "rating":"5"
-                },
-                "@namespaces": {
-                "critique": {
-                "name": "/critique/link-relations/"
-                    }
-                },
-                "@controls": {
-                    "self": {
-                        "href": "/critique/api/ratings/"
-                    },
-                    "profile": {
-                        "href": "/critique/profiles/rating-profile/"
-                    },
-                    "collection": {
-                        "href": "/forum/api/ratings/"
-                    },
-                    "critique:add-rating":{
-                        "title":"add rating",
-                        "href":"/critique/api/ratings/",
-                        "encoding":"json"
-                }
-            }
+            { NOT IMPLEMENTED }
 
 + Response 400 (application/vnd.mason+json)
 
@@ -1033,19 +1020,99 @@ Add a new rating
                 "resource_url": "/critique/api/ratings/"
             }
 
+### Create a new rating [POST]
 
+Appends a new rating to the list of ratings.
+
++ Relation: add-rating
+
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/vnd.mason+json
+
+    + Body
+
+            {
+                "rating": 8,
+                "sender": "Scott",
+                "receiver": "Kim"
+            }
+
+
++ Response 201
+
+    Rating created successfully.
+
+    + Headers
+
+            Location: URL of the newly created resource.
+
+
++ Response 400 (application/vnd.mason+json)
+
+    Rating info is not well formed or entity body is missing.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "Rating info is not well formed or entity body is missing."
+                },
+                "resource_url": "/critique/api/ratings/"
+            }
+
++ Response 415 (application/vnd.mason+json)
+
+    Format of the input is not json.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "Format of the input is not json."
+                },
+                "resource_url": "/critique/api/ratings/"
+            }
+
++ Response 422 (application/vnd.mason+json)
+
+    Sender or receiver not found.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "Sender or receiver not found."
+                },
+                "resource_url": "/critique/api/ratings/"
+            }
+
++ Response 500 (application/vnd.mason+json)
+
+    The system has failed. Please, contact the administrator.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "The system has failed. Please, contact the administrator."
+                },
+                "resource_url": "/critique/api/ratings/"
+            }
 
 ## Rating [/critique/api/ratings/{ratingId}/]
 
-View a specific rating information
+View a specific rating information.
 
 ### Receive ratings information [GET]
 
-View a specific rating
+Extracts a rating from the database.
 
 + Parameters
 
-    + ratingId: `rtg-015` (integer) - Rating id.
+    + ratingId: `rtg-015` (string) - Rating id.
 
 + Request
 
@@ -1059,47 +1126,50 @@ View a specific rating
     + Body
 
             {
-                "rating":"5",
+                "ratingId": "rtg-015",
+                "rating": 8,
+                "sender": "Scott",
+                "receiver": "Kim",
                 "@namespaces": {
                     "critique": {
-                    "name": "/critique/link-relations/"
-                },
-                "@controls":{
-                    "self":{
-                        "href":"/critique/api/ratings/rtg-015"
+                        "name": "/critique/link-relations/"
                     },
-                    "profile":{
-                        "href": "/critique/profiles/rating-profile/"
-                    },
-                    "collection":{
-                        "href": "/forum/api/ratings/"
-                    },
-                    "critique:edit-rating":{
-                        "title":"edit-rating",
-                        "href":"/critique/api/ratings/rtg-015",
-                        "encoding":"json",
-                        "method": "PUT",
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "rating": {
-                                    "title": "rating",
-                                    "description": "given rating to the user",
-                                    "type": "integer"
+                    "@controls": {
+                        "self": {
+                            "href": "/critique/api/ratings/rtg-015"
+                        },
+                        "profile": {
+                            "href": "/critique/profiles/rating-profile/"
+                        },
+                        "edit": {
+                            "title": "edit-rating",
+                            "href": "/critique/api/ratings/rtg-015",
+                            "encoding": "json",
+                            "method": "PUT",
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "rating": {
+                                        "title": "rating",
+                                        "description": "Given rating to the user",
+                                        "type": "number"
                                     }
                                 }
+                            },
+                            "required": [ ]
                         },
-                        "required":["rating"]
-                    },
-                    "critique:delete-rating":{
-                        "href":"/critique/api/ratings/rtg-015",
-                        "method":"DELETE"
+                        "critique:delete": {
+                            "href": "/critique/api/ratings/rtg-015",
+                            "method": "DELETE"
+                        }
                     }
                 }
             }
 
 
 + Response 404 (application/vnd.mason+json)
+
+    Rating not found.
 
     + Body
 
@@ -1112,6 +1182,8 @@ View a specific rating
 
 + Response 500 (application/vnd.mason+json)
 
+    The system has failed. Please, contact the administrator.
+
     + Body
 
             {
@@ -1121,16 +1193,15 @@ View a specific rating
                 "resource_url": "/critique/api/ratings/{ratingId}/"
             }
 
-### Edit ratings information [PUT]
+### Edit rating's information [PUT]
 
-Edit a spesific rating.
+Modifies a rating.
 
-+ Relation: edit-rating
++ Relation: edit
 
 + Parameters
 
-    + ratingId: `rtg-015` (integer) - Rating id.
-
+    + ratingId: `rtg-015` (string) - Rating id.
 
 + Request
 
@@ -1141,7 +1212,7 @@ Edit a spesific rating.
     + Body
 
             {
-                "rating": "5"
+                "rating": 9
             }
 
 + Response 204 (application/vnd.mason+json)
@@ -1151,6 +1222,8 @@ Edit a spesific rating.
             Location: URL of the newly edited resource.
 
 + Response 400 (application/vnd.mason+json)
+
+    Rating info is not well formed or it is empty.
 
     + Body
 
@@ -1163,6 +1236,8 @@ Edit a spesific rating.
 
 + Response 404 (application/vnd.mason+json)
 
+    Rating not found.
+
     + Body
 
             {
@@ -1174,6 +1249,8 @@ Edit a spesific rating.
 
 + Response 415 (application/vnd.mason+json)
 
+    Format of the input is not json.
+
     + Body
 
             {
@@ -1184,6 +1261,8 @@ Edit a spesific rating.
             }
 
 + Response 500 (application/vnd.mason+json)
+
+    The system has failed. Please, contact the administrator.
 
     + Body
 
@@ -1197,13 +1276,13 @@ Edit a spesific rating.
 
 ### Delete ratings information [DELETE]
 
-Detete a spesific rating.
+Deletes the specified rating.
 
-+ Relation: delete-rating
++ Relation: delete
 
 + Parameters
 
-    + ratingId: `rtg-015` (integer) - Rating id.
+    + ratingId: `rtg-015` (string) - Rating id.
 
 + Response 204 (application/vnd.mason+json)
 
@@ -1213,7 +1292,7 @@ Detete a spesific rating.
 
 + Response 404 (application/vnd.mason+json)
 
-    + Headers
+    Rating not found.
 
     + Body
 
@@ -1226,7 +1305,7 @@ Detete a spesific rating.
 
 + Response 500 (application/vnd.mason+json)
 
-    + Headers
+    The system has failed. Please, contact the administrator.
 
     + Body
 
