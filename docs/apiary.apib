@@ -19,6 +19,26 @@ Return the link relation description in HTML format.
 
 + Response 200 (text/html)
 
+## add-post [/critique/link-relations/add-post]
+
+Creates a new post via `POST`.
+
+### GET
+
+Return the link relation description in HTML format.
+
++ Response 200 (text/html)
+
+## add-reply [/critique/link-relations/add-reply]
+
+Creates a new reply to a post via `POST`.
+
+### GET
+
+Return the link relation description in HTML format.
+
++ Response 200 (text/html)
+
 ## add-rating [/critique/link-relations/add-rating]
 
 Creates a new rating via `POST`.
@@ -148,6 +168,52 @@ Return the User Profile in HTML format.
 
 + Response 200 (text/html)
 
+## Post Profile [/critique/profiles/post_profile]
+
+Profile definition for all post resources.
+
+### Dependencies
+
+This profile inherits:
+
+ * Some semantic descriptors from [Person](http://schema.org/Rating)
+ * Some link relations from IANA Web linking [RFC5988](https://www.iana.org//assignmentscritique/link-/relationscritique/link-relations.xhtml)
+
+### Link relations
+
+ * [`add-post`](#add-post)
+ * [`add-reply`](#add-reply)
+ * [`delete`](#delete)
+
+Inherited from IANA RFC5988:
+
+ * [`collection`](http://tools.ietf.org/html/rfc6573): Only accessible through `GET`.
+ * [`edit`](https://tools.ietf.org/html/rfc5023#section-11.1): This link allows editing the post via `PUT`.
+ * [`profile`](https://tools.ietf.org/html/rfc6906): The link contains the location of the resource profile.
+
+### Semantic Descriptors
+
+#### Data Type post
+
+ * `sender` (string): Nickname of the sender. Mandatory in representations in which a new post is generated.
+ * `receiver` (string): Nickname of the receiver. Optional in representations in which a new post is generated.
+ * `timestamp` (number): Time of the post created in UNIX format.
+ * `postId` (string): Id of the post in 'p-(\d+)' format.
+ * `replyTo` (string): Id of the parent post. If `null` is returned it means post is the top most.
+ * `body` (string): Text of the post. Mandatory in creation of a new post.
+ * `anonymous` (boolean): Is the post sent anonymously or not. Mandatory in creation of a new post.
+ * `public` (boolean): Is the post sent public or not.
+
+Inherited from [Rating](http://schema.org/Rating):
+
+ * [`bestRating`](http://schema.org/bestRating) (number): For informing the client.
+ * [`ratingValue`](http://schema.org/ratingValue) (number): Optional in creation of a new post.
+
+### GET
+
+Return the post profile in HTML format.
+
++ Response 200 (text/html)
 
 ## Rating Profile [/critique/profiles/rating-profile]
 
