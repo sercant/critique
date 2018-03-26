@@ -909,64 +909,14 @@ In addition all error messages follow the [Error Profile](#profiles-error-profil
 
 A list of all posts in the platform.
 
-### List posts [POST]
-
-Creates a new post to the list of posts and returns the post URI.
-
-+ Relation: self
-
-+ Response 200 (application/vnd.mason+json)
-
-    + Body
-
-            {
-            "items":[
-                {
-                    "sender":"Mina",
-                    "receiver": "Sercant",
-                    "text": "Hey man, nice work on PWP.",
-                    "@controls": {
-                        "self": {
-                            "href": "/critique/api/posts/"
-                        },
-                        "profile": {
-                            "href": "/critique/profiles/posts-profile/"
-                        }
-                    }
-                },
-                {
-                    "sender":"Brian",
-                    "receiver": "Armadillo",
-                    "text": "You have weird working ethics.",
-                    "@controls": {
-                        "self": {
-                            "href": "/critique/api/posts/"
-                        },
-                        "profile": {
-                            "href": "/critique/profiles/posts-profile/"
-                        }
-                    }
-                }
-            ],
-            "@namespace": {
-                "critique": {
-                    "name": "/critique/link-relations/"
-                }
-            }
-
-            }
-
-## POST [/critique/api/posts/{postId}/]
-
-Creates a new post.
 
 ### Create a new post [POST]
 
-Extracts a post and all it’s information.
+Create a new post.
 
-+ Relation: self
++ Relation: add-post
 
-+ Request
++ Request (application/json)
 
     + Headers
 
@@ -975,21 +925,25 @@ Extracts a post and all it’s information.
     + Body
 
             {
-                "sender": "lisa",
-                "receiver": "ibiza",
-                "text": "You startup is amazing, keep up the good work."
+                "sender": "Scott",
+                "receiver": "Kim",
+                "body": "She is great! (sometimes)",
+                "anonymous": false,
+                "ratingValue": 8
             }
 
-+ Response 201 (application/vnd.mason+json)
++ Response 201
 
-    Successful.
+    Post created successfully.
 
-    + Header
+    + Headers
 
             Location: URL of the newly created resource.
 
 
 + Response 400 (application/vnd.mason+json)
+
+    Post info is not well formed or entity body is missing.
 
     + Body
 
@@ -1002,6 +956,8 @@ Extracts a post and all it’s information.
 
 + Response 415 (application/vnd.mason+json)
 
+    Format of the input is not json.
+
     + Body
 
             {
@@ -1012,6 +968,8 @@ Extracts a post and all it’s information.
             }
 
 + Response 422 (application/vnd.mason+json)
+
+    Nickname, email, or mobile already exist in the users list.
 
     + Body
 
@@ -1024,6 +982,8 @@ Extracts a post and all it’s information.
 
 + Response 500 (application/vnd.mason+json)
 
+    The system has failed. Please, contact the administrator.
+
     + Body
 
             {
@@ -1032,8 +992,6 @@ Extracts a post and all it’s information.
                 },
                 "resource_url": "/critique/api/posts/"
             }
-
-
 
 
 # Group Ratings
