@@ -804,9 +804,9 @@ In addition all error messages follow the [Error Profile](#profiles-error-profil
 
 A list of all posts in the platform.
 
-### List posts [GET]
+### List posts [POST]
 
-Get a list of all posts in the platform.
+Creates a new post to the list of posts and returns the post URI.
 
 + Relation: self
 
@@ -815,8 +815,120 @@ Get a list of all posts in the platform.
     + Body
 
             {
-                NOT IMPLEMENTED
+            "items":[
+                {
+                    "sender":"Mina",
+                    "receiver": "Sercant",
+                    "text": "Hey man, nice work on PWP.",
+                    "@controls": {
+                        "self": {
+                            "href": "/critique/api/posts/"
+                        },
+                        "profile": {
+                            "href": "/critique/profiles/posts-profile/"
+                        }
+                    }
+                },
+                {
+                    "sender":"Brian",
+                    "receiver": "Armadillo",
+                    "text": "You have weird working ethics.",
+                    "@controls": {
+                        "self": {
+                            "href": "/critique/api/posts/"
+                        },
+                        "profile": {
+                            "href": "/critique/profiles/posts-profile/"
+                        }
+                    }
+                }
+            ],
+            "@namespace": {
+                "critique": {
+                    "name": "/critique/link-relations/"
+                }
             }
+
+            }
+
+## POST [/critique/api/posts/{postId}/]
+
+Creates a new post.
+
+### Create a new post [POST]
+
+Extracts a post and all it’s information.
+
++ Relation: self
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.mason+json
+
+    + Body
+
+            {
+                "sender": "lisa",
+                "receiver": "ibiza",
+                "text": "You startup is amazing, keep up the good work."
+            }
+
++ Response 201 (application/vnd.mason+json)
+
+    Successful.
+
+    + Header
+
+            Location: URL of the newly created resource.
+
+
++ Response 400 (application/vnd.mason+json)
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "Post info is not well formed or entity body is missing."
+                },
+                "resource_url": "/critique/api/posts/"
+            }
+
++ Response 415 (application/vnd.mason+json)
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "Format of the input is not json."
+                },
+                "resource_url": "/critique/api/posts/"
+            }
+
++ Response 422 (application/vnd.mason+json)
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "Sender or receiver not found."
+                },
+                "resource_url": "/critique/api/posts/"
+            }
+
++ Response 500 (application/vnd.mason+json)
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "The system has failed. Please, contact the administrator."
+                },
+                "resource_url": "/critique/api/posts/"
+            }
+
+
 
 
 # Group Ratings
