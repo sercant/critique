@@ -910,7 +910,7 @@ NOT IMPLEMENTED
 
 ### Create a new rating [POST]
 
-Create a new rating.
+Appends a new rating to the list of ratings.
 
 + Relation: add-rating
 
@@ -992,15 +992,15 @@ Create a new rating.
 
 ## Rating [/critique/api/ratings/{ratingId}/]
 
-View a specific rating information
+View a specific rating information.
 
 ### Receive ratings information [GET]
 
-View a specific rating
+Extracts a rating from the database.
 
 + Parameters
 
-    + ratingId: `rtg-015` (integer) - Rating id.
+    + ratingId: `rtg-015` (string) - Rating id.
 
 + Request
 
@@ -1014,41 +1014,42 @@ View a specific rating
     + Body
 
             {
-                "rating":"5",
+                "ratingId": "rtg-015",
+                "rating": 8,
+                "sender": "Scott",
+                "receiver": "Kim",
                 "@namespaces": {
                     "critique": {
-                    "name": "/critique/link-relations/"
-                },
-                "@controls":{
-                    "self":{
-                        "href":"/critique/api/ratings/rtg-015"
+                        "name": "/critique/link-relations/"
                     },
-                    "profile":{
-                        "href": "/critique/profiles/rating-profile/"
-                    },
-                    "collection":{
-                        "href": "/forum/api/ratings/"
-                    },
-                    "critique:edit-rating":{
-                        "title":"edit-rating",
-                        "href":"/critique/api/ratings/rtg-015",
-                        "encoding":"json",
-                        "method": "PUT",
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "rating": {
-                                    "title": "rating",
-                                    "description": "given rating to the user",
-                                    "type": "integer"
+                    "@controls": {
+                        "self": {
+                            "href": "/critique/api/ratings/rtg-015"
+                        },
+                        "profile": {
+                            "href": "/critique/profiles/rating-profile/"
+                        },
+                        "edit": {
+                            "title": "edit-rating",
+                            "href": "/critique/api/ratings/rtg-015",
+                            "encoding": "json",
+                            "method": "PUT",
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "rating": {
+                                        "title": "rating",
+                                        "description": "Given rating to the user",
+                                        "type": "number"
                                     }
                                 }
+                            },
+                            "required": [ ]
                         },
-                        "required":["rating"]
-                    },
-                    "critique:delete-rating":{
-                        "href":"/critique/api/ratings/rtg-015",
-                        "method":"DELETE"
+                        "critique:delete": {
+                            "href": "/critique/api/ratings/rtg-015",
+                            "method": "DELETE"
+                        }
                     }
                 }
             }
@@ -1076,16 +1077,15 @@ View a specific rating
                 "resource_url": "/critique/api/ratings/{ratingId}/"
             }
 
-### Edit ratings information [PUT]
+### Edit rating's information [PUT]
 
-Edit a spesific rating.
+Modifies a rating.
 
-+ Relation: edit-rating
++ Relation: edit
 
 + Parameters
 
     + ratingId: `rtg-015` (integer) - Rating id.
-
 
 + Request
 
@@ -1096,7 +1096,7 @@ Edit a spesific rating.
     + Body
 
             {
-                "rating": "5"
+                "rating": 9
             }
 
 + Response 204 (application/vnd.mason+json)
