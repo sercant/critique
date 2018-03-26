@@ -1057,6 +1057,8 @@ Extracts a rating from the database.
 
 + Response 404 (application/vnd.mason+json)
 
+    Rating not found.
+
     + Body
 
             {
@@ -1067,6 +1069,8 @@ Extracts a rating from the database.
             }
 
 + Response 500 (application/vnd.mason+json)
+
+    The system has failed. Please, contact the administrator.
 
     + Body
 
@@ -1085,7 +1089,7 @@ Modifies a rating.
 
 + Parameters
 
-    + ratingId: `rtg-015` (integer) - Rating id.
+    + ratingId: `rtg-015` (string) - Rating id.
 
 + Request
 
@@ -1107,6 +1111,8 @@ Modifies a rating.
 
 + Response 400 (application/vnd.mason+json)
 
+    Rating info is not well formed or it is empty.
+
     + Body
 
             {
@@ -1117,6 +1123,8 @@ Modifies a rating.
             }
 
 + Response 404 (application/vnd.mason+json)
+
+    Rating not found.
 
     + Body
 
@@ -1129,6 +1137,8 @@ Modifies a rating.
 
 + Response 415 (application/vnd.mason+json)
 
+    Format of the input is not json.
+
     + Body
 
             {
@@ -1139,6 +1149,8 @@ Modifies a rating.
             }
 
 + Response 500 (application/vnd.mason+json)
+
+    The system has failed. Please, contact the administrator.
 
     + Body
 
@@ -1152,13 +1164,13 @@ Modifies a rating.
 
 ### Delete ratings information [DELETE]
 
-Detete a spesific rating.
+Deletes the specified rating.
 
-+ Relation: delete-rating
++ Relation: delete
 
 + Parameters
 
-    + ratingId: `rtg-015` (integer) - Rating id.
+    + ratingId: `rtg-015` (string) - Rating id.
 
 + Response 204 (application/vnd.mason+json)
 
@@ -1168,7 +1180,7 @@ Detete a spesific rating.
 
 + Response 404 (application/vnd.mason+json)
 
-    + Headers
+    Rating not found.
 
     + Body
 
@@ -1181,7 +1193,7 @@ Detete a spesific rating.
 
 + Response 500 (application/vnd.mason+json)
 
-    + Headers
+    The system has failed. Please, contact the administrator.
 
     + Body
 
