@@ -637,7 +637,7 @@ Delete a particular user from the platform.
 
 ## User's ratings [/critique/api/users/{nickname}/ratings/]
 
-Rating of a user stored in critique database
+Ratings given to the user.
 
 + Parameters
     + nickname: `Scott` (string) - The nickname of the user.
@@ -645,11 +645,11 @@ Rating of a user stored in critique database
 
 ### Receive users ratings [GET]
 
-Get the ratings of the users in the database
+Extracts the ratings given to the user.
 
-+ Relation: self
++ Relation: user-ratings
 
-+ Request (application/json)
++ Request
 
     + Headers
 
@@ -660,59 +660,78 @@ Get the ratings of the users in the database
     + Body
 
             {
-            "items":[
-                {
-                    "ratingId":"rtg-015",
-                    "rating": "5",
-                    "@controls":{
-                        "self":{
-                            "href":"/critique/api/ratings/rtg-015/"
-                        },
-                        "profile": {
-                            "href": "/critique/profiles/rating-profile/"
-                        }
-                    }
-                },
-                {
-                    "ratingId": "rtg-016",
-                    "rating": "2",
-                    "@controls":{
-                        "self":{
-                            "href":"/critique/api/ratings/rtg-016/"
-                        },
-                        "profile": {
-                            "href": "/critique/profiles/rating-profile/"
-                        }
-                    }
-                }
-            ],
-            "@namespaces": {
-                "critique": {
-                    "name": "/critique/link-relations/"
-                }
-            },
-            "@controls": {
-                "self": {
-                    "href": "/forum/api/users/Kim/ratings/"
-                },
-                "critique:add-rating": {
-                    "href": "/forum/api/ratings/",
-                    "encoding": "json",
-                    "method": "POST",
-                    "schema": {
-                        "type": "object",
-                        "properties": {
-                            "rating": {
-                                "title": "Rating",
-                                "description": "Rating for the user",
-                                "type": "integer"
+                "items": [
+                    {
+                        "ratingId": "rtg-015",
+                        "rating": 8,
+                        "sender": "Scott",
+                        "receiver": "Kim",
+                        "@controls": {
+                            "self": {
+                                "href": "/critique/api/ratings/rtg-015/"
+                            },
+                            "profile": {
+                                "href": "/critique/profiles/rating-profile/"
                             }
-                        },
-                        "required": ["rating"]
+                        }
+                    },
+                    {
+                        "ratingId": "rtg-016",
+                        "rating": 4,
+                        "sender": "Kim",
+                        "receiver": "Scott",
+                        "@controls": {
+                            "self": {
+                                "href": "/critique/api/ratings/rtg-016/"
+                            },
+                            "profile": {
+                                "href": "/critique/profiles/rating-profile/"
+                            }
+                        }
+                    }
+                ],
+                "@namespaces": {
+                    "critique": {
+                        "name": "/critique/link-relations/"
+                    }
+                },
+                "@controls": {
+                    "self": {
+                        "href": "/forum/api/users/Kim/ratings/"
+                    },
+                    "critique:add-rating": {
+                        "href": "/forum/api/ratings/",
+                        "encoding": "json",
+                        "method": "POST",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "rating": {
+                                    "title": "Rating",
+                                    "description": "Rating for the user",
+                                    "type": "number"
+                                },
+                                "sender": {
+                                    "title": "Sender",
+                                    "description": "Nickname of sender of the rating",
+                                    "type": "string"
+                                },
+                                "receiver": {
+                                    "title": "Receiver",
+                                    "description": "Nickname of receiver of the rating",
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "rating",
+                                "sender",
+                                "receiver"
+                            ]
+                        }
                     }
                 }
             }
-            }
+
 
 + Response 404 (application/vnd.mason+json)
 
@@ -1199,7 +1218,7 @@ Modifies a rating.
 
 + Relation: edit
 
-+ Request
++ Request (application/json)
 
     + Headers
 
