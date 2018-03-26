@@ -19,6 +19,16 @@ Return the link relation description in HTML format.
 
 + Response 200 (text/html)
 
+## add-rating [/critique/link-relations/add-rating]
+
+Creates a new rating via `POST`.
+
+### GET
+
+Return the link relation description in HTML format.
+
++ Response 200 (text/html)
+
 ## user-inbox [/critique/link-relations/user-inbox]
 
 Returns the posts sent to the user which are currently not public via `GET`.
@@ -139,7 +149,7 @@ Return the User Profile in HTML format.
 + Response 200 (text/html)
 
 
-## Ratings Profile [/critique/profiles/rating-profile]
+## Rating Profile [/critique/profiles/rating-profile]
 
 Profile definition for all rating resources.
 
@@ -165,6 +175,8 @@ Inherited from IANA RFC5988:
 #### Data Type Rating
 
  * `ratingId` (string): Rating id of the rating in `rtg-(\d+)` format. Example `rtg-1`.
+ * `sender` (string): Nickname of the sender. Example, `Scott`.
+ * `receiver` (string): Nickname of the receiver. Example, `Kim`.
  * `rating` (integer): Rating value in 0 - 10 range.
 
 ### GET
@@ -172,6 +184,7 @@ Inherited from IANA RFC5988:
 Return the Rating Profile in HTML format.
 
 + Response 200 (text/html)
+
 
 
 # Group Users
@@ -831,9 +844,9 @@ View the list that contains users ratings
 
 ### List ratings [GET]
 
-Add a new rating
+NOT IMPLEMENTED
 
-+ Relation: add-rating
++ Relation: self
 
 + Request
 
@@ -849,33 +862,7 @@ Add a new rating
 
     + Body
 
-            {
-                "nickname":"alkila",
-                "givenName":"Sercan",
-                "email":"sercan@mail.com",
-                "rating":"5"
-                },
-                "@namespaces": {
-                "critique": {
-                "name": "/critique/link-relations/"
-                    }
-                },
-                "@controls": {
-                    "self": {
-                        "href": "/critique/api/ratings/"
-                    },
-                    "profile": {
-                        "href": "/critique/profiles/rating-profile/"
-                    },
-                    "collection": {
-                        "href": "/forum/api/ratings/"
-                    },
-                    "critique:add-rating":{
-                        "title":"add rating",
-                        "href":"/critique/api/ratings/",
-                        "encoding":"json"
-                }
-            }
+            { NOT IMPLEMENTED }
 
 + Response 400 (application/vnd.mason+json)
 
@@ -921,7 +908,87 @@ Add a new rating
                 "resource_url": "/critique/api/ratings/"
             }
 
+### Create a new rating [POST]
 
+Create a new rating.
+
++ Relation: add-rating
+
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/vnd.mason+json
+
+    + Body
+
+            {
+                "rating": 8,
+                "sender": "Scott",
+                "receiver": "Kim"
+            }
+
+
++ Response 201
+
+    Rating created successfully.
+
+    + Headers
+
+            Location: URL of the newly created resource.
+
+
++ Response 400 (application/vnd.mason+json)
+
+    Rating info is not well formed or entity body is missing.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "Rating info is not well formed or entity body is missing."
+                },
+                "resource_url": "/critique/api/ratings/"
+            }
+
++ Response 415 (application/vnd.mason+json)
+
+    Format of the input is not json.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "Format of the input is not json."
+                },
+                "resource_url": "/critique/api/ratings/"
+            }
+
++ Response 422 (application/vnd.mason+json)
+
+    Sender or receiver not found.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "Sender or receiver not found."
+                },
+                "resource_url": "/critique/api/ratings/"
+            }
+
++ Response 500 (application/vnd.mason+json)
+
+    The system has failed. Please, contact the administrator.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "The system has failed. Please, contact the administrator."
+                },
+                "resource_url": "/critique/api/ratings/"
+            }
 
 ## Rating [/critique/api/ratings/{ratingId}/]
 
