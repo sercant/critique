@@ -157,6 +157,7 @@ Profile definition for all rating resources.
 
 This profile inherits:
 
+ * Some semantic descriptors from [Person](http://schema.org/Rating)
  * Some link relations from IANA Web linking [RFC5988](https://www.iana.org//assignmentscritique/link-/relationscritique/link-relations.xhtml)
 
 ### Link relations
@@ -177,7 +178,11 @@ Inherited from IANA RFC5988:
  * `ratingId` (string): Rating id of the rating in `rtg-(\d+)` format. Example `rtg-1`.
  * `sender` (string): Nickname of the sender. Example, `Scott`.
  * `receiver` (string): Nickname of the receiver. Example, `Kim`.
- * `rating` (integer): Rating value in 0 - 10 range.
+
+Inherited from [Rating](http://schema.org/Rating):
+
+ * [`bestRating`](http://schema.org/bestRating) (number): For informing the client.
+ * [`ratingValue`](http://schema.org/ratingValue) (number): Mandatory in creation of a new rating.
 
 ### GET
 
@@ -663,7 +668,8 @@ Extracts the ratings given to the user.
                 "items": [
                     {
                         "ratingId": "rtg-015",
-                        "rating": 8,
+                        "bestRating": 10,
+                        "ratingValue": 8,
                         "sender": "Scott",
                         "receiver": "Kim",
                         "@controls": {
@@ -677,7 +683,8 @@ Extracts the ratings given to the user.
                     },
                     {
                         "ratingId": "rtg-016",
-                        "rating": 4,
+                        "bestRating": 10,
+                        "ratingValue": 4,
                         "sender": "Kim",
                         "receiver": "Scott",
                         "@controls": {
@@ -706,7 +713,7 @@ Extracts the ratings given to the user.
                         "schema": {
                             "type": "object",
                             "properties": {
-                                "rating": {
+                                "ratingValue": {
                                     "title": "Rating",
                                     "description": "Rating for the user",
                                     "type": "number"
@@ -723,7 +730,7 @@ Extracts the ratings given to the user.
                                 }
                             },
                             "required": [
-                                "rating",
+                                "ratingValue",
                                 "sender",
                                 "receiver"
                             ]
@@ -1054,7 +1061,7 @@ Appends a new rating to the list of ratings.
     + Body
 
             {
-                "rating": 8,
+                "ratingValue": 8,
                 "sender": "Scott",
                 "receiver": "Kim"
             }
@@ -1146,7 +1153,8 @@ Extracts a rating from the database.
 
             {
                 "ratingId": "rtg-015",
-                "rating": 8,
+                "bestRating": 10,
+                "ratingValue": 8,
                 "sender": "Scott",
                 "receiver": "Kim",
                 "@namespaces": {
@@ -1168,8 +1176,8 @@ Extracts a rating from the database.
                             "schema": {
                                 "type": "object",
                                 "properties": {
-                                    "rating": {
-                                        "title": "rating",
+                                    "ratingValue": {
+                                        "title": "Rating",
                                         "description": "Given rating to the user",
                                         "type": "number"
                                     }
@@ -1227,7 +1235,7 @@ Modifies a rating.
     + Body
 
             {
-                "rating": 9
+                "ratingValue": 9
             }
 
 + Response 204 (application/vnd.mason+json)
