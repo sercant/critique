@@ -167,6 +167,56 @@ POSSIBLE RESPONSES
         Content-Type: text/html
 ```
 
+### add-post
+
+Adds a new post
+
+#### GET /critique/link-relations/add-post
+
+Return the link relation description in HTML format.
+```json
+POSSIBLE RESPONSES
+
+200:
+    HEADER
+        Response: 200
+        Content-Type: text/html
+```
+
+### add-reply
+
+Adds a reply to an existing post.
+
+#### GET /critique/link-relations/add-reply
+
+Return the link relation description in HTML format.
+
+```json
+POSSIBLE REPSONSES
+
+200:
+    HEADER
+        Response: 200
+        Content-Type: text/html
+```
+
+### posts-profile
+
+Profile definition for all posts resource
+
+#### GET /critique/link-relations/posts-profile
+
+Return the link relation description in HTML format.
+
+```json
+POSSIBLE REPSONSES
+
+200:
+    HEADER
+        Response: 200
+        Content-Type: text/html
+```
+
 ## Users
 
 All these resources use the [User Profile](#user-profile).
@@ -711,8 +761,7 @@ POSSIBLE RESPONSES
 
 ```json
 PARAMETERS
-    TODO
-    nickname: The nickname of the user. Example, Scott.
+    nickname: The nickname of the user. for example: Scott.
 ```
 
 ```json
@@ -729,12 +778,48 @@ POSSIBLE RESPONSES
         Response: 200 (Successful.)
         Content-Type: application/vnd.mason+json
     BODY
-        TODO
-    RELATIONS
-        Self: TODO
-        Profile: TODO
-        TODO OTHER LINKS
+        CHECK_THIS
+        {
+            "items": [
 
+                {
+                    "givenName": "Scott",
+                    "avatar": "photo1.jpg",
+                    "text":"this is a river text 01.",
+                    "@controls":{
+                        "self":{
+                            "href": "/critique/api/users/mina/river/01"
+                        },
+                        "profile": {
+                            "href": "/critique/profiles/user-profile/"
+                        },
+                        "critique:user-ratings": {
+                            "href": "/critique/api/users/Scott/ratings"
+                        }
+                    }
+                },
+                {
+                    "givenName": "Moamen",
+                    "avatar": "photoMoamen.jpg",
+                    "text":"this is a river text of Moamen.",
+                    "@controls":{
+                        "self":{
+                            "href": "/critique/api/users/mina/river/02"
+                        },
+                        "profile": {
+                            "href": "/critique/profiles/user-profile/"
+                        },
+                        "critique:user-ratings": {
+                            "href": "/critique/api/users/Moamen/ratings"
+                        }
+                    }
+                }
+            ]
+        }
+    RELATIONS
+        Self
+        Profile
+        user-ratings
 404:
     HEADER
         Response: 404
@@ -752,8 +837,7 @@ POSSIBLE RESPONSES
 
 ```json
 PARAMETERS
-    TODO
-    nickname: The nickname of the user. Example, Scott.
+    nickname: The nickname of the user. for example: Scott.
 ```
 
 ```json
@@ -770,11 +854,47 @@ POSSIBLE RESPONSES
         Response: 200 (Successful.)
         Content-Type: application/vnd.mason+json
     BODY
-        TODO
+        CHECK_THIS
+        {
+            "items": [
+                {
+                    "givenName": "Walcott",
+                    "avatar": "photoWalcott.jpg",
+                    "text":"this is an inbox post text 01.",
+                    "@controls":{
+                        "self":{
+                            "href": "/critique/api/users/mina/inbox/"
+                        },
+                        "profile": {
+                            "href": "/critique/profiles/posts-profile/"
+                        },
+                        "critique:user-ratings": {
+                            "href": "/critique/api/users/Walcott/ratings"
+                        }
+                    }
+                },
+                {
+                    "givenName": "Modric",
+                    "avatar": "photoModric.jpg",
+                    "text":"this is an inbox post text from Modric.",
+                    "@controls":{
+                        "self":{
+                            "href": "/critique/api/users/mina/river/"
+                        },
+                        "profile": {
+                            "href": "/critique/profiles/posts-profile/"
+                        },
+                        "critique:user-ratings": {
+                            "href": "/critique/api/users/Modric/ratings"
+                        }
+                    }
+                }
+            ]
+        }
     RELATIONS
-        Self: TODO
-        Profile: TODO
-        TODO OTHER LINKS
+        Self
+        Profile
+        user-ratings
 
 404:
     HEADER
@@ -791,9 +911,10 @@ POSSIBLE RESPONSES
 
 ## Posts
 
-TODO description
-
+TODO
 ### GET /critique/api/posts/
+
+A list of all posts in the platform
 
 ```json
 REQUEST
@@ -809,19 +930,51 @@ POSSIBLE RESPONSES
         Response: 200 (Successful.)
         Content-Type: application/vnd.mason+json
     BODY
-        TODO
+        {
+            "items":[
+                {
+                    "sender":"Mina",
+                    "receiver": "Sercant",
+                    "text": "Hey man, nice work on PWP.",
+                    "@controls": {
+                        "self": {
+                            "href": "/critique/api/posts/"
+                        },
+                        "profile": {
+                            "href": "/critique/profiles/posts-profile/"
+                        }
+                    }
+                },
+                {
+                    "sender":"Brian",
+                    "receiver": "Armadillo",
+                    "text": "You have weird working ethics.",
+                    "@controls": {
+                        "self": {
+                            "href": "/critique/api/posts/"
+                        },
+                        "profile": {
+                            "href": "/critique/profiles/posts-profile/"
+                        }
+                    }
+                }
+            ],
+            "@namespace": {
+                "critique": {
+                    "name": "/critique/link-relations/"
+                }
+            },
+
+        }
     RELATIONS
-        Self: TODO
-        Profile: TODO
-        TODO OTHER LINKS
+        Self
+        Profile
+
 ```
 
 ### POST /critique/api/posts/
 
-```json
-PARAMETERS
-    TODO
-```
+Creates a new post.
 
 ```json
 REQUEST
@@ -829,10 +982,12 @@ REQUEST
     HEADER
         Content-Type: application/json
         Accept: application/vnd.mason+json
-    PARAMETERS
-        TODO
     BODY
-        TODO
+        {
+            "sender": "lisa",
+            "receiver": "ibiza",
+            "text": "You startup is amazing, keep up the good work."
+        }
 ```
 
 ```json
@@ -894,9 +1049,11 @@ POSSIBLE RESPONSES
 
 ### GET /critique/api/posts/{postId}/
 
+Gets a specific post from the platform
+
 ```json
 PARAMETERS
-    TODO
+    postId: the specific post ID required to retrieve the post. ex: 113
 ```
 
 ```json
@@ -913,11 +1070,59 @@ POSSIBLE RESPONSES
         Response: 200 (Successful.)
         Content-Type: application/vnd.mason+json
     BODY
-        TODO
+        {
+            "sender": "Jeff",
+            "receiver": "Audrey",
+            "text": "I love you.",
+            "rating": 5,
+            "@namespaces": {
+                "critique": {
+                    "name": "/critique/link-relations/"
+                }
+            },
+            "@controls": {
+                "self": {
+                    "href": "/critique/api/posts/113/"
+                },
+                "profile": {
+                    "href": "/critique/profiles/posts-profile/"
+                },
+                "collection": {
+                    "href": "/critique/api/posts/"
+                },
+                "edit": {
+                    "title": "Edit this post",
+                    "href": "/critique/api/posts/113/",
+                    "encoding": "json",
+                    "method": "PUT",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "text": {
+                                "title": "post's text",
+                                "description": "contents of the post",
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "critique:delete":{
+                    "href": "/critique/api/posts/113",
+                    "method": "DELETE"
+                },
+                "critique:user-ratings": {
+                    "href": "/critique/api/users/Jeff/ratings"
+                }
+            },
+
+        }
     RELATIONS
-        Self: TODO
-        Profile: TODO
-        TODO OTHER LINKS
+        self
+        profile
+        collection
+        edit
+        delete
+        user-ratings
 
 404:
     HEADER
@@ -934,9 +1139,11 @@ POSSIBLE RESPONSES
 
 ### POST /critique/api/posts/{postId}/
 
+add a reply to an existing post
+
 ```json
 PARAMETERS
-    TODO
+    postId: the parent post ID which gets the reply.
 ```
 
 ```json
@@ -946,9 +1153,14 @@ REQUEST
         Content-Type: application/json
         Accept: application/vnd.mason+json
     PARAMETERS
-        TODO
+        {
+            "receiverNickname": "Hammam"
+        }
     BODY
-        TODO
+        {
+            "senderNickname": "Shazam",
+            "text": "hey man, I would really appreciate if we could meet."
+        }
 ```
 
 ```json
@@ -1022,9 +1234,11 @@ POSSIBLE RESPONSES
 
 ### PUT /critique/api/posts/{postId}/
 
+Edit an existing post.
+
 ```json
 PARAMETERS
-    TODO
+    postId: ID of specific post to edit.
 ```
 
 ```json
@@ -1034,9 +1248,13 @@ REQUEST
         Content-Type: application/json
         Accept: application/vnd.mason+json
     PARAMETERS
-        TODO
+        {
+            "postId": 113
+        }
     BODY
-        TODO
+        {
+            "text": "I hate you, it is the edited reply"
+        }
 ```
 
 ```json
@@ -1098,9 +1316,11 @@ POSSIBLE RESPONSES
 
 ### DELETE /critique/api/posts/{postId}/
 
+Deletes an existing post.
+
 ```json
 PARAMETERS
-    TODO
+    postId: ID of the post to delete.
 ```
 
 ```json
