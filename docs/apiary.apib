@@ -909,7 +909,6 @@ In addition all error messages follow the [Error Profile](#profiles-error-profil
 
 A list of all posts in the platform.
 
-
 ### Create a new post [POST]
 
 Create a new post.
@@ -993,6 +992,141 @@ Create a new post.
                 "resource_url": "/critique/api/posts/"
             }
 
+## Post [/critique/api/posts/{postId}/]
+
+View a specific post information.
+
++ Parameters
+
+    + postId: `p-1` (string) - Post id.
+
+## Receive post's information [GET]
+
+Extracts a post from the database.
+
++ Request
+
+    + Headers
+
+            Accept: application/vnd.mason+json
+
+
++ Response 200 (application/vnd.mason+json)
+
+    + Body
+
+            {
+                "sender": "Scott",
+                "receiver": "Kim",
+                "timestamp": 45345234234,
+                "postId": "p-1",
+                "replyTo": null,
+                "body": "She is great! (sometimes)",
+                "anonymous": false,
+                "public": true,
+                "bestRating": 10,
+                "ratingValue": 8,
+                "@namespaces": {
+                    "critique": {
+                        "name": "/critique/link-relations/"
+                    }
+                },
+                "@controls": {
+                    "collection": {
+                        "href": "/critique/api/posts"
+                    },
+                    "self": {
+                        "href": "/critique/api/posts/p-1"
+                    },
+                    "profile": {
+                        "href": "/critique/profiles/post-profile/"
+                    },
+                    "edit": {
+                        "title": "Edit a post",
+                        "href": "/critique/api/posts/p-1",
+                        "encoding": "json",
+                        "method": "PUT",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "ratingValue": {
+                                    "title": "Rating",
+                                    "description": "Rating given in the post",
+                                    "type": "number"
+                                },
+                                "body": {
+                                    "title": "Body",
+                                    "description": "Text of the post",
+                                    "type": "number"
+                                },
+                                "public": {
+                                    "title": "Public",
+                                    "description": "Publicity of the post",
+                                    "type": "boolean"
+                                }
+                            }
+                        },
+                        "required": []
+                    },
+                    "critique:add-reply": {
+                        "title": "Add reply",
+                        "href": "/critique/api/posts/p-1",
+                        "encoding": "json",
+                        "method": "POST",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "sender": {
+                                    "title": "Sender",
+                                    "description": "Nickname of sender of the rating",
+                                    "type": "string"
+                                },
+                                "body": {
+                                    "title": "Body",
+                                    "description": "Text of the post",
+                                    "type": "number"
+                                }
+                            }
+                        },
+                        "required": [
+                            "sender",
+                            "body"
+                        ]
+                    },
+                    "critique:delete": {
+                        "href": "/critique/api/posts/p-1",
+                        "method": "DELETE"
+                    }
+                }
+            }
+
+
+
++ Response 404 (application/vnd.mason+json)
+
+    Post not found.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "Post not found."
+                },
+                "resource_url": "/critique/api/posts/{postId}/"
+            }
+
++ Response 500 (application/vnd.mason+json)
+
+    The system has failed. Please, contact the administrator.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "The system has failed. Please, contact the administrator."
+                },
+                "resource_url": "/critique/api/posts/{postId}/"
+            }
 
 # Group Ratings
 
@@ -1160,7 +1294,7 @@ View a specific rating information.
 
     + ratingId: `rtg-015` (string) - Rating id.
 
-### Receive ratings information [GET]
+### Receive rating's information [GET]
 
 Extracts a rating from the database.
 
