@@ -79,16 +79,6 @@ Return the link relation description in HTML format.
 
 + Response 200 (text/html)
 
-## edit-rating [/critique/link-relations/edit-rating]
-
-Edits the ratings the spesific rating via `PUT`.
-
-### GET
-
-Return the link relation description in HTML format.
-
-+ Response 200 (text/html)
-
 ## delete [/critique/link-relations/delete]
 
 Deletes the current context. Use via `DELETE`.
@@ -266,11 +256,11 @@ In addition all error messages follow the [Error Profile](#profiles-error-profil
 
 ## Users List [/critique/api/users/]
 
-A list of all users in the platform.
+This resource returns list of users, extracting all user’s summary in the database. It contains the data for every user profile including the id, firstname, lastname, bio about the user and other information.
 
 ### List Users [GET]
 
-Get a list of all users in the platform.
+Extracts all users summary in the database.
 
 + Relation: self
 
@@ -357,7 +347,7 @@ Get a list of all users in the platform.
 
 ### Create a new user [POST]
 
-Create a new user.
+Adds a new user to the list of users. Returns the new user URI in the location header.
 
 + Relation: add-user
 
@@ -439,14 +429,14 @@ Create a new user.
 
 ## User [/critique/api/users/{nickname}/]
 
-A user stored in the Critique database.
+Resource has the basic information of a specific user. Bio is where the user should enter information about himself/herself, so it should be text. Email and mobile are unique texts as they will not repeat for other users. Gender, avatar and birthdate are texts.
 
 + Parameters
     + nickname: `Scott` (string) - The nickname of the user.
 
 ### Receive user information [GET]
 
-Receives the information of a particular user.
+Extract information of a user.
 
 + Relation: self
 
@@ -570,7 +560,7 @@ Receives the information of a particular user.
 
 ### Edit user information [PUT]
 
-Edit the information of a particular user.
+Modifies mutable attributes of the specified user.
 
 + Relation: edit
 
@@ -669,7 +659,7 @@ Edit the information of a particular user.
 
 ### Delete a user [DELETE]
 
-Delete a particular user from the platform.
+Deletes the specified user.
 
 + Relation: delete
 
@@ -708,7 +698,7 @@ Delete a particular user from the platform.
 
 ## User's ratings [/critique/api/users/{nickname}/ratings/]
 
-Ratings given to the user.
+Contains the ratings list containing ratings from all other users to this specific user. It should have a track of the ratings made by users to each other including the person who made the rating and that who received it as a sender id of the rating and receiver id.  It includes the ratings_id, timestamp indicates when the users give ratings to each other, sender_id and reciever_id which are foreign keys to user_id in users.
 
 + Parameters
     + nickname: `Scott` (string) - The nickname of the user.
@@ -821,14 +811,14 @@ Extracts the ratings given to the user.
 
 ## User's river [/critique/api/users/{nickname}/river/]
 
-NOT IMPLEMENTED
+The river contains the posts sent to users, these posts should be the public ones, after the user has accepted the post sent to him/her. Posts have their ratings and fields indicating whether they were posted anonymously or not.
 
 + Parameters
     + nickname: `Scott` (string) - The nickname of the user.
 
 ### Receive user's river [GET]
 
-NOT IMPLEMENTED
+Posts sent to the user which are currently public.
 
 + Relation: self
 
@@ -843,8 +833,55 @@ NOT IMPLEMENTED
     + Body
 
             {
-                NOT IMPLEMENTED
+                "items": [
+                    {
+                        "sender": "Margaret",
+                        "receiver": "Scott",
+                        "timestamp": 45345234234,
+                        "postId": "p-2",
+                        "replyTo": null,
+                        "body": "He is a great bass.",
+                        "anonymous": false,
+                        "public": true,
+                        "bestRating": 10,
+                        "ratingValue": 8,
+                        "@controls": {
+                            "self": {
+                                "href": "/critique/api/posts/p-2"
+                            },
+                            "profile": {
+                                "href": "/critique/profiles/post-profile/"
+                            }
+                        }
+                    },
+                    {
+                        "sender": "Kim",
+                        "receiver": "Scott",
+                        "timestamp": 45345434534,
+                        "postId": "p-3",
+                        "replyTo": null,
+                        "body": "I hate you.",
+                        "anonymous": false,
+                        "public": true,
+                        "bestRating": 10,
+                        "ratingValue": 3,
+                        "@controls": {
+                            "self": {
+                                "href": "/critique/api/posts/p-3"
+                            },
+                            "profile": {
+                                "href": "/critique/profiles/post-profile/"
+                            }
+                        }
+                    }
+                ],
+                "@controls":{
+                    "self": {
+                        "href": "/critique/api/users/Scott/river"
+                    }
+                }
             }
+
 
 + Response 404 (application/vnd.mason+json)
 
@@ -861,14 +898,14 @@ NOT IMPLEMENTED
 
 ## User's inbox [/critique/api/users/{nickname}/inbox/]
 
-NOT IMPLEMETED
+Contains posts sent to the user, it should include text as the actual post, however, rating is optional in the message.
 
 + Parameters
     + nickname: `Scott` (string) - The nickname of the user.
 
 ### Receive user's inbox [GET]
 
-NOT IMPLEMETED
+Posts sent to the user which are currently private.
 
 + Relation self
 
@@ -883,8 +920,55 @@ NOT IMPLEMETED
     + Body
 
             {
-                NOT IMPLEMETED
+                "items": [
+                    {
+                        "sender": "Margaret",
+                        "receiver": "Scott",
+                        "timestamp": 45345234234,
+                        "postId": "p-2",
+                        "replyTo": null,
+                        "body": "He is a great bass.",
+                        "anonymous": false,
+                        "public": false,
+                        "bestRating": 10,
+                        "ratingValue": 8,
+                        "@controls": {
+                            "self": {
+                                "href": "/critique/api/posts/p-2"
+                            },
+                            "profile": {
+                                "href": "/critique/profiles/post-profile/"
+                            }
+                        }
+                    },
+                    {
+                        "sender": "Kim",
+                        "receiver": "Scott",
+                        "timestamp": 45345434534,
+                        "postId": "p-3",
+                        "replyTo": null,
+                        "body": "I hate you.",
+                        "anonymous": false,
+                        "public": false,
+                        "bestRating": 10,
+                        "ratingValue": 3,
+                        "@controls": {
+                            "self": {
+                                "href": "/critique/api/posts/p-3"
+                            },
+                            "profile": {
+                                "href": "/critique/profiles/post-profile/"
+                            }
+                        }
+                    }
+                ],
+                "@controls":{
+                    "self": {
+                        "href": "/critique/api/users/Scott/inbox"
+                    }
+                }
             }
+
 
 + Response 404 (application/vnd.mason+json)
 
@@ -907,11 +991,11 @@ In addition all error messages follow the [Error Profile](#profiles-error-profil
 
 ## Posts List [/critique/api/posts/]
 
-A list of all posts in the platform.
+Contains the list of posts for a specific user. Extracts all the posts’ summary from the database and creates a new post to the list of posts. It contains the posts sent to users whether public or private posts. Posts have their ratings.
 
 ### Create a new post [POST]
 
-Create a new post.
+Creates a new post to the list of posts. Returns the post URI.
 
 + Relation: add-post
 
@@ -928,7 +1012,8 @@ Create a new post.
                 "receiver": "Kim",
                 "body": "She is great! (sometimes)",
                 "anonymous": false,
-                "ratingValue": 8
+                "ratingValue": 8,
+                "public": false
             }
 
 + Response 201
@@ -968,7 +1053,7 @@ Create a new post.
 
 + Response 422 (application/vnd.mason+json)
 
-    Nickname, email, or mobile already exist in the users list.
+    Sender or receiver not found.
 
     + Body
 
@@ -994,7 +1079,7 @@ Create a new post.
 
 ## Post [/critique/api/posts/{postId}/]
 
-View a specific post information.
+Contains the information needed from a specific post where it contains the post text, timestamp, sender id and receiver id which should not be null value. Post_text is the post content that holds the data needed while rating is an integer of the ratings to the post from others. Public is an integer flag indicating if the post is public or private. While anonymous is the same but indicates whether the user wants to post it without being known.
 
 + Parameters
 
@@ -1002,7 +1087,7 @@ View a specific post information.
 
 ## Receive post's information [GET]
 
-Extracts a post from the database.
+Extracts a post and all it’s information.
 
 + Request
 
@@ -1128,6 +1213,217 @@ Extracts a post from the database.
                 "resource_url": "/critique/api/posts/{postId}/"
             }
 
+### Edit post's information [PUT]
+
+Modifies the contents of a specified post.
+
++ Relation: edit
+
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/vnd.mason+json
+
+    + Body
+
+            {
+                "body": "She is great! (sometimes)",
+                "ratingValue": 8,
+                "public": true
+            }
+
++ Response 204 (application/vnd.mason+json)
+
+    + Headers
+
+            Location: URL of the newly edited resource.
+
++ Response 400 (application/vnd.mason+json)
+
+    Post info is not well formed or it is empty.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "Post info is not well formed or it is empty."
+                },
+                "resource_url": "/critique/api/posts/{postId}/"
+            }
+
++ Response 404 (application/vnd.mason+json)
+
+    Post not found.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "Post not found."
+                },
+                "resource_url": "/critique/api/posts/{postId}/"
+            }
+
++ Response 415 (application/vnd.mason+json)
+
+    Format of the input is not json.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "Format of the input is not json."
+                },
+                "resource_url": "/critique/api/posts/{postId}/"
+            }
+
++ Response 500 (application/vnd.mason+json)
+
+    The system has failed. Please, contact the administrator.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "The system has failed. Please, contact the administrator."
+                },
+                "resource_url": "/critique/api/posts/{postId}/"
+            }
+
+### Delete a post [DELETE]
+
+Deletes the specified post.
+
++ Relation: delete
+
++ Response 204 (application/vnd.mason+json)
+
+    Post deleted successfully.
+
+    + Headers
+
++ Response 404 (application/vnd.mason+json)
+
+    Post not found.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "Post not found."
+                },
+                "resource_url": "/critique/api/posts/{postId}/"
+            }
+
++ Response 500 (application/vnd.mason+json)
+
+    The system has failed. Please, contact the administrator.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "The system has failed. Please, contact the administrator."
+                },
+                "resource_url": "/critique/api/posts/{postId}/"
+            }
+
+### Create a new post as a reply [POST]
+
+Posts a new post as a reply to a given post.
+
++ Relation: add-reply
+
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/vnd.mason+json
+
+    + Body
+
+            {
+                "sender": "Scott",
+                "replyTo": "p-1",
+                "body": "It's actually useful",
+            }
+
++ Response 201
+
+    Post created successfully.
+
+    + Headers
+
+            Location: URL of the newly created resource.
+
+
++ Response 400 (application/vnd.mason+json)
+
+    Post info is not well formed or entity body is missing.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "Post info is not well formed or entity body is missing."
+                },
+                "resource_url": "/critique/api/posts/{postId}"
+            }
+
+
++ Response 404 (application/vnd.mason+json)
+
+    Post not found.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "Post not found."
+                },
+                "resource_url": "/critique/api/posts/{postId}"
+            }
+
++ Response 415 (application/vnd.mason+json)
+
+    Format of the input is not json.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "Format of the input is not json."
+                },
+                "resource_url": "/critique/api/posts/{postId}"
+            }
+
++ Response 422 (application/vnd.mason+json)
+
+    Sender not found.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "Sender not found."
+                },
+                "resource_url": "/critique/api/posts/{postId}"
+            }
+
++ Response 500 (application/vnd.mason+json)
+
+    The system has failed. Please, contact the administrator.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "The system has failed. Please, contact the administrator."
+                },
+                "resource_url": "/critique/api/posts/{postId}"
+            }
+
 # Group Ratings
 
 All these resources use the [Post Profile](#profiles-post-profile).
@@ -1136,7 +1432,7 @@ In addition all error messages follow the [Error Profile](#profiles-error-profil
 
 ## Ratings list [/critique/api/ratings/]
 
-View the list that contains users ratings
+TODO
 
 ### List ratings [GET]
 
@@ -1288,7 +1584,7 @@ Appends a new rating to the list of ratings.
 
 ## Rating [/critique/api/ratings/{ratingId}/]
 
-View a specific rating information.
+Contains a specific rating to this specific user. It is in integer  indicating the number for rating to the user. Can be modified after stating it.
 
 + Parameters
 
@@ -1327,7 +1623,7 @@ Extracts a rating from the database.
                             "href": "/critique/profiles/rating-profile/"
                         },
                         "edit": {
-                            "title": "edit-rating",
+                            "title": "Edit Rating",
                             "href": "/critique/api/ratings/rtg-015",
                             "encoding": "json",
                             "method": "PUT",
@@ -1455,7 +1751,7 @@ Modifies a rating.
             }
 
 
-### Delete ratings information [DELETE]
+### Delete a rating [DELETE]
 
 Deletes the specified rating.
 
