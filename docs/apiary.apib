@@ -256,7 +256,7 @@ In addition all error messages follow the [Error Profile](#profiles-error-profil
 
 ## Users List [/critique/api/users/]
 
-This resource returns list of users, extracting all user’s summary in the database. It contains the data for every user profile including the id, firstname, lastname, bio about the user and other information.
+This resource returns list of users, extracting all user’s summary in the database. It contains the data for every user profile including the id, firstname, lastname, bio about the user and other information.Should contain nickname, avatar and bio.
 
 ### List Users [GET]
 
@@ -429,7 +429,7 @@ Adds a new user to the list of users. Returns the new user URI in the location h
 
 ## User [/critique/api/users/{nickname}/]
 
-Resource has the basic information of a specific user. Bio is where the user should enter information about himself/herself, so it should be text. Email and mobile are unique texts as they will not repeat for other users. Gender, avatar and birthdate are texts.
+Resource has the basic information of a specific user. Bio is where the user should enter information about himself/herself, so it should be text. Email and telephone are unique texts as they will not repeat for other users. Gender, avatar and birthdate are texts.
 
 + Parameters
     + nickname: `Scott` (string) - The nickname of the user.
@@ -698,7 +698,7 @@ Deletes the specified user.
 
 ## User's ratings [/critique/api/users/{nickname}/ratings/]
 
-Contains the ratings list containing ratings from all other users to this specific user. It should have a track of the ratings made by users to each other including the person who made the rating and that who received it as a sender id of the rating and receiver id.  It includes the ratings_id, timestamp indicates when the users give ratings to each other, sender_id and reciever_id which are foreign keys to user_id in users.
+Contains the ratings list with ratings from all other users to this specific user. It should have a track of the ratings made by users to each other including the person who made the rating and that who received it. Also, it contains the rating id to keep track of the ratings.
 
 + Parameters
     + nickname: `Scott` (string) - The nickname of the user.
@@ -820,7 +820,7 @@ The river contains the posts sent to users, these posts should be the public one
 
 Posts sent to the user which are currently public.
 
-+ Relation: self
++ Relation: user-river
 
 + Request
 
@@ -907,7 +907,7 @@ Contains posts sent to the user, it should include text as the actual post, howe
 
 Posts sent to the user which are currently private.
 
-+ Relation self
++ Relation user-inbox
 
 + Request
 
@@ -1079,7 +1079,7 @@ Creates a new post to the list of posts. Returns the post URI.
 
 ## Post [/critique/api/posts/{postId}/]
 
-Contains the information needed from a specific post where it contains the post text, timestamp, sender id and receiver id which should not be null value. Post_text is the post content that holds the data needed while rating is an integer of the ratings to the post from others. Public is an integer flag indicating if the post is public or private. While anonymous is the same but indicates whether the user wants to post it without being known.
+Contains the information needed from a specific post where it contains the post text, timestamp, sender and receiver nicknames which should not be null value. Post_text is the post content that holds the data needed while rating is an integer of the ratings to the post from others. Should contain postId number. It should also contain replyTo which is the id of the parent post if it is a reply to a post or null if it is the main post.
 
 + Parameters
 
@@ -1432,7 +1432,7 @@ In addition all error messages follow the [Error Profile](#profiles-error-profil
 
 ## Ratings list [/critique/api/ratings/]
 
-TODO
+A list that contains all ratings made. This resource is basically for adding new rating.
 
 ### List ratings [GET]
 
