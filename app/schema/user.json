@@ -1,0 +1,25 @@
+{
+    "type": "object",
+    "properties": {
+        "nickname": {
+            "title": "Nickname",
+            "description": "User nickname",
+            "type": "string"
+        },
+        "givenName": {
+            "title": "Given name",
+            "description": "User given name",
+            "type": "string"
+        },
+        "email": {
+            "title": "Email",
+            "description": "User email",
+            "type": "string"
+        }
+    },
+    "required": [
+        "nickname",
+        "givenName",
+        "email"
+    ]
+}

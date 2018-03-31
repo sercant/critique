@@ -438,9 +438,10 @@ class Connection(object):
         '''
         return {
             'nickname': row['nickname'],
-            'registrationdate': row['regDate'],
             'bio': row['bio'],
-            'avatar': row['avatar']
+            'avatar': row['avatar'],
+            'firstname': row['firstname'],
+            'lastname': row['lastname']
         }
 
     def _create_user_object(self, row):
@@ -683,12 +684,10 @@ class Connection(object):
 
         '''
 
-
         m = re.match('rating-(\d+)', rating_id)
         if m is None or m.group(1) is None:
             raise ValueError('rating id is malformed')
         rating_id = int(m.group(1))
-
 
         # Create the SQL Statements
         # SQL Statement for retrieving the ratings
@@ -726,24 +725,24 @@ class Connection(object):
         :raises ValueError: if the rating_id has a wrong format.
 
         '''
-        #Extracts the int which is the id for a rating in the database
+        # Extracts the int which is the id for a rating in the database
         match = re.match('rating-(\d+)', rating_id)
         if match is None:
             raise ValueError("The rating_id is malformed")
         rating_id = int(match.group(1))
 
-        #SQL Statement to update the ratings table
+        # SQL Statement to update the ratings table
         query = 'UPDATE ratings SET rating = ? WHERE rating_id = ?'
 
-        #Activate foreign key support
+        # Activate foreign key support
         self.set_foreign_keys_support()
 
-        #Cursor and row initialization
+        # Cursor and row initialization
         self.con.row_factory = sqlite3.Row
 
         try:
             cur = self.con.cursor()
-            #Execute the statement to extract the id associated to a nickname
+            # Execute the statement to extract the id associated to a nickname
             pvalue = (new_rating, rating_id)
             cur.execute(query, pvalue)
             self.con.commit()
@@ -751,7 +750,7 @@ class Connection(object):
             print("Error %s:" % excp.args[0])
             return None
 
-        #Check that I have modified the user
+        # Check that I have modified the user
         if cur.rowcount < 1:
             return None
         return 'rating-' + str(rating_id)
@@ -806,46 +805,47 @@ class Connection(object):
         # check if the rating is given to the user already by the sender
         ratings = self.get_ratings(sender=sender, receiver=receiver)
         if ratings is not None and len(ratings) is not 0:
-            raise ValueError('rating is already given by this sender to the receiver. try modifying the rating.')
+            raise ValueError(
+                'rating is already given by this sender to the receiver. try modifying the rating.')
 
-        #Create the SQL statment
-        #SQL Statement for getting the user id given a nickname
+        # Create the SQL statment
+        # SQL Statement for getting the user id given a nickname
         query_user_id = 'SELECT user_id from users WHERE nickname = ?'
 
-        #SQL Statement for inserting the data
+        # SQL Statement for inserting the data
         stmnt = 'INSERT INTO ratings(timestamp,sender_id,receiver_id,rating) \
                  VALUES(?,?,?,?)'
 
-        #Variables for the statement.
-        #sender_id is obtained from first statement.
+        # Variables for the statement.
+        # sender_id is obtained from first statement.
         sender_id = None
 
-        #receiver_id is obtained from first statement.
+        # receiver_id is obtained from first statement.
         receiver_id = None
         timestamp = time.mktime(datetime.now().timetuple())
 
-        #Activate foreign key support
+        # Activate foreign key support
         self.set_foreign_keys_support()
 
-        #Cursor and row initialization
+        # Cursor and row initialization
         self.con.row_factory = sqlite3.Row
         cur = self.con.cursor()
 
-        #Provide support for foreign keys
-        #Execute SQL Statement to get user_id given nickname
+        # Provide support for foreign keys
+        # Execute SQL Statement to get user_id given nickname
         pvalue = (sender,)
         cur.execute(query_user_id, pvalue)
 
-        #Extract user id
+        # Extract user id
         row = cur.fetchone()
         if row is not None:
             sender_id = row["user_id"]
 
-        #Execute SQL Statement to get user_id given nickname
+        # Execute SQL Statement to get user_id given nickname
         pvalue = (receiver,)
         cur.execute(query_user_id, pvalue)
 
-        #Extract user id
+        # Extract user id
         row = cur.fetchone()
         if row is not None:
             receiver_id = row["user_id"]
@@ -853,17 +853,17 @@ class Connection(object):
         if sender_id is None or receiver_id is None:
             raise ValueError('sender or receiver nickname is not found')
 
-        #Generate the values for SQL statement
+        # Generate the values for SQL statement
         pvalue = (timestamp, sender_id, receiver_id, rating)
 
-        #Execute the statement
+        # Execute the statement
         cur.execute(stmnt, pvalue)
         self.con.commit()
 
-        #Extract the id of the added rating
+        # Extract the id of the added rating
         lid = cur.lastrowid
 
-        #Return the id in
+        # Return the id in
         if lid is None:
             return None
         return 'rating-' + str(lid)
@@ -1012,7 +1012,7 @@ class Connection(object):
         :raise ValueError: if the user argument is not well formed.
 
         '''
-        user_id = self.get_user_id(nickname)
+        user_id = self.get_user_id_w_nickname(nickname)
         if user_id is None:
             return None
 
@@ -1109,7 +1109,7 @@ class Connection(object):
 
         '''
         # Check if nickname already exists in the database
-        if self.get_user_id(nickname) is not None:
+        if self.get_user_id_w_nickname(nickname) is not None:
             return None
 
         # Create the SQL Statements
@@ -1189,18 +1189,20 @@ class Connection(object):
         return nickname
 
     # Utils
-    def get_user_id(self, nickname):
+    def _get_user_w(self, field, value):
         '''
         Get the key of the database row which contains the user with the given
-        nickname.
+        field.
 
-        :param str nickname: The nickname of the user to search.
-        :return: the database attribute user_id or None if ``nickname`` does
+        :param str field: The field of the user to search.
+        :param str value: The value of the field to match.
+        :return: the database attribute user_id or None if ``field`` with ``value`` does
             not exit.
         :rtype: str
 
         '''
-        query = 'SELECT user_id FROM users WHERE nickname = ?'
+        query = 'SELECT users.user_id FROM users, users_profile \
+                 WHERE users.user_id = users_profile.user_id and ' + field + ' = ?'
 
         # Activate foreign key support
         self.set_foreign_keys_support()
@@ -1210,7 +1212,7 @@ class Connection(object):
         cur = self.con.cursor()
 
         # Execute the  main SQL statement
-        pvalue = (nickname,)
+        pvalue = (value,)
         cur.execute(query, pvalue)
 
         # Process the response.
@@ -1222,6 +1224,45 @@ class Connection(object):
         # Build the return object
         else:
             return row[0]
+
+    def get_user_id_w_nickname(self, nickname):
+        '''
+        Get the key of the database row which contains the user with the given
+        nickname.
+
+        :param str nickname: The nickname of the user to search.
+        :return: the database attribute user_id or None if ``nickname`` does
+            not exit.
+        :rtype: str
+
+        '''
+        return self._get_user_w('nickname', nickname)
+
+    def get_user_id_w_email(self, email):
+        '''
+        Get the key of the database row which contains the user with the given
+        email.
+
+        :param str email: The email of the user to search.
+        :return: the database attribute user_id or None if ``email`` does
+            not exit.
+        :rtype: str
+
+        '''
+        return self._get_user_w('email', email)
+
+    def get_user_id_w_mobile(self, mobile):
+        '''
+        Get the key of the database row which contains the user with the given
+        mobile.
+
+        :param str mobile: The mobile of the user to search.
+        :return: the database attribute user_id or None if ``mobile`` does
+            not exit.
+        :rtype: str
+
+        '''
+        return self._get_user_w('mobile', mobile)
 
     def _create_post_list_object(self, row):
         '''
@@ -1318,7 +1359,7 @@ class Connection(object):
                     break
         return posts
 
-    def delete_post(self, post_id = None):
+    def delete_post(self, post_id=None):
         '''
         Delete the post with id given as parameter.
 
@@ -1332,24 +1373,24 @@ class Connection(object):
             raise ValueError("No post ID inserted to delete.")
         queryParameter = (post_id, )
 
-        #Create the SQL Statement
+        # Create the SQL Statement
         query = 'DELETE FROM posts WHERE post_id = ?'
 
-        #Activate foreign key support
+        # Activate foreign key support
         self.set_foreign_keys_support()
 
-        #Cursor and row initialization
+        # Cursor and row initialization
         self.con.row_factory = sqlite3.Row
 
-        #Execute main SQL Statement
+        # Execute main SQL Statement
         try:
-            #Get the cursor object.
-            #It allows to execute SQL code and traverse the result set
+            # Get the cursor object.
+            # It allows to execute SQL code and traverse the result set
             cur = self.con.cursor()
-            #execute the pragma command, OFF
+            # execute the pragma command, OFF
             cur.execute(query, queryParameter)
             if cur.rowcount < 1:
-                print("No posts with post_id = %s" %str(post_id))
+                print("No posts with post_id = %s" % str(post_id))
                 return False
             print("%s post deleted" % str(post_id))
             self.con.commit()
@@ -1362,7 +1403,13 @@ class Connection(object):
         '''
         :returns: ``True`` if the user is in the database else ``False``
         '''
-        return self.get_user_id(nickname) is not None
+        return self.get_user_id_w_nickname(nickname) is not None
+
+    def contains_user_extended(self, nickname, email):
+        '''
+        :returns: ``True`` if the user is in the database else ``False``
+        '''
+        return self.get_user_id_w_nickname(nickname) is not None or self.get_user_id_w_email(email) is not None
 
     def contains_rating(self, rating_id):
         '''
@@ -1383,18 +1430,18 @@ class Connection(object):
         :raises ValueError: if the post id not input.
 
         '''
-        #SQL Statement to update the messages table
+        # SQL Statement to update the messages table
         query = 'UPDATE posts SET post_text = ? WHERE post_id = ?'
 
-        #Activate foreign key support
+        # Activate foreign key support
         self.set_foreign_keys_support()
 
-        #Cursor and row initialization
+        # Cursor and row initialization
         self.con.row_factory = sqlite3.Row
 
         try:
             cur = self.con.cursor()
-            #Execute the statement to extract the id associated to a nickname
+            # Execute the statement to extract the id associated to a nickname
             pvalue = (body, post_id)
             cur.execute(query, pvalue)
             self.con.commit()
@@ -1402,7 +1449,7 @@ class Connection(object):
             print("Error %s:" % excp.args[0])
             return None
 
-        #Check that I have modified the user
+        # Check that I have modified the user
         if cur.rowcount < 1:
             print("I am making NONE")
             return None
@@ -1443,34 +1490,34 @@ class Connection(object):
         if public is None:
             public = 1
 
-        #Create the SQL statment
-        #SQL to test that the message which I am answering does exist
+        # Create the SQL statment
+        # SQL to test that the message which I am answering does exist
         query1 = 'SELECT * from posts WHERE post_id = ?'
 
-        #SQL Statement for getting the user id given a nickname
+        # SQL Statement for getting the user id given a nickname
         query2 = 'SELECT user_id from users WHERE nickname = ?'
 
-        #SQL Statement for inserting the data
+        # SQL Statement for inserting the data
         stmnt = 'INSERT INTO posts (timestamp,sender_id,receiver_id,reply_to, \
                  post_text,rating,anonymous,public) \
                  VALUES(?,?,?,?,?,?,?,?)'
 
-        #Variables for the statement.
-        #sender_id is obtained from executing query2 statement.
-        #and timestamp is calculated with a function
+        # Variables for the statement.
+        # sender_id is obtained from executing query2 statement.
+        # and timestamp is calculated with a function
         sender_id = None
         receiver_id = None
         timestamp = time.mktime(datetime.now().timetuple())
 
-        #Activate foreign key support
+        # Activate foreign key support
         self.set_foreign_keys_support()
 
-        #Cursor and row initialization
+        # Cursor and row initialization
         self.con.row_factory = sqlite3.Row
         cur = self.con.cursor()
 
-        #If exists the replyto argument, check that the post exists in
-        #the database table
+        # If exists the replyto argument, check that the post exists in
+        # the database table
         if reply_to is not None:
             pvalue = (reply_to,)
             cur.execute(query1, pvalue)
@@ -1478,38 +1525,38 @@ class Connection(object):
             if len(posts) < 1:
                 return None
 
-        #Execute SQL Statement to get sender id given nickname
+        # Execute SQL Statement to get sender id given nickname
         pvalue = (sender_nickname,)
         cur.execute(query2, pvalue)
 
-        #Extract user id
+        # Extract user id
         row = cur.fetchone()
         if row is not None:
             sender_id = row["user_id"]
         else:
             return None
 
-        #Execute SQL Statement to get sender id given nickname
+        # Execute SQL Statement to get sender id given nickname
         pvalue = (receiver_nickname,)
         cur.execute(query2, pvalue)
 
-        #Extract user id
+        # Extract user id
         row = cur.fetchone()
         if row is not None:
             receiver_id = row["user_id"]
         else:
             return None
 
-        #Generate the values for SQL statement
-        pvalue = (timestamp,sender_id,receiver_id,reply_to,
-                 post_text,rating,anonymous,public)
+        # Generate the values for SQL statement
+        pvalue = (timestamp, sender_id, receiver_id, reply_to,
+                  post_text, rating, anonymous, public)
 
-        #Execute the statement
+        # Execute the statement
         cur.execute(stmnt, pvalue)
         self.con.commit()
 
-        #Extract the id of the added message
+        # Extract the id of the added message
         lid = cur.lastrowid
 
-        #Return the id in
+        # Return the id in
         return lid if lid is not None else None

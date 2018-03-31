@@ -465,24 +465,24 @@ class UserDBAPITestCase(unittest.TestCase):
             USER1['summary']['nickname'], NEW_USER)
         self.assertIsNone(nickname)
 
-    def test_get_user_id(self):
+    def test_get_user_id_w_nickname(self):
         '''
-        Test that get_user_id returns the right value given a nickname
+        Test that get_user_id_w_nickname returns the right value given a nickname
         '''
-        print('('+self.test_get_user_id.__name__+')',
-              self.test_get_user_id.__doc__)
-        id = self.connection.get_user_id(USER1['summary']['nickname'])
+        print('('+self.test_get_user_id_w_nickname.__name__+')',
+              self.test_get_user_id_w_nickname.__doc__)
+        id = self.connection.get_user_id_w_nickname(USER1['summary']['nickname'])
         self.assertEqual(USER1_ID, id)
-        id = self.connection.get_user_id(USER2['summary']['nickname'])
+        id = self.connection.get_user_id_w_nickname(USER2['summary']['nickname'])
         self.assertEqual(USER2_ID, id)
 
-    def test_get_user_id_unknown_user(self):
+    def test_get_user_id_w_nickname_unknown_user(self):
         '''
-        Test that get_user_id returns None when the nickname does not exist
+        Test that get_user_id_w_nickname returns None when the nickname does not exist
         '''
-        print('('+self.test_get_user_id.__name__+')',
-              self.test_get_user_id.__doc__)
-        id = self.connection.get_user_id(USER_WRONG_NICKNAME)
+        print('('+self.test_get_user_id_w_nickname.__name__+')',
+              self.test_get_user_id_w_nickname.__doc__)
+        id = self.connection.get_user_id_w_nickname(USER_WRONG_NICKNAME)
         self.assertIsNone(id)
 
     def test_not_contains_user(self):
