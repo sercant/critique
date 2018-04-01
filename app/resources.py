@@ -157,6 +157,7 @@ class CritiqueObject(MasonObject):
             "href": api.url_for(User, nickname=nickname),
             "title": "Edit this user",
             "method": "PUT",
+            "encoding": "json",
             "schema": EDIT_USER_SCHEMA
         }
 
