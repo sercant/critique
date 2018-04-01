@@ -1,0 +1,25 @@
+{
+    "type": "object",
+    "properties": {
+        "ratingValue": {
+            "title": "Rating",
+            "description": "Rating for the user",
+            "type": "number"
+        },
+        "sender": {
+            "title": "Sender",
+            "description": "Nickname of sender of the rating",
+            "type": "string"
+        },
+        "receiver": {
+            "title": "Receiver",
+            "description": "Nickname of receiver of the rating",
+            "type": "string"
+        }
+    },
+    "required": [
+        "ratingValue",
+        "sender",
+        "receiver"
+    ]
+}

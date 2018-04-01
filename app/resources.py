@@ -19,6 +19,7 @@ from app.model.mason import MasonObject
 MASON = "application/vnd.mason+json"
 JSON = "application/json"
 CRITIQUE_USER_PROFILE = "/profiles/user-profile/"
+CRITIQUE_RATING_PROFILE = "/profiles/rating-profile/"
 ERROR_PROFILE = "/profiles/error-profile"
 
 ATOM_THREAD_PROFILE = "https://tools.ietf.org/html/rfc4685"
@@ -30,6 +31,7 @@ APIARY_PROFILES_URL = APIARY_PROJECT+"/#reference/profiles/"
 APIARY_RELATIONS_URL = APIARY_PROJECT+"/#reference/link-relations/"
 
 CREATE_USER_SCHEMA = json.load(open('app/schema/create_user.json'))
+CREATE_RATING_SCHEMA = json.load(open('app/schema/create_rating.json'))
 EDIT_USER_SCHEMA = json.load(open('app/schema/edit_user.json'))
 
 PRIVATE_PROFILE_SCHEMA_URL = "/critique/schema/private-profile/"
@@ -47,7 +49,7 @@ api = Api(app)
 
 
 class CritiqueObject(MasonObject):
-    """
+    '''
     A convenience subclass of MasonObject that defines a bunch of shorthand
     methods for inserting application specific objects into the document. This
     class is particularly useful for adding control objects that are largely
@@ -57,22 +59,22 @@ class CritiqueObject(MasonObject):
 
     In the code this object should always be used for root document as
     well as any items in a collection type resource.
-    """
+    '''
 
     def __init__(self, **kwargs):
-        """
+        '''
         Calls dictionary init method with any received keyword arguments. Adds
         the controls key afterwards because hypermedia without controls is not
         hypermedia.
-        """
+        '''
 
         super(CritiqueObject, self).__init__(**kwargs)
         self["@controls"] = {}
 
     def add_control_users_collection(self):
-        """
+        '''
         This adds the user collection link to an object. Intended for the document object.
-        """
+        '''
 
         self["@controls"]["collection"] = {
             "href": api.url_for(Users),
@@ -80,12 +82,10 @@ class CritiqueObject(MasonObject):
         }
 
     def add_control_add_user(self):
-        """
+        '''
         This adds the add-user control to an object. Intended for the
-        document object. Instead of adding a schema dictionary we are pointing
-        to a schema url instead for two reasons: 1) to demonstrate both options;
-        2) the user schema is relatively large.
-        """
+        document object.
+        '''
 
         self["@controls"]["critique:add-user"] = {
             "href": api.url_for(Users),
@@ -96,48 +96,48 @@ class CritiqueObject(MasonObject):
         }
 
     def add_control_user_inbox(self, nickname):
-        """
+        '''
         This adds the user-inbox control to an object. Intended for the
         document object.
 
         : param str nickname: The nickname of the user
-        """
+        '''
 
         self["@controls"]["critique:user-inbox"] = {
             "href": api.url_for(UserInbox, nickname=nickname),
         }
 
     def add_control_user_river(self, nickname):
-        """
+        '''
         This adds the user-river control to an object. Intended for the
         document object.
 
         : param str nickname: The nickname of the user
-        """
+        '''
 
         self["@controls"]["critique:user-river"] = {
             "href": api.url_for(UserRiver, nickname=nickname),
         }
 
     def add_control_user_ratings(self, nickname):
-        """
+        '''
         This adds the user-ratings control to an object. Intended for the
         document object.
 
         : param str nickname: The nickname of the user
-        """
+        '''
 
         self["@controls"]["critique:user-ratings"] = {
             "href": api.url_for(UserRatings, nickname=nickname),
         }
 
     def add_control_delete_user(self, nickname):
-        """
+        '''
         Adds the delete control to an object. This is intended for any
         object that represents a user.
 
         : param str nickname: The nickname of the user to remove
-        """
+        '''
 
         self["@controls"]["critique:delete"] = {
             "href": api.url_for(User, nickname=nickname),
@@ -146,12 +146,12 @@ class CritiqueObject(MasonObject):
         }
 
     def add_control_edit_user(self, nickname):
-        """
+        '''
         Adds the edit control to an object. This is intended for any
         object that represents a user.
 
         : param str nickname: The nickname of the user to edit
-        """
+        '''
 
         self["@controls"]["edit"] = {
             "href": api.url_for(User, nickname=nickname),
@@ -160,9 +160,23 @@ class CritiqueObject(MasonObject):
             "schema": EDIT_USER_SCHEMA
         }
 
+    def add_control_add_rating(self):
+        '''
+        This adds the add-rating control to an object. Intended for the
+        document object.
+        '''
+
+        self["@controls"]["critique:add-rating"] = {
+            "href": api.url_for(Ratings),
+            "title": "Create a new rating",
+            "encoding": "json",
+            "method": "POST",
+            "schema": CREATE_RATING_SCHEMA
+        }
+
 
 def create_error_response(status_code, title, message=None):
-    """
+    '''
     Creates a: py: class:`flask.Response` instance when sending back an
     HTTP error response
 
@@ -170,7 +184,7 @@ def create_error_response(status_code, title, message=None):
     : param str title: A short description of the problem
     : param message: A long description of the problem
     : rtype:: py: class:`flask.Response`
-    """
+    '''
 
     resource_url = None
     # We need to access the context in order to access the request.path
@@ -204,23 +218,23 @@ def unknown_error(error):
 # HOOKS
 @app.before_request
 def connect_db():
-    """
+    '''
     Creates a database connection before the request is proccessed.
 
     The connection is stored in the application context variable flask.g .
     Hence it is accessible from the request object.
-    """
+    '''
 
     g.con = app.config["Engine"].connect()
 
 
 @app.teardown_request
 def close_connection(exc):
-    """
+    '''
     Closes the database connection
     Check if the connection is created. It might be exception appear before
     the connection is created.
-    """
+    '''
 
     if hasattr(g, "con"):
         g.con.close()
@@ -229,7 +243,7 @@ def close_connection(exc):
 class Users(Resource):
 
     def get(self):
-        """
+        '''
         Gets a list of all the users in the database.
 
         It returns always status code 200.
@@ -255,7 +269,7 @@ class Users(Resource):
          * The attribute familyName is obtained from the column users_profile.lastname
          * The rest of attributes match one-to-one with column names in the
            database.
-        """
+        '''
         # PERFORM OPERATIONS
         # create users list
         users_db = g.con.get_users()
@@ -263,11 +277,6 @@ class Users(Resource):
         # FILTER AND GENERATE THE RESPONSE
         # Create the envelope
         envelope = CritiqueObject()
-
-        envelope.add_namespace("critique", LINK_RELATIONS_URL)
-
-        envelope.add_control_add_user()
-        envelope.add_control("self", href=api.url_for(Users))
 
         items = envelope["items"] = []
 
@@ -279,17 +288,21 @@ class Users(Resource):
                 avatar=user['avatar'],
                 bio=user['bio']
             )
-            # item.add_control_messages_history(user["nickname"])
+            items.append(item)
             item.add_control("self", href=api.url_for(
                 User, nickname=user["nickname"]))
             item.add_control("profile", href=CRITIQUE_USER_PROFILE)
-            items.append(item)
+
+        envelope.add_namespace("critique", LINK_RELATIONS_URL)
+
+        envelope.add_control_add_user()
+        envelope.add_control("self", href=api.url_for(Users))
 
         # RENDER
         return Response(json.dumps(envelope), 200, mimetype=MASON+";" + CRITIQUE_USER_PROFILE)
 
     def post(self):
-        """
+        '''
         Adds a new user in the database.
 
         REQUEST ENTITY BODY:
@@ -333,7 +346,7 @@ class Users(Resource):
                 }
             }
 
-        """
+        '''
 
         if JSON != request.headers.get("Content-Type", ""):
             abort(415)
@@ -380,15 +393,15 @@ class Users(Resource):
 
 
 class User(Resource):
-    """
+    '''
     Resource has the basic information of a specific user.
     Bio is where the user should enter information about himself/herself,
     so it should be text. Email and telephone are unique texts as they
     will not repeat for other users. Gender, avatar and birthdate are texts.
-    """
+    '''
 
     def get(self, nickname):
-        """
+        '''
         Extract information of a user.
 
         INPUT PARAMETER:
@@ -441,7 +454,7 @@ class User(Resource):
                     'birthdate': '',
                 }
             }
-        """
+        '''
 
         # PERFORM OPERATIONS
         user_db = g.con.get_user(nickname)
@@ -479,7 +492,7 @@ class User(Resource):
         return Response(json.dumps(envelope), 200, mimetype=MASON+";" + CRITIQUE_USER_PROFILE)
 
     def put(self, nickname):
-        """
+        '''
         Modifies mutable attributes of the specified user.
 
         REQUEST ENTITY BODY:
@@ -525,7 +538,7 @@ class User(Resource):
                     'birthdate': '',
                 }
             }
-        """
+        '''
 
         user_db = g.con.get_user(nickname)
         if not user_db:
@@ -568,7 +581,7 @@ class User(Resource):
                         headers={"Location": api.url_for(User, nickname=nickname)})
 
     def delete(self, nickname):
-        """
+        '''
         Deletes the specified user.
 
         :param str nickname: The nickname of the user. Example: Scott.
@@ -579,7 +592,7 @@ class User(Resource):
             * If the nickname does not exist return 404
             * If there was a db error return 500
 
-        """
+        '''
         # PEROFRM OPERATIONS
 
         userExist = g.con.contains_user(nickname)
@@ -600,6 +613,95 @@ class User(Resource):
                                          "The system has failed. Please, contact the administrator.")
 
 
+class UserRatings(Resource):
+    '''
+    Contains the ratings list with ratings from all other users to this specific user.
+    It should have a track of the ratings made by users to each other including the person
+    who made the rating and that who received it. Also, it contains the rating id to keep
+    track of the ratings.
+    '''
+
+    def get(self, nickname):
+        '''
+        Extracts the ratings given to the user.
+
+        INPUT PARAMETER:
+
+        :param str nickname: The nickname of the user. Example: `Scott`.
+
+        OUTPUT:
+            * Return 200 if the nickname exists.
+            * Return 404 if the nickname not found.
+
+        RESPONSE ENTITY BODY:
+
+        OUTPUT:
+            * Media type: application/vnd.mason+json
+                https://github.com/JornWildt/Mason
+            * Profile: Rating
+                /profiles/rating-profile
+
+        Link relations used in items: self, profile
+
+        Semantic descriptions used in items: ratingId, bestRating, ratingValue, sender, receiver
+
+        Link relations used in links: self, add-rating
+
+        Semantic descriptors used in template: items
+
+        NOTE:
+            * The attribute ratingId is obtained from the column ratings.rating_id
+            * The attribute ratingValue is obtained from the column ratings.rating
+
+        NOTE:
+            * Database returns in this format
+                {
+                    rating_id: "string",
+                    timestamp: "number",
+                    sender: "string",
+                    receiver: "string",
+                    rating: "string",
+                }
+        '''
+
+        userExist = g.con.contains_user(nickname)
+        if not userExist:
+            return create_error_response(404, "User not found.")
+
+        # PERFORM OPERATIONS
+        # create ratings list
+        ratings_db = g.con.get_ratings(receiver=nickname)
+
+        # FILTER AND GENERATE THE RESPONSE
+        # Create the envelope
+        envelope = CritiqueObject()
+
+        items = envelope["items"] = []
+
+        for rating in ratings_db:
+            item = CritiqueObject(
+                ratingId=rating["rating_id"],
+                bestRating=10,
+                ratingValue=rating['rating'],
+                sender=rating['sender'],
+                receiver=rating['receiver']
+            )
+
+            items.append(item)
+            item.add_control("self",
+                             href=api.url_for(Rating, ratingId=rating["rating_id"]))
+            item.add_control("profile", href=CRITIQUE_RATING_PROFILE)
+
+        envelope.add_namespace("critique", LINK_RELATIONS_URL)
+
+        envelope.add_control("self", href=api.url_for(
+            UserRatings, nickname=nickname))
+        envelope.add_control_add_rating()
+
+        # RENDER
+        return Response(json.dumps(envelope), 200, mimetype=MASON+";" + CRITIQUE_USER_PROFILE)
+
+
 class UserInbox(Resource):
     def get(self, nickname):
         return Response('NOT IMPLEMENTED', 200)
@@ -610,8 +712,13 @@ class UserRiver(Resource):
         return Response('NOT IMPLEMENTED', 200)
 
 
-class UserRatings(Resource):
-    def get(self, nickname):
+class Ratings(Resource):
+    def get(self):
+        return Response('NOT IMPLEMENTED', 200)
+
+
+class Rating(Resource):
+    def get(self, ratingId):
         return Response('NOT IMPLEMENTED', 200)
 
 
@@ -625,12 +732,16 @@ api.add_resource(Users, "/critique/api/users/",
                  endpoint="users")
 api.add_resource(User, "/critique/api/users/<nickname>/",
                  endpoint="user")
-api.add_resource(UserInbox, "/critique/api/users/<nickname>/inbox",
+api.add_resource(UserInbox, "/critique/api/users/<nickname>/inbox/",
                  endpoint="inbox")
-api.add_resource(UserRiver, "/critique/api/users/<nickname>/river",
+api.add_resource(UserRiver, "/critique/api/users/<nickname>/river/",
                  endpoint="river")
-api.add_resource(UserRatings, "/critique/api/users/<nickname>/ratings",
+api.add_resource(UserRatings, "/critique/api/users/<nickname>/ratings/",
+                 endpoint="user-ratings")
+api.add_resource(Ratings, "/critique/api/ratings/",
                  endpoint="ratings")
+api.add_resource(Rating, "/critique/api/ratings/<ratingId>/",
+                 endpoint="rating")
 
 # Redirect profile
 

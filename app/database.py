@@ -519,7 +519,7 @@ class Connection(object):
 
         '''
         return {
-            'rating_id': 'rating-' + str(row['rating_id']),
+            'rating_id': 'rtg-' + str(row['rating_id']),
             'timestamp': row['timestamp'],
             'sender': row['sender'],
             'receiver': row['receiver'],
@@ -673,7 +673,7 @@ class Connection(object):
         '''
         Extracts rating in the database for given rating id
 
-        :param str rating_id: rating id in the database in format ``rating-(\d+)``
+        :param str rating_id: rating id in the database in format ``rtg-(\d+)``
 
         :returns: rating information for the given rating id
             contains following keys: ``id`` (integer), ``timestamp``
@@ -684,7 +684,7 @@ class Connection(object):
 
         '''
 
-        m = re.match('rating-(\d+)', rating_id)
+        m = re.match('rtg-(\d+)', rating_id)
         if m is None or m.group(1) is None:
             raise ValueError('rating id is malformed')
         rating_id = int(m.group(1))
@@ -714,19 +714,19 @@ class Connection(object):
         Modify the rating of the rating with id ``rating_id``
 
         :param str rating_id: The id of the rating to modify. Note that
-            rating_id is a string with format rating-\d+
+            rating_id is a string with format rtg-\d+
 
         :param int new_rating: the rating's rating
 
         :return: the id of the edited rating or None if the rating was
-              not found. The id of the rating has the format ``rating-\d+``,
+              not found. The id of the rating has the format ``rtg-\d+``,
               where \d+ is the id of the rating in the database.
 
         :raises ValueError: if the rating_id has a wrong format.
 
         '''
         # Extracts the int which is the id for a rating in the database
-        match = re.match('rating-(\d+)', rating_id)
+        match = re.match('rtg-(\d+)', rating_id)
         if match is None:
             raise ValueError("The rating_id is malformed")
         rating_id = int(match.group(1))
@@ -753,7 +753,7 @@ class Connection(object):
         # Check that I have modified the user
         if cur.rowcount < 1:
             return None
-        return 'rating-' + str(rating_id)
+        return 'rtg-' + str(rating_id)
 
     def delete_user(self, nickname):
         '''
@@ -794,7 +794,7 @@ class Connection(object):
         :param int rating: rating given to the receiver.
 
         :return: the id of the created rating or None if the rating created.
-            Note that it is a string with the format rating-\d+.
+            Note that it is a string with the format rtg-\d+.
 
         :raises DatabaseError: if the database could not be modified.
 
@@ -866,7 +866,7 @@ class Connection(object):
         # Return the id in
         if lid is None:
             return None
-        return 'rating-' + str(lid)
+        return 'rtg-' + str(lid)
 
     def _create_post_object(self, row):
         '''
