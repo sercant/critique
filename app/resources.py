@@ -700,7 +700,7 @@ class UserRatings(Resource):
         envelope.add_control_add_rating()
 
         # RENDER
-        return Response(json.dumps(envelope), 200, mimetype=MASON+";" + CRITIQUE_USER_PROFILE)
+        return Response(json.dumps(envelope), 200, mimetype=MASON+";" + CRITIQUE_RATING_PROFILE)
 
 
 class UserInbox(Resource):

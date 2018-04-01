@@ -18,6 +18,7 @@ ENGINE = database.Engine(DB_PATH)
 MASON_JSON = "application/vnd.mason+json"
 JSON = "application/json"
 CRITIQUE_USER_PROFILE = "/profiles/user-profile/"
+CRITIQUE_RATING_PROFILE = "/profiles/rating-profile/"
 ATOM_THREAD_PROFILE = "https://tools.ietf.org/html/rfc4685"
 
 # Tell Flask that I am running it in testing mode.
@@ -30,6 +31,7 @@ resources.app.config.update({"Engine": ENGINE})
 
 # Other database parameters.
 initial_users = 5
+scott_ratings_count = 4
 
 
 class ResourcesAPITestCase(unittest.TestCase):
@@ -269,7 +271,7 @@ class UsersTestCase (ResourcesAPITestCase):
 
 class UserTestCase(ResourcesAPITestCase):
 
-    #ATTENTION: json.loads return unicode
+    # ATTENTION: json.loads return unicode
     user_mod_req_1 = {
         "givenName": "Scotta",
         "familyName": "Pilgrimu",
@@ -363,7 +365,7 @@ class UserTestCase(ResourcesAPITestCase):
                 resources.UserInbox, _external=False, nickname="Scott"
             ))
 
-            #Check rest attributes
+            # Check rest attributes
             self.assertIn("nickname", data)
             self.assertIn("givenName", data)
             self.assertIn("familyName", data)
@@ -381,7 +383,7 @@ class UserTestCase(ResourcesAPITestCase):
         print("("+self.test_get_user_mimetype.__name__+")",
               self.test_get_user_mimetype.__doc__)
 
-        #Check that I receive status code 200
+        # Check that I receive status code 200
         resp = self.client.get(self.url)
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.headers.get("Content-Type", None),
@@ -398,12 +400,12 @@ class UserTestCase(ResourcesAPITestCase):
                                headers={"Content-Type": JSON})
         self.assertEqual(resp.status_code, 204)
 
-        #Check that the user has been modified
+        # Check that the user has been modified
         resp2 = self.client.get(self.url)
         self.assertEqual(resp2.status_code, 200)
         data = json.loads(resp2.data.decode("utf-8"))
 
-        #Check that the fields returned correctly
+        # Check that the fields returned correctly
         for key in self.user_mod_req_1.keys():
             self.assertEqual(data[key], self.user_mod_req_1[key])
 
@@ -437,6 +439,103 @@ class UserTestCase(ResourcesAPITestCase):
               self.test_delete_nonexisting_user.__doc__)
         resp = self.client.delete(self.url_wrong)
         self.assertEqual(resp.status_code, 404)
+
+
+class UserRatingsTestCase(ResourcesAPITestCase):
+
+    CREATE_RATING_SCHEMA = json.load(open('app/schema/create_rating.json'))
+
+    def setUp(self):
+        super(UserRatingsTestCase, self).setUp()
+        self.url = resources.api.url_for(resources.UserRatings,
+                                         nickname="Scott",
+                                         _external=False)
+        self.url_wrong = resources.api.url_for(resources.UserRatings,
+                                               nickname="Kimo",
+                                               _external=False)
+
+    def test_url(self):
+        """
+        Checks that the URL points to the right resource
+        """
+        _url = "/critique/api/users/Scott/ratings/"
+        print("("+self.test_url.__name__+")", self.test_url.__doc__, end=' ')
+        with resources.app.test_request_context(_url):
+            rule = flask.request.url_rule
+            view_point = resources.app.view_functions[rule.endpoint].view_class
+            self.assertEqual(view_point, resources.UserRatings)
+
+    def test_wrong_url(self):
+        """
+        Checks that GET user ratings return correct status code if given a
+        wrong nickname
+        """
+        resp = self.client.get(self.url_wrong)
+        self.assertEqual(resp.status_code, 404)
+
+    def test_get_user_ratings(self):
+        """
+        Checks that GET user_ratings return correct status code and data format
+        """
+        print("("+self.test_get_user_ratings.__name__+")",
+              self.test_get_user_ratings.__doc__)
+        # Check that I receive status code 200
+        resp = self.client.get(self.url)
+        self.assertEqual(resp.status_code, 200)
+
+        # Check that I receive a collection and adequate href
+        data = json.loads(resp.data.decode("utf-8"))
+
+        controls = data["@controls"]
+        self.assertIn("self", controls)
+        self.assertIn("critique:add-rating", controls)
+
+        self.assertIn("href", controls["self"])
+        self.assertEqual(controls["self"]["href"], self.url)
+
+        add_ctrl = controls["critique:add-rating"]
+        self.assertIn("href", add_ctrl)
+        self.assertEqual(add_ctrl["href"], resources.api.url_for(
+            resources.Ratings, _external=False))
+        self.assertIn("encoding", add_ctrl)
+        self.assertEqual(add_ctrl["encoding"], "json")
+        self.assertIn("method", add_ctrl)
+        self.assertEqual(add_ctrl["method"], "POST")
+        self.assertIn("schema", add_ctrl)
+        self.assertEqual(add_ctrl["schema"], self.CREATE_RATING_SCHEMA)
+
+        items = data["items"]
+        self.assertEqual(len(items), scott_ratings_count)
+        for item in items:
+            self.assertIn("ratingId", item)
+            self.assertIn("bestRating", item)
+            self.assertIn("ratingValue", item)
+            self.assertIn("sender", item)
+            self.assertIn("receiver", item)
+
+            self.assertIn("@controls", item)
+            self.assertIn("self", item["@controls"])
+            self.assertIn("href", item["@controls"]["self"])
+
+            self.assertEqual(item["@controls"]["self"]["href"], resources.api.url_for(
+                resources.Rating, ratingId=item["ratingId"], _external=False))
+
+            self.assertIn("profile", item["@controls"])
+            self.assertEqual(item["@controls"]["profile"]
+                             ["href"], CRITIQUE_RATING_PROFILE)
+
+    def test_get_user_ratings_mimetype(self):
+        """
+        Checks that GET user ratings return correct status code and data format
+        """
+        print("("+self.test_get_user_ratings_mimetype.__name__+")",
+              self.test_get_user_ratings_mimetype.__doc__)
+
+        # Check that I receive status code 200
+        resp = self.client.get(self.url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.headers.get("Content-Type", None),
+                         "{};{}".format(MASON_JSON, CRITIQUE_RATING_PROFILE))
 
 
 if __name__ == "__main__":
