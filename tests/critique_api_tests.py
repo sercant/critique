@@ -78,7 +78,7 @@ class UsersTestCase (ResourcesAPITestCase):
     }
 
     user_wrong_1_request = {
-        "nickname": "Scott",  # existing username
+        "nickname": "Scott",  # existing nickname
         "givenName": "Sercan",
         "email": "sercsssdan@mail.com"
     }
@@ -171,6 +171,100 @@ class UsersTestCase (ResourcesAPITestCase):
             self.assertIn("profile", item["@controls"])
             self.assertEqual(item["@controls"]["profile"]
                              ["href"], CRITIQUE_USER_PROFILE)
+
+    def test_get_users_mimetype(self):
+        """
+        Checks that GET Messages return correct status code and data format
+        """
+        print("("+self.test_get_users_mimetype.__name__+")",
+              self.test_get_users_mimetype.__doc__)
+
+        # Check that I receive status code 200
+        resp = self.client.get(self.url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.headers.get("Content-Type", None),
+                         "{};{}".format(MASON_JSON, CRITIQUE_USER_PROFILE))
+
+    def test_add_user(self):
+        """
+        Checks that the user is added correctly
+        """
+        print("("+self.test_add_user.__name__+")", self.test_add_user.__doc__)
+
+        # With a complete request
+        resp = self.client.post(resources.api.url_for(resources.Users),
+                                headers={"Content-Type": JSON},
+                                data=json.dumps(self.user_1_request))
+
+        self.assertEqual(resp.status_code, 201)
+
+        self.assertIn("Location", resp.headers)
+        url = resp.headers["Location"]
+
+        resp2 = self.client.get(url)
+        self.assertEqual(resp2.status_code, 200)
+
+    def test_add_user_missing_mandatory(self):
+        """
+        Test that it returns error when is missing a mandatory data
+        """
+        print("("+self.test_add_user_missing_mandatory.__name__+")",
+              self.test_add_user_missing_mandatory.__doc__)
+
+        # Removing nickname
+        resp = self.client.post(resources.api.url_for(resources.Users),
+                                headers={"Content-Type": JSON},
+                                data=json.dumps(self.user_wrong_3_request)
+                                )
+        self.assertEqual(resp.status_code, 400)
+
+        # Removing givenName
+        resp = self.client.post(resources.api.url_for(resources.Users),
+                                headers={"Content-Type": JSON},
+                                data=json.dumps(self.user_wrong_4_request)
+                                )
+        self.assertEqual(resp.status_code, 400)
+
+        # Removing email
+        resp = self.client.post(resources.api.url_for(resources.Users),
+                                headers={"Content-Type": JSON},
+                                data=json.dumps(self.user_wrong_5_request)
+                                )
+        self.assertEqual(resp.status_code, 400)
+
+    def test_add_existing_user(self):
+        """
+        Testing that trying to add an existing user will fail
+
+        """
+        print("("+self.test_add_existing_user.__name__+")",
+              self.test_add_existing_user.__doc__)
+
+        # Existing nickname
+        resp = self.client.post(resources.api.url_for(resources.Users),
+                                headers={"Content-Type": JSON},
+                                data=json.dumps(self.user_wrong_1_request)
+                                )
+        self.assertEqual(resp.status_code, 422)
+
+        # Existing email
+        resp = self.client.post(resources.api.url_for(resources.Users),
+                                headers={"Content-Type": JSON},
+                                data=json.dumps(self.user_wrong_2_request)
+                                )
+        self.assertEqual(resp.status_code, 422)
+
+    def test_wrong_type(self):
+        """
+        Test that return adequate error if sent incorrect mime type
+        """
+        print("("+self.test_wrong_type.__name__+")",
+              self.test_wrong_type.__doc__)
+        resp = self.client.post(resources.api.url_for(resources.Users),
+                                headers={"Content-Type": "text/html"},
+                                data=json.dumps(self.user_1_request)
+                                )
+        self.assertEqual(resp.status_code, 415)
 
 
 if __name__ == "__main__":
