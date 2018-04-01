@@ -28,7 +28,7 @@ ATOM_THREAD_PROFILE = "https://tools.ietf.org/html/rfc4685"
 # Fill with the correct Apiary url"
 APIARY_PROJECT = "https://critique.docs.apiary.io"
 APIARY_PROFILES_URL = APIARY_PROJECT+"/#reference/profiles/"
-APIARY_RELS_URL = APIARY_PROJECT+"/#reference/link-relations/"
+APIARY_RELATIONS_URL = APIARY_PROJECT+"/#reference/link-relations/"
 
 USER_SCHEMA = json.load(open('app/schema/user.json'))
 PRIVATE_PROFILE_SCHEMA_URL = "/critique/schema/private-profile/"
@@ -41,7 +41,7 @@ app.debug = True
 # testing) provide the database path   app.config to modify the
 # database to be used (for instance for testing)
 app.config.update({"Engine": database.Engine()})
-# Start the RESTful API.
+# Start the RESTFUL API.
 api = Api(app)
 
 
@@ -80,7 +80,7 @@ class CritiqueObject(MasonObject):
 
     def add_control_add_user(self):
         """
-        This adds the add-user control to an object. Intended ffor the
+        This adds the add-user control to an object. Intended for the
         document object. Instead of adding a schema dictionary we are pointing
         to a schema url instead for two reasons: 1) to demonstrate both options;
         2) the user schema is relatively large.
@@ -178,7 +178,7 @@ def connect_db():
 def close_connection(exc):
     """
     Closes the database connection
-    Check if the connection is created. It migth be exception appear before
+    Check if the connection is created. It might be exception appear before
     the connection is created.
     """
 
@@ -357,8 +357,8 @@ def redirect_to_profile(profile_name):
 
 
 @app.route("/critique/link-relations/<rel_name>/")
-def redirect_to_rels(rel_name):
-    return redirect(APIARY_RELS_URL + rel_name)
+def redirect_to_relations(rel_name):
+    return redirect(APIARY_RELATIONS_URL + rel_name)
 
 # Send our schema file(s)
 
