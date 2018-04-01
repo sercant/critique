@@ -1405,6 +1405,12 @@ class Connection(object):
         '''
         return self.get_user_id_w_nickname(nickname) is not None
 
+    def contains_user_email(self, email):
+        '''
+        :returns: ``True`` if the user is in the database else ``False``
+        '''
+        return self.get_user_id_w_email(email) is not None
+
     def contains_user_extended(self, nickname, email):
         '''
         :returns: ``True`` if the user is in the database else ``False``

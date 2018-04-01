@@ -18,8 +18,7 @@ from app.model.mason import MasonObject
 # Constants for hypermedia formats and profiles
 MASON = "application/vnd.mason+json"
 JSON = "application/json"
-FORUM_USER_PROFILE = "/profiles/user-profile/"
-FORUM_MESSAGE_PROFILE = "/profiles/message-profile/"
+CRITIQUE_USER_PROFILE = "/profiles/user-profile/"
 ERROR_PROFILE = "/profiles/error-profile"
 
 ATOM_THREAD_PROFILE = "https://tools.ietf.org/html/rfc4685"
@@ -30,7 +29,9 @@ APIARY_PROJECT = "https://critique.docs.apiary.io"
 APIARY_PROFILES_URL = APIARY_PROJECT+"/#reference/profiles/"
 APIARY_RELATIONS_URL = APIARY_PROJECT+"/#reference/link-relations/"
 
-USER_SCHEMA = json.load(open('app/schema/user.json'))
+CREATE_USER_SCHEMA = json.load(open('app/schema/create_user.json'))
+EDIT_USER_SCHEMA = json.load(open('app/schema/edit_user.json'))
+
 PRIVATE_PROFILE_SCHEMA_URL = "/critique/schema/private-profile/"
 LINK_RELATIONS_URL = "/critique/link-relations/"
 
@@ -91,7 +92,31 @@ class CritiqueObject(MasonObject):
             "title": "Create a new user",
             "encoding": "json",
             "method": "POST",
-            "schema": USER_SCHEMA
+            "schema": CREATE_USER_SCHEMA
+        }
+
+    def add_control_user_inbox(self, nickname):
+        """
+        This adds the user-inbox control to an object. Intended for the
+        document object.
+
+        : param str nickname: The nickname of the user
+        """
+
+        self["@controls"]["critique:user-inbox"] = {
+            "href": api.url_for(UserInbox, nickname=nickname),
+        }
+
+    def add_control_user_river(self, nickname):
+        """
+        This adds the user-river control to an object. Intended for the
+        document object.
+
+        : param str nickname: The nickname of the user
+        """
+
+        self["@controls"]["critique:user-river"] = {
+            "href": api.url_for(UserRiver, nickname=nickname),
         }
 
     def add_control_user_ratings(self, nickname):
@@ -118,6 +143,21 @@ class CritiqueObject(MasonObject):
             "href": api.url_for(User, nickname=nickname),
             "title": "Delete a user",
             "method": "DELETE"
+        }
+
+    def add_control_edit_user(self, nickname):
+        """
+        Adds the edit control to an object. This is intended for any
+        object that represents a user.
+
+        : param str nickname: The nickname of the user to edit
+        """
+
+        self["@controls"]["edit"] = {
+            "href": api.url_for(User, nickname=nickname),
+            "title": "Edit this user",
+            "method": "PUT",
+            "schema": EDIT_USER_SCHEMA
         }
 
 
@@ -242,11 +282,11 @@ class Users(Resource):
             # item.add_control_messages_history(user["nickname"])
             item.add_control("self", href=api.url_for(
                 User, nickname=user["nickname"]))
-            item.add_control("profile", href=FORUM_USER_PROFILE)
+            item.add_control("profile", href=CRITIQUE_USER_PROFILE)
             items.append(item)
 
         # RENDER
-        return Response(json.dumps(envelope), 200, mimetype=MASON+";" + FORUM_USER_PROFILE)
+        return Response(json.dumps(envelope), 200, mimetype=MASON+";" + CRITIQUE_USER_PROFILE)
 
     def post(self):
         """
@@ -254,7 +294,7 @@ class Users(Resource):
 
         REQUEST ENTITY BODY:
          * Media type: JSON
-         * Profile: Forum_User
+         * Profile: Critique_User
 
         Semantic descriptors used in template: nickname(mandatory), givenName(mandatory),
         email(mandatory).
@@ -339,6 +379,242 @@ class Users(Resource):
                         headers={"Location": api.url_for(User, nickname=nickname)})
 
 
+class User(Resource):
+    """
+    Resource has the basic information of a specific user.
+    Bio is where the user should enter information about himself/herself,
+    so it should be text. Email and telephone are unique texts as they
+    will not repeat for other users. Gender, avatar and birthdate are texts.
+    """
+
+    def get(self, nickname):
+        """
+        Extract information of a user.
+
+        INPUT PARAMETER:
+
+        :param str nickname: Nickname of the required user.
+
+        OUTPUT:
+         * Return 200 if the nickname exists.
+         * Return 404 if the nickname is not stored in the system.
+
+        RESPONSE ENTITY BODY:
+
+        OUTPUT:
+            * Media type: application/vnd.mason+json
+                https://github.com/JornWildt/Mason
+            * Profile: User
+                /profiles/user-profile
+
+        Link relations used: self, collection, delete, user-inbox, edit,
+        user-river, user-ratings, profile
+
+        Semantic descriptors used: nickname, givenName, familyName, avatar,
+        bio, email, birthday, telephone, gender
+
+        NOTE:
+         * The attribute givenName is obtained from the column users_profile.firstname
+         * The attribute familyName is obtained from the column users_profile.lastname
+         * The attribute telephone is obtained from the column users_profile.mobile
+         * The rest of attributes match one-to-one with column names in the
+           database.
+
+        NOTE:
+        The: py: method:`Connection.get_user()` returns a dictionary with the
+        the following format.
+
+            {
+                'summary': {
+                    'nickname': '',
+                    'registrationdate': ,
+                    'bio': '',
+                    'avatar': ''
+                },
+                'details': {
+                    'lastlogindate': ,
+                    'firstname': '',
+                    'lastname': '',
+                    'email': '',
+                    'mobile': '',
+                    'gender': '',
+                    'birthdate': '',
+                }
+            }
+        """
+
+        # PERFORM OPERATIONS
+        user_db = g.con.get_user(nickname)
+        if not user_db:
+            return create_error_response(404, "User not found.")
+
+        summary = user_db['summary']
+        details = user_db['details']
+
+        # FILTER AND GENERATE RESPONSE
+        # Create the envelope:
+        envelope = CritiqueObject(
+            nickname=nickname,
+            givenName=details.get('firstname', None),
+            familyName=details.get('lastname', None),
+            avatar=summary.get('avatar', None),
+            bio=summary.get('bio', None),
+            email=details.get('email', None),
+            birthdate=details.get('birthdate', None),
+            telephone=details.get('mobile', None),
+            gender=details.get('gender', None)
+        )
+
+        envelope.add_namespace("critique", LINK_RELATIONS_URL)
+
+        envelope.add_control("self", href=api.url_for(User, nickname=nickname))
+        envelope.add_control("profile", href=CRITIQUE_USER_PROFILE)
+        envelope.add_control("collection", href=api.url_for(Users))
+        envelope.add_control_edit_user(nickname)
+        envelope.add_control_delete_user(nickname)
+        envelope.add_control_user_inbox(nickname)
+        envelope.add_control_user_river(nickname)
+        envelope.add_control_user_ratings(nickname)
+
+        return Response(json.dumps(envelope), 200, mimetype=MASON+";" + CRITIQUE_USER_PROFILE)
+
+    def put(self, nickname):
+        """
+        Modifies mutable attributes of the specified user.
+
+        REQUEST ENTITY BODY:
+         * Media type: JSON
+         * Profile: Critique_User
+
+        Semantic descriptors used in template: givenName(optional), familyName(optional),
+        avatar(optional), bio(optional), email(optional), birthdate(optional), telephone(optional),
+        gender(optional)
+
+        RESPONSE STATUS CODE:
+         * Returns 204 + the url of the edited resource in the Location header
+         * Return 400 User info is not well formed or entity body is missing.
+         * Return 404 If user not found with given nickname.
+         * Return 415 if it receives a media type != application/json
+         * Return 422 Conflict if there is another user with the same nickname, email, mobile
+
+        NOTE:
+         * The attribute givenName is obtained from the column users_profile.firstname
+         * The attribute familyName is obtained from the column users_profile.lastname
+         * The attribute telephone is obtained from the column users_profile.mobile
+         * The rest of attributes match one-to-one with column names in the
+           database.
+
+        NOTE:
+        The: py: method:`Connection.edit_user()` receives as a parameter a
+        dictionary with the following format.
+
+            {
+                'summary': {
+                    'nickname': '',
+                    'registrationdate': ,
+                    'bio': '',
+                    'avatar': ''
+                },
+                'details': {
+                    'lastlogindate': ,
+                    'firstname': '',
+                    'lastname': '',
+                    'email': '',
+                    'mobile': '',
+                    'gender': '',
+                    'birthdate': '',
+                }
+            }
+        """
+
+        user_db = g.con.get_user(nickname)
+        if not user_db:
+            return create_error_response(404, "User not found.")
+
+        summary = user_db['summary']
+        details = user_db['details']
+
+        request_body = request.get_json()
+        if not request_body:
+            return create_error_response(415, "Format of the input is not json.")
+
+        email = request_body.get('email', None)
+        if email is not None and details['email'] != email and g.con.contains_user_email(email):
+            return create_error_response(
+                422, "Nickname, email, or mobile already exist in the users list.")
+
+        summary['avatar'] = request_body.get(
+            'avatar', summary['avatar'])
+        summary['bio'] = request_body.get(
+            'bio', summary['bio'])
+
+        details['firstname'] = request_body.get(
+            'givenName', details['firstname'])
+        details['lastname'] = request_body.get(
+            'familyName', details['lastname'])
+        details['mobile'] = request_body.get(
+            'telephone', details['mobile'])
+        details['email'] = request_body.get(
+            'email', details['email'])
+        details['birthdate'] = request_body.get(
+            'birthdate', details['birthdate'])
+        details['gender'] = request_body.get(
+            'gender', details['gender'])
+
+        if not g.con.modify_user(nickname, summary, details):
+            return create_error_response(500, "The system has failed. Please, contact the administrator.")
+
+        return Response(status=204,
+                        headers={"Location": api.url_for(User, nickname=nickname)})
+
+    def delete(self, nickname):
+        """
+        Deletes the specified user.
+
+        :param str nickname: The nickname of the user. Example: Scott.
+
+        RESPONSE STATUS CODE:
+
+            * If the user is deleted returns 204.
+            * If the nickname does not exist return 404
+            * If there was a db error return 500
+
+        """
+        # PEROFRM OPERATIONS
+
+        userExist = g.con.contains_user(nickname)
+        if not userExist:
+            return create_error_response(404, "User not found.")
+
+        # Try to delete the user. If it could not be deleted, the database
+        # returns None.
+        try:
+            if g.con.delete_user(nickname):
+                # RENDER RESPONSE
+                return Response('', 204)
+            else:
+                # GENERATE ERROR RESPONSE
+                return create_error_response(404, "User not found.")
+        except:
+            return create_error_response(500,
+                                         "The system has failed. Please, contact the administrator.")
+
+
+class UserInbox(Resource):
+    def get(self, nickname):
+        return Response('NOT IMPLEMENTED', 200)
+
+
+class UserRiver(Resource):
+    def get(self, nickname):
+        return Response('NOT IMPLEMENTED', 200)
+
+
+class UserRatings(Resource):
+    def get(self, nickname):
+        return Response('NOT IMPLEMENTED', 200)
+
+
 # Add the Regex Converter so we can use regex expressions when we define the
 # routes
 app.url_map.converters["regex"] = RegexConverter
@@ -347,6 +623,14 @@ app.url_map.converters["regex"] = RegexConverter
 
 api.add_resource(Users, "/critique/api/users/",
                  endpoint="users")
+api.add_resource(User, "/critique/api/users/<nickname>/",
+                 endpoint="user")
+api.add_resource(UserInbox, "/critique/api/users/<nickname>/inbox",
+                 endpoint="inbox")
+api.add_resource(UserRiver, "/critique/api/users/<nickname>/river",
+                 endpoint="river")
+api.add_resource(UserRatings, "/critique/api/users/<nickname>/ratings",
+                 endpoint="ratings")
 
 # Redirect profile
 

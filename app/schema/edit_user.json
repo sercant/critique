@@ -1,0 +1,46 @@
+{
+    "type": "object",
+    "properties": {
+        "givenName": {
+            "title": "given name",
+            "description": "user given name",
+            "type": "string"
+        },
+        "familyName": {
+            "title": "family name",
+            "description": "user family name",
+            "type": "string"
+        },
+        "avatar": {
+            "title": "avatar",
+            "description": "user avatar",
+            "type": "string"
+        },
+        "bio": {
+            "title": "bio",
+            "description": "user bio",
+            "type": "string"
+        },
+        "email": {
+            "title": "email",
+            "description": "user email",
+            "type": "string"
+        },
+        "birthdate": {
+            "title": "birthdate",
+            "description": "user birthdate",
+            "type": "string"
+        },
+        "telephone": {
+            "title": "telephone",
+            "description": "user telephone",
+            "type": "string"
+        },
+        "gender": {
+            "title": "gender",
+            "description": "user gender",
+            "type": "string"
+        }
+    },
+    "required": []
+}
