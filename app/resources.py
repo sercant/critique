@@ -311,7 +311,8 @@ class Users(Resource):
          * Profile: Critique_User
 
         Semantic descriptors used in template: nickname(mandatory), givenName(mandatory),
-        email(mandatory).
+        email(mandatory), bio(optional), avatar(optional), familyName(optional),
+        birthDate(optional), telephone(optional), gender(optional)
 
         RESPONSE STATUS CODE:
          * Returns 201 + the url of the new resource in the Location header
@@ -366,6 +367,8 @@ class Users(Resource):
         except KeyError:
             return create_error_response(400,
                                          "Wrong request format")
+        # optional fields
+
 
         # Conflict if user already exist
         if g.con.contains_user_extended(nickname, email):
@@ -374,11 +377,17 @@ class Users(Resource):
 
         user = {
             'summary': {
-                'nickname': nickname
+                'nickname': nickname,
+                'bio': request_body.get('bio', None),
+                'avatar': request_body.get('avatar', None)
             },
             'details': {
                 'firstname': firstName,
+                'lastname': request_body.get('familyName', None),
                 'email': email,
+                'mobile': request_body.get('telephone', None),
+                'gender': request_body.get('gender', None),
+                'birthdate': request_body.get('birthDate', None),
             }
         }
 

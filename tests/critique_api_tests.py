@@ -79,6 +79,14 @@ class UsersTestCase (ResourcesAPITestCase):
         "email": "sercan@mail.com"
     }
 
+    user_2_request = {
+        "nickname": "nandeska",
+        "givenName": "nandesu",
+        "email": "nande@mail.com",
+        "bio": "hello evermeow!",
+        "familyName": "meow"
+    }
+
     user_wrong_1_request = {
         "nickname": "Scott",  # existing nickname
         "givenName": "Sercan",
@@ -205,6 +213,27 @@ class UsersTestCase (ResourcesAPITestCase):
 
         resp2 = self.client.get(url)
         self.assertEqual(resp2.status_code, 200)
+
+        data = json.loads(resp2.data.decode("utf-8"))
+        for key in self.user_1_request.keys():
+            self.assertEqual(data[key], self.user_1_request[key])
+
+        # With a complete request that includes optional fields
+        resp = self.client.post(resources.api.url_for(resources.Users),
+                                headers={"Content-Type": JSON},
+                                data=json.dumps(self.user_2_request))
+
+        self.assertEqual(resp.status_code, 201)
+
+        self.assertIn("Location", resp.headers)
+        url = resp.headers["Location"]
+
+        resp3 = self.client.get(url)
+        self.assertEqual(resp3.status_code, 200)
+
+        data = json.loads(resp3.data.decode("utf-8"))
+        for key in self.user_1_request.keys():
+            self.assertEqual(data[key], self.user_2_request[key])
 
     def test_add_user_missing_mandatory(self):
         """
