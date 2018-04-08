@@ -81,6 +81,26 @@ class CritiqueObject(MasonObject):
             "title": "List users"
         }
 
+    def add_control_all_posts(self):
+        '''
+        This adds the posts collection link to an object. Intended for the document object.
+        '''
+
+        self["@controls"]["all-posts"] = {
+            "href": api.url_for(Posts),
+            "title": "List posts"
+        }
+
+    def add_control_all_users(self):
+        '''
+        This adds the users collection link to an object. Intended for the document object.
+        '''
+
+        self["@controls"]["all-users"] = {
+            "href": api.url_for(Users),
+            "title": "List users"
+        }
+
     def add_control_add_user(self):
         '''
         This adds the add-user control to an object. Intended for the
@@ -161,18 +181,40 @@ class CritiqueObject(MasonObject):
             "schema": EDIT_USER_SCHEMA
         }
 
-    def add_control_add_rating(self):
+    def add_control_add_rating(self, nickname):
         '''
         This adds the add-rating control to an object. Intended for the
         document object.
         '''
 
         self["@controls"]["critique:add-rating"] = {
-            "href": api.url_for(Ratings),
+            "href": api.url_for(UserRatings, nickname=nickname),
             "title": "Create a new rating",
             "encoding": "json",
             "method": "POST",
             "schema": CREATE_RATING_SCHEMA
+        }
+
+    def add_control_sender(self, nickname):
+        '''
+        This adds the sender control to an object. Intended for the
+        document object.
+        '''
+
+        self["@controls"]["critique:sender"] = {
+            "href": api.url_for(User, nickname=nickname),
+            "title": "Sender of the resource",
+        }
+
+    def add_control_receiver(self, nickname):
+        '''
+        This adds the receiver control to an object. Intended for the
+        document object.
+        '''
+
+        self["@controls"]["critique:receiver"] = {
+            "href": api.url_for(User, nickname=nickname),
+            "title": "Receiver of the resource",
         }
 
 
@@ -295,6 +337,7 @@ class Users(Resource):
             item.add_control("profile", href=CRITIQUE_USER_PROFILE)
 
         envelope.add_namespace("critique", LINK_RELATIONS_URL)
+        envelope.add_control_all_posts()
 
         envelope.add_control_add_user()
         envelope.add_control("self", href=api.url_for(Users))
@@ -368,7 +411,6 @@ class Users(Resource):
             return create_error_response(400,
                                          "Wrong request format")
         # optional fields
-
 
         # Conflict if user already exist
         if g.con.contains_user_extended(nickname, email):
@@ -698,15 +740,17 @@ class UserRatings(Resource):
             )
 
             items.append(item)
+            item.add_control_sender(rating['sender'])
+            item.add_control_receiver(rating['receiver'])
             item.add_control("self",
-                             href=api.url_for(Rating, ratingId=rating["rating_id"]))
+                             href=api.url_for(Rating, nickname=nickname, ratingId=rating["rating_id"]))
             item.add_control("profile", href=CRITIQUE_RATING_PROFILE)
 
         envelope.add_namespace("critique", LINK_RELATIONS_URL)
 
         envelope.add_control("self", href=api.url_for(
             UserRatings, nickname=nickname))
-        envelope.add_control_add_rating()
+        envelope.add_control_add_rating(nickname)
 
         # RENDER
         return Response(json.dumps(envelope), 200, mimetype=MASON+";" + CRITIQUE_RATING_PROFILE)
@@ -722,13 +766,18 @@ class UserRiver(Resource):
         return Response('NOT IMPLEMENTED', 200)
 
 
-class Ratings(Resource):
-    def get(self):
-        return Response('NOT IMPLEMENTED', 200)
+# class Ratings(Resource):
+#     def get(self):
+#         return Response('NOT IMPLEMENTED', 200)
 
 
 class Rating(Resource):
-    def get(self, ratingId):
+    def get(self, nickname, ratingId):
+        return Response('NOT IMPLEMENTED', 200)
+
+
+class Posts(Resource):
+    def get(self):
         return Response('NOT IMPLEMENTED', 200)
 
 
@@ -748,10 +797,10 @@ api.add_resource(UserRiver, "/critique/api/users/<nickname>/river/",
                  endpoint="river")
 api.add_resource(UserRatings, "/critique/api/users/<nickname>/ratings/",
                  endpoint="user-ratings")
-api.add_resource(Ratings, "/critique/api/ratings/",
-                 endpoint="ratings")
-api.add_resource(Rating, "/critique/api/ratings/<ratingId>/",
+api.add_resource(Rating, "/critique/api/users/<nickname>/ratings/<ratingId>/",
                  endpoint="rating")
+api.add_resource(Posts, "/critique/api/posts/",
+                 endpoint="posts")
 
 # Redirect profile
 

@@ -154,6 +154,10 @@ class UsersTestCase (ResourcesAPITestCase):
         self.assertIn("href", controls["self"])
         self.assertEqual(controls["self"]["href"], self.url)
 
+        self.assertIn("href", controls["all-posts"])
+        self.assertEqual(controls["all-posts"]["href"], resources.api.url_for(
+            resources.Posts, _external=False))
+
         add_ctrl = controls["critique:add-user"]
         self.assertIn("href", add_ctrl)
         self.assertEqual(add_ctrl["href"], self.url)
@@ -525,7 +529,7 @@ class UserRatingsTestCase(ResourcesAPITestCase):
         add_ctrl = controls["critique:add-rating"]
         self.assertIn("href", add_ctrl)
         self.assertEqual(add_ctrl["href"], resources.api.url_for(
-            resources.Ratings, _external=False))
+            resources.UserRatings, nickname="Scott", _external=False))
         self.assertIn("encoding", add_ctrl)
         self.assertEqual(add_ctrl["encoding"], "json")
         self.assertIn("method", add_ctrl)
@@ -544,10 +548,18 @@ class UserRatingsTestCase(ResourcesAPITestCase):
 
             self.assertIn("@controls", item)
             self.assertIn("self", item["@controls"])
-            self.assertIn("href", item["@controls"]["self"])
 
+            self.assertIn("href", item["@controls"]["self"])
             self.assertEqual(item["@controls"]["self"]["href"], resources.api.url_for(
-                resources.Rating, ratingId=item["ratingId"], _external=False))
+                resources.Rating, nickname="Scott", ratingId=item["ratingId"], _external=False))
+
+            self.assertIn("href", item["@controls"]["critique:sender"])
+            self.assertEqual(item["@controls"]["critique:sender"]["href"], resources.api.url_for(
+                resources.User, nickname=item["sender"], _external=False))
+
+            self.assertIn("href", item["@controls"]["critique:receiver"])
+            self.assertEqual(item["@controls"]["critique:receiver"]["href"], resources.api.url_for(
+                resources.User, nickname=item["receiver"], _external=False))
 
             self.assertIn("profile", item["@controls"])
             self.assertEqual(item["@controls"]["profile"]
