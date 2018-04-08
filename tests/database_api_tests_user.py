@@ -349,10 +349,17 @@ class UserDBAPITestCase(unittest.TestCase):
         # Iterate through users and check if the users with USER1_ID and
         # USER2_ID are correct:
         for user in users:
+            test_user = None
             if user['nickname'] == USER1['summary']['nickname']:
-                self.assertDictContainsSubset(user, USER1['summary'])
+                test_user = USER1
             elif user['nickname'] == USER2['summary']['nickname']:
-                self.assertDictContainsSubset(user, USER2['summary'])
+                test_user = USER2
+            if test_user is not None:
+                for key in user.keys():
+                    containsKey = (key in test_user['summary']) or (
+                        key in test_user['details'])
+                    self.assertTrue(containsKey)
+
 
     def test_delete_user(self):
         '''
