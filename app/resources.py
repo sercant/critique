@@ -1,6 +1,9 @@
 '''
 Created on 31.03.2018
 @author: Sercan Turkmen
+
+    REFERENCEs:
+    -   [1] Programmable Web Project, Exercise3, resources.py
 '''
 
 import json
@@ -22,8 +25,6 @@ CRITIQUE_USER_PROFILE = "/profiles/user-profile/"
 CRITIQUE_RATING_PROFILE = "/profiles/rating-profile/"
 ERROR_PROFILE = "/profiles/error-profile"
 
-ATOM_THREAD_PROFILE = "https://tools.ietf.org/html/rfc4685"
-
 # Fill these in
 # Fill with the correct Apiary url"
 APIARY_PROJECT = "https://critique.docs.apiary.io"
@@ -37,6 +38,7 @@ EDIT_USER_SCHEMA = json.load(open('app/schema/edit_user.json'))
 PRIVATE_PROFILE_SCHEMA_URL = "/critique/schema/private-profile/"
 LINK_RELATIONS_URL = "/critique/link-relations/"
 
+# Borrowed from lab exercises [1]
 # Define the application and the api
 app = Flask(__name__, static_folder="static", static_url_path="/.")
 app.debug = True
@@ -48,7 +50,7 @@ app.config.update({"Engine": database.Engine()})
 api = Api(app)
 
 
-class CritiqueObject(MasonObject):
+class CritiqueObject(MasonObject):  # Borrowed from lab exercises [1]
     '''
     A convenience subclass of MasonObject that defines a bunch of shorthand
     methods for inserting application specific objects into the document. This
@@ -61,7 +63,7 @@ class CritiqueObject(MasonObject):
     well as any items in a collection type resource.
     '''
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs):  # Borrowed from lab exercises [1]
         '''
         Calls dictionary init method with any received keyword arguments. Adds
         the controls key afterwards because hypermedia without controls is not
@@ -218,6 +220,7 @@ class CritiqueObject(MasonObject):
         }
 
 
+# Borrowed from lab exercises [1]
 def create_error_response(status_code, title, message=None):
     '''
     Creates a: py: class:`flask.Response` instance when sending back an
@@ -241,26 +244,27 @@ def create_error_response(status_code, title, message=None):
 
 
 @app.errorhandler(404)
-def resource_not_found(error):
+def resource_not_found(error):  # Borrowed from lab exercises [1]
     return create_error_response(404, "Resource not found",
                                  "This resource url does not exit")
 
 
 @app.errorhandler(400)
-def resource_not_found(error):
+def resource_not_found(error):  # Borrowed from lab exercises [1]
     return create_error_response(400, "Malformed input format",
                                  "The format of the input is incorrect")
 
 
 @app.errorhandler(500)
-def unknown_error(error):
+def unknown_error(error):  # Borrowed from lab exercises [1]
     return create_error_response(500, "Error",
                                  "The system has failed. Please, contact the administrator")
 
 
+# Borrowed from lab exercises [1]
 # HOOKS
 @app.before_request
-def connect_db():
+def connect_db():  # Borrowed from lab exercises [1]
     '''
     Creates a database connection before the request is proccessed.
 
@@ -272,7 +276,7 @@ def connect_db():
 
 
 @app.teardown_request
-def close_connection(exc):
+def close_connection(exc):  # Borrowed from lab exercises [1]
     '''
     Closes the database connection
     Check if the connection is created. It might be exception appear before
@@ -783,10 +787,11 @@ class Posts(Resource):
 
 # Add the Regex Converter so we can use regex expressions when we define the
 # routes
+# Borrowed from lab exercises [1]
 app.url_map.converters["regex"] = RegexConverter
 
-# Define the routes
 
+# Define the routes
 api.add_resource(Users, "/critique/api/users/",
                  endpoint="users")
 api.add_resource(User, "/critique/api/users/<nickname>/",
@@ -805,11 +810,12 @@ api.add_resource(Posts, "/critique/api/posts/",
 # Redirect profile
 
 
-@app.route("/profiles/<profile_name>/")
+@app.route("/profiles/<profile_name>/")  # Borrowed from lab exercises [1]
 def redirect_to_profile(profile_name):
     return redirect(APIARY_PROFILES_URL + profile_name)
 
 
+# Borrowed from lab exercises [1]
 @app.route("/critique/link-relations/<rel_name>/")
 def redirect_to_relations(rel_name):
     return redirect(APIARY_RELATIONS_URL + rel_name)
@@ -825,6 +831,6 @@ def redirect_to_relations(rel_name):
 
 # Start the application
 # DATABASE SHOULD HAVE BEEN POPULATED PREVIOUSLY
-if __name__ == '__main__':
+if __name__ == '__main__':  # Borrowed from lab exercises [1]
     # Debug true activates automatic code reloading and improved error messages
     app.run(debug=True)

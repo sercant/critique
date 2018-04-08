@@ -1,6 +1,9 @@
 """
 Created on 01.05.2018
 @author: sercant
+
+    REFERENCEs:
+    -   [1] Programmable Web Project, Exercise3, exercise3_api_tests.py
 """
 
 import unittest
@@ -19,7 +22,6 @@ MASON_JSON = "application/vnd.mason+json"
 JSON = "application/json"
 CRITIQUE_USER_PROFILE = "/profiles/user-profile/"
 CRITIQUE_RATING_PROFILE = "/profiles/rating-profile/"
-ATOM_THREAD_PROFILE = "https://tools.ietf.org/html/rfc4685"
 
 # Tell Flask that I am running it in testing mode.
 resources.app.config["TESTING"] = True
@@ -34,10 +36,10 @@ initial_users = 5
 scott_ratings_count = 4
 
 
-class ResourcesAPITestCase(unittest.TestCase):
+class ResourcesAPITestCase(unittest.TestCase): # Borrowed from lab exercises [1]
     # INITIATION AND TEARDOWN METHODS
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls):  # Borrowed from lab exercises [1]
         """ Creates the database structure. Removes first any preexisting
             database file
         """
@@ -46,12 +48,12 @@ class ResourcesAPITestCase(unittest.TestCase):
         ENGINE.create_tables()
 
     @classmethod
-    def tearDownClass(cls):
+    def tearDownClass(cls):  # Borrowed from lab exercises [1]
         """Remove the testing database"""
         print("Testing ENDED for ", cls.__name__)
         ENGINE.remove_database()
 
-    def setUp(self):
+    def setUp(self):  # Borrowed from lab exercises [1]
         """
         Populates the database
         """
@@ -63,7 +65,7 @@ class ResourcesAPITestCase(unittest.TestCase):
         # Create a test client
         self.client = resources.app.test_client()
 
-    def tearDown(self):
+    def tearDown(self):  # Borrowed from lab exercises [1]
         """
         Remove all records from database
         """
@@ -130,6 +132,7 @@ class UsersTestCase (ResourcesAPITestCase):
         """
         _url = "/critique/api/users/"
         print("("+self.test_url.__name__+")", self.test_url.__doc__, end=' ')
+        # Borrowed from lab exercises [1]
         with resources.app.test_request_context(_url):
             rule = flask.request.url_rule
             view_point = resources.app.view_functions[rule.endpoint].view_class
@@ -304,7 +307,6 @@ class UsersTestCase (ResourcesAPITestCase):
 
 class UserTestCase(ResourcesAPITestCase):
 
-    # ATTENTION: json.loads return unicode
     user_mod_req_1 = {
         "givenName": "Scotta",
         "familyName": "Pilgrimu",
@@ -418,6 +420,7 @@ class UserTestCase(ResourcesAPITestCase):
 
         # Check that I receive status code 200
         resp = self.client.get(self.url)
+        # Borrowed from lab exercises [1]
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.headers.get("Content-Type", None),
                          "{};{}".format(MASON_JSON, CRITIQUE_USER_PROFILE))
@@ -579,6 +582,6 @@ class UserRatingsTestCase(ResourcesAPITestCase):
                          "{};{}".format(MASON_JSON, CRITIQUE_RATING_PROFILE))
 
 
-if __name__ == "__main__":
+if __name__ == "__main__": # Borrowed from lab exercises [1]
     print("Start running tests")
     unittest.main()
