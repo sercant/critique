@@ -52,6 +52,7 @@ To run the tests please make sure that you activated the virtual environment usi
 # this is for mac users, please check your how you activate the virtual environment in your operating system.
 . venv/bin/activate
 ./run_database_api_tests.sh
+./run_critique_api_tests.sh
 ```
 
 ## Rendering API documentation
@@ -61,4 +62,12 @@ npm install -g aglio
 
 # will give you a link and changes in the file are updated live
 aglio -i docs/apiary.apib --server
+```
+
+## Running the API server
+
+```bash
+# this is for mac users, please check your how you activate the virtual environment in your operating system.
+. venv/bin/activate
+python main.py
 ```
