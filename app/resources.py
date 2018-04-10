@@ -1,6 +1,7 @@
 '''
 Created on 31.03.2018
 @author: Sercan Turkmen
+         Moamen Ibrahim
 
     REFERENCEs:
     -   [1] Programmable Web Project, Exercise3, resources.py
@@ -153,6 +154,18 @@ class CritiqueObject(MasonObject):  # Borrowed from lab exercises [1]
             "href": api.url_for(UserRatings, nickname=nickname),
         }
 
+    def add_control_reply_to(self, post_id):
+        '''
+        This adds the reply to a post control to an object. Intended for the
+        document object.
+
+        : param str post_id: The id of the post
+        '''
+
+        self["@controls"]["critique:add-reply"] = {
+            "href": api.url_for(Post, post_id=post_id),
+        }
+
     def add_control_delete_user(self, nickname):
         '''
         Adds the delete control to an object. This is intended for any
@@ -164,6 +177,21 @@ class CritiqueObject(MasonObject):  # Borrowed from lab exercises [1]
         self["@controls"]["critique:delete"] = {
             "href": api.url_for(User, nickname=nickname),
             "title": "Delete a user",
+            "method": "DELETE"
+        }
+
+    def add_control_delete_post(self, nickname, post_id):
+        '''
+        Adds the delete control to an object. This is intended for any
+        object that represents a user's post.
+
+        : param str nickname: The nickname of the user to remove
+        : param integer post_id : The id of the post to be deleted
+        '''
+
+        self["@controls"]["critique:delete"] = {
+            "href": api.url_for(UserRiver, nickname=nickname),
+            "title": "Delete a user's post",
             "method": "DELETE"
         }
 
@@ -761,23 +789,381 @@ class UserRatings(Resource):
 
 
 class UserInbox(Resource):
-    def get(self, nickname):
-        return Response('NOT IMPLEMENTED', 200)
+    '''
+    Contains private posts sent to the user, it should include text as the actual post,
+    however, rating is optional in the message.
+    '''
+
+    def get(self, nickname, number_of_messages):
+        '''
+        Get posts sent to the user which are currently not public
+
+        INPUT PARAMETER:
+
+       :param user_id: default is None, takes the user id of the user
+            that you want the posts of. if the parameter is None, it
+            will raise a ValueError exception.
+        :type nickname: nickname of the user
+        :param number_of_messages: sets the number of maximum window of
+            messages returned. if None, it returns a list of all the
+            posts made by the requested user.
+        :type number_of_messages: integer
+
+        OUTPUT:
+            * Return 200 if the nickname exists.
+            * Return 404 if the nickname not found.
+            TODO : (check) checking on number_of_messages
+
+        RESPONSE ENTITY BODY:
+
+        OUTPUT:
+            * Media type: application/vnd.mason+json
+                https://github.com/JornWildt/Mason
+            * Profile: Inbox
+                /profiles/post_profile
+
+        Link relations used in items: self, profile
+
+        Semantic descriptions used in items: sender, receiver, timestamp, postId, replyTo, body, anonymous, public
+
+        Link relations used in links: self, add-post, add-reply
+
+        Semantic descriptors used in template: items
+
+        '''
+
+        userExist = g.con.contains_user(nickname)
+        if not userExist:
+            return create_error_response(404, "User not found.")
+
+        # PERFORM OPERATIONS
+        # create posts list
+        post_db = g.con.get_posts_by_user(nickname, number_of_messages)
+
+        # FILTER AND GENERATE THE RESPONSE
+        # Create the envelope
+        envelope = CritiqueObject()
+
+        items = envelope["items"] = []
+
+        #PEFORM OPERATIONS INITIAL CHECKS
+        #Get the post from db
+        post_db = g.con.get_posts_by_user(nickname, number_of_messages)
+        if not post_db:
+            return create_error_response(404, "Message not found",
+                                         "There is no a message with id %s" % nickname)
+
+        for post in post_db:
+            item = CritiqueObject(
+                postId=post["post_id"],
+                ratingValue=post['rating'],
+                sender=post['sender'],
+                receiver=post['receiver'],
+                replyTo=post['reply_to'],
+                post_Text=post['post_text'],
+                anonymous=post['anonymous'],
+                public=post['public']
+            )
+            if (public == 0):
+                # check if the post is public and then append
+                items.append(item)
+                item.add_control("self",
+                                 href=api.url_for(UserInbox, postId=post["post_id"]))
+                item.add_control("profile", href=CRITIQUE_USER_PROFILE)
+
+        envelope.add_namespace("critique", LINK_RELATIONS_URL)
+        envelope.add_control_user_inbox(nickname)
+        envelope.add_control_reply_to(nickname)
+        envelope.add_control("profile", href=CRITIQUE_USER_PROFILE)
+        envelope.add_control("self", href=api.url_for(
+            UserInbox, messageid=nickname))
+
+        if parent:
+            envelope.add_control("atom-thread:in-reply-to",
+                                 href=api.url_for(UserInbox, messageid=parent))
+        else:
+            envelope.add_control("atom-thread:in-reply-to", href=None)
+
+        #RENDER
+        return Response(json.dumps(envelope), 200, mimetype=MASON+";" + CRITIQUE_USER_PROFILE)
+
+        def post(self, nickname):
+            '''
+            Creates a new post to the list of posts. Returns the post URI.
+            '''
+
+            return Response('NOT IMPLEMENTED', 200)
 
 
 class UserRiver(Resource):
-    def get(self, nickname):
+    '''
+    Contains public posts sent to the user, it should include text as the actual post,
+    however, rating is optional in the posts.
+    '''
+
+    def get(self, nickname, number_of_messages):
+        '''
+        Get posts sent to the user which are currently public
+
+        INPUT PARAMETER:
+
+       :param user_id: default is None, takes the user id of the user
+            that you want the posts of. if the parameter is None, it
+            will raise a ValueError exception.
+        :type nickname: nickname of the user
+        :param number_of_messages: sets the number of maximum window of
+            messages returned. if None, it returns a list of all the
+            posts made by the requested user.
+        :type number_of_messages: integer
+
+        OUTPUT:
+            * Return 200 if the nickname exists.
+            * Return 404 if the nickname not found.
+            TODO : (check) checking on number_of_messages
+
+        RESPONSE ENTITY BODY:
+
+        OUTPUT:
+            * Media type: application/vnd.mason+json
+                https://github.com/JornWildt/Mason
+            * Profile: River
+                /profiles/post_profile
+
+        Link relations used in items: self, profile
+
+        Semantic descriptions used in items: sender, receiver, timestamp, postId, replyTo, body, anonymous, public
+
+        Link relations used in links: self, add-post, add-reply
+
+        Semantic descriptors used in template: items
+
+        '''
+
+        userExist = g.con.contains_user(nickname)
+        if not userExist:
+            return create_error_response(404, "User not found.")
+
+        # FILTER AND GENERATE THE RESPONSE
+        # Create the envelope
+        envelope = CritiqueObject()
+
+        items = envelope["items"] = []
+
+        # PEFORM OPERATIONS INITIAL CHECKS
+        # Get the post from db and create posts list
+        post_db = g.con.get_posts_by_user(nickname, number_of_messages)
+        if not post_db:
+            return create_error_response(404, "Message not found",
+                                         "There is no a message with id %s" % nickname)
+
+        for post in post_db:
+            item = CritiqueObject(
+                postId=post["post_id"],
+                ratingValue=post['rating'],
+                sender=post['sender'],
+                receiver=post['receiver'],
+                replyTo=post['reply_to'],
+                post_Text=post['post_text'],
+                anonymous=post['anonymous'],
+                public=post['public']
+            )
+
+            if (public == 1):
+                # check if the post is public and then append
+                items.append(item)
+                item.add_control("self",
+                                 href=api.url_for(UserRiver, postId=post["post_id"]))
+                item.add_control("profile", href=CRITIQUE_USER_PROFILE)
+
+        envelope.add_namespace("critique", LINK_RELATIONS_URL)
+        envelope.add_control_user_river(nickname)
+        # TODO : check
+        envelope.add_control_reply_to(nickname)
+        envelope.add_control("profile", href=CRITIQUE_USER_PROFILE)
+        envelope.add_control("self", href=api.url_for(
+            UserRiver, messageid=nickname))
+
+        if parent:
+            envelope.add_control("atom-thread:in-reply-to",
+                                 href=api.url_for(UserRiver, messageid=parent))
+        else:
+            envelope.add_control("atom-thread:in-reply-to", href=None)
+
+        #RENDER
+        return Response(json.dumps(envelope), 200, mimetype=MASON+";" + CRITIQUE_USER_PROFILE)
+
+
+class Ratings(Resource):
+    '''
+    Contains the ratings list with ratings from all other users to this specific user.
+    It should have a track of the ratings made by users to each other including the person
+    who made the rating and that who received it. Also, it contains the rating id to keep
+    track of the ratings.
+    '''
+
+    def get(self):
         return Response('NOT IMPLEMENTED', 200)
 
 
-# class Ratings(Resource):
-#     def get(self):
-#         return Response('NOT IMPLEMENTED', 200)
+class Post(Resource):
+    '''
+    Returns the information needed from a specific post where it contains the post text,
+    timestamp, sender id and receiver id which should not be null value.
+    Post_text is the post content that holds the data needed while rating is an integer of
+    the ratings to the post from others.
+    Public is an integer flag indicating if the post is public or private.
+    While anonymous is the same but indicates whether the user wants to post it without being known.
+    '''
+
+    def get(parametself, nicknameer_list):
+        '''
+        Extracts a post and all it’s information.
+        '''
+        return Response('NOT IMPLEMENTED', 200)
+
+    def post(self, nickname):
+        '''
+        Modifies the contents of a specified post.
+        '''
+        return Response('NOT IMPLEMENTED', 200)
+
+    def delete(self, nickname):
+        '''
+        Deletes a specific post.
+        '''
+        return Response('NOT IMPLEMENTED', 200)
+
+    def put(self, post_id):
+        '''
+        Modifies the contents of a specified post.
+
+        REQUEST ENTITY BODY:
+         * Media type: JSON
+         * Profile: Critique_Post
+
+        Semantic descriptors used in template: post_text (optional)
+
+        RESPONSE STATUS CODE:
+         * Returns 204 + the url of the edited resource in the Location header
+         * Return 404 If post not found with given id.
+         * Return 415 if it receives a media type != application/json
+
+        NOTE:
+         * The attribute post_text is obtained from the column posts_profile.post_text
+         * The rest of attributes match one-to-one with column names in the
+           database.
+        '''
+
+        post_db = g.con.get_user(post_id)
+        if not post_db:
+            return create_error_response(404, "Post not found.")
+
+        post = post_db['post']
+
+        request_body = request.get_json()
+        if not request_body:
+            return create_error_response(415, "Format of the input is not json.")
+
+        body['post_text'] = request_body.get(
+            'post_text', body['post_text'])
+
+        if not g.con.modify_post(post_id, body):
+            return create_error_response(500, "The system has failed. Please, contact the administrator.")
+
+        return Response(status=204,
+                        headers={"Location": api.url_for(Post, post_id=post_id)})
+
+
 
 
 class Rating(Resource):
-    def get(self, nickname, ratingId):
+    '''
+    Contains the ratings list with ratings from all other users to this specific user.
+    It should have a track of the ratings made by users to each other including the person
+    who made the rating and that who received it. Also, it contains the rating id to keep
+    track of the ratings.
+    '''
+
+    def get(self, ratingId):
         return Response('NOT IMPLEMENTED', 200)
+
+    def put(self, rating_id):
+        '''
+        Modifies a rating.
+
+        REQUEST ENTITY BODY:
+         * Media type: JSON
+         * Profile: Critique_User
+
+        Semantic descriptors used in template: rating_id (required), new_rating (optional)
+
+        RESPONSE STATUS CODE:
+         * Returns 204 + the url of the edited resource in the Location header
+         * Return 404 If rating not found with given id.
+         * Return 415 if it receives a media type != application/json
+         * Return 500 if there was a db error
+
+
+        NOTE:
+         * The attribute rating_id is obtained from the column ratings_profile.rating_id
+         * The attribute new_rating is obtained from the column ratings_profile.new_rating
+         * The rest of attributes match one-to-one with column names in the
+           database.
+        '''
+
+        rating_db = g.con.get_rating(rating_id)
+        if not rating_db:
+            return create_error_response(404, "User not found.")
+
+        rating = rating_db['post']
+
+        request_body = request.get_json()
+        if not request_body:
+            return create_error_response(415, "Format of the input is not json.")
+
+        rating_id['rating_id'] = request_body.get(
+            'rating_id', rating_id['rating_id'])
+
+        new_value['new_rating'] = request_body.get(
+            'new_rating', new_value['new_rating'])
+
+        if not g.con.modify_rating(rating_id, new_value):
+            return create_error_response(500, "The system has failed. Please, contact the administrator.")
+
+        return Response(status=204,
+                        headers={"Location": api.url_for(Rating, rating_id=rating_id)})
+
+    def delete(self, ratingId):
+        '''
+        Deletes the specified rating.
+
+        :param integer ratingId: The id of the a rating. Example: rtg-015.
+
+        RESPONSE STATUS CODE:
+
+            * If the rating is deleted returns 204.
+            * If the rating does not exist return 404
+            * If there was a db error return 500
+        '''
+        # PEROFRM OPERATIONS
+
+        ratingExist = g.con.contains_rating(ratingId)
+        if not ratingExist:
+            return create_error_response(404, "Rating not found.")
+
+        # Try to delete the Rating. If it could not be deleted, the database
+        # returns None.
+
+        try:
+            if g.con.delete_rating(ratingId):
+                # RENDER RESPONSE
+                return Response('', 204)
+            else:
+                # GENERATE ERROR RESPONSE
+                return create_error_response(404, "Rating not found.")
+        except:
+            return create_error_response(500,
+                                         "The system has failed. Please, contact the administrator.")
 
 
 class Posts(Resource):
