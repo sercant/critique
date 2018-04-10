@@ -755,6 +755,46 @@ class Connection(object):
             return None
         return 'rtg-' + str(rating_id)
 
+    def delete_rating(self, rating_id=None):
+        '''
+        Delete the rating with id given as parameter.
+
+        :param rating_id: id of the rating to remove.
+        :type rating_id: integer
+        :return: True if the message has been deleted, False otherwise
+        :raises ValueError: if the rating_id not inserted.
+
+        '''
+        if rating_id is None:
+            raise ValueError("No rating ID inserted to delete.")
+        queryParameter = (rating_id, )
+
+        # Create the SQL Statement
+        query = 'DELETE FROM ratings WHERE rating_id = ?'
+
+        # Activate foreign key support
+        self.set_foreign_keys_support()
+
+        # Cursor and row initialization
+        self.con.row_factory = sqlite3.Row
+
+        # Execute main SQL Statement
+        try:
+            # Get the cursor object.
+            # It allows to execute SQL code and traverse the result set
+            cur = self.con.cursor()
+            # execute the pragma command, OFF
+            cur.execute(query, queryParameter)
+            if cur.rowcount < 1:
+                print("No ratings with rating_id = %s" % str(rating_id))
+                return False
+            print("%s rating deleted" % str(rating_id))
+            self.con.commit()
+        except sqlite3.Error as excp:
+            print("Error %s:" % excp.args[0])
+            return False
+        return True
+
     def delete_user(self, nickname):
         '''
         Deletes the user from the database.
@@ -1202,7 +1242,7 @@ class Connection(object):
 
         '''
         query = 'SELECT users.user_id FROM users, users_profile \
-                 WHERE users.user_id = users_profile.user_id and ' + field + ' = ?'
+                 WHERE users.user_id = users_profile.user_id and '                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   + field + ' = ?'
 
         # Activate foreign key support
         self.set_foreign_keys_support()
