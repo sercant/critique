@@ -2,7 +2,7 @@
 Created on 31.03.2018
 @author: Sercan Turkmen
          Moamen Ibrahim
-
+         Mina Ghobrial
     REFERENCEs:
     -   [1] Programmable Web Project, Exercise3, resources.py
 '''
@@ -850,8 +850,8 @@ class UserInbox(Resource):
         #Get the post from db
         post_db = g.con.get_posts_by_user(nickname, number_of_messages)
         if not post_db:
-            return create_error_response(404, "Message not found",
-                                         "There is no a message with id %s" % nickname)
+            return create_error_response(404, "Posts not found",
+                                         "There is no posts for %s" % nickname)
 
         for post in post_db:
             item = CritiqueObject(
@@ -887,12 +887,41 @@ class UserInbox(Resource):
         #RENDER
         return Response(json.dumps(envelope), 200, mimetype=MASON+";" + CRITIQUE_USER_PROFILE)
 
-        def post(self, nickname):
-            '''
-            Creates a new post to the list of posts. Returns the post URI.
-            '''
+    def post(self, nickname):
+        '''
+        Creates a new post to the list of posts. Returns the post URI.
+        
+        INPUT PARAMETERS:
+        :param nickname: nickname of the user that we are sending to.
+        :type nickname: string
 
-            return Response('NOT IMPLEMENTED', 200)
+        REQUEST ENTITY BODY:
+        * Media type: application/vnd.mason+json
+                https://github.com/JornWildt/Mason
+        * Profile: Inbox
+                /profiles/post_profile
+
+        Semantic descriptors used in template: messageBody(mandatory),
+        anonymous(optional)
+
+        RESPONSE STATUS CODE:
+         * Returns 201 + the url of the new resource in the Location header
+         * Return 400 Post info is not well formed or entity body is missing.
+         * Return 415 if it receives a media type != application/json
+         * Return 422 Conflict if the sender or receiver are not found
+         '''
+        # CONTENT TYPE CHECK
+        if JSON != request.headers.get("Content-Type", ""):
+            abort(415)
+        
+        # PARSE REQUEST
+        request_body = request.get_json(force = True)
+        if not request_body:
+            return create_error_response(415,
+                                        "Unsupported Media Type")
+
+        
+        return Response('NOT IMPLEMENTED', 200)
 
 
 class UserRiver(Resource):
@@ -1018,18 +1047,27 @@ class Post(Resource):
     def get(parametself, nicknameer_list):
         '''
         Extracts a post and all it’s information.
+
+        Link relations used: self, profile, add-reply, delete, edit,
+        collection, post-rating
         '''
         return Response('NOT IMPLEMENTED', 200)
 
     def post(self, nickname):
         '''
         Modifies the contents of a specified post.
+
+        Link relations used: self, profile, add-reply, delete, edit,
+        collection, post-rating
         '''
         return Response('NOT IMPLEMENTED', 200)
 
     def delete(self, nickname):
         '''
         Deletes a specific post.
+
+        Link relations used: self, profile, add-reply, delete, edit,
+        collection, post-rating
         '''
         return Response('NOT IMPLEMENTED', 200)
 
@@ -1074,8 +1112,6 @@ class Post(Resource):
                         headers={"Location": api.url_for(Post, post_id=post_id)})
 
 
-
-
 class Rating(Resource):
     '''
     Contains the ratings list with ratings from all other users to this specific user.
@@ -1085,6 +1121,9 @@ class Rating(Resource):
     '''
 
     def get(self, ratingId):
+        '''
+        
+        '''
         return Response('NOT IMPLEMENTED', 200)
 
     def put(self, rating_id):

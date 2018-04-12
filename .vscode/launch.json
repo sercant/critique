@@ -53,6 +53,15 @@
             "stopOnEntry": false,
             "pythonPath": "${config:python.pythonPath}",
             "module": "main",
+		},
+		
+        {
+            "name": "database_api_tests_posts",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": true,
+            "pythonPath": "${config:python.pythonPath}",
+            "module": "tests.database_api_tests_posts",
             "cwd": "${workspaceFolder}",
             "env": {},
             "envFile": "${workspaceFolder}/.env",
