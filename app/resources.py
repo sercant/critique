@@ -794,7 +794,7 @@ class UserInbox(Resource):
     however, rating is optional in the message.
     '''
 
-    def get(self, nickname, number_of_messages):
+    def get(self, nickname):
         '''
         Get posts sent to the user which are currently not public
 
@@ -804,15 +804,10 @@ class UserInbox(Resource):
             that you want the posts of. if the parameter is None, it
             will raise a ValueError exception.
         :type nickname: nickname of the user
-        :param number_of_messages: sets the number of maximum window of
-            messages returned. if None, it returns a list of all the
-            posts made by the requested user.
-        :type number_of_messages: integer
 
         OUTPUT:
             * Return 200 if the nickname exists.
             * Return 404 if the nickname not found.
-            TODO : (check) checking on number_of_messages
 
         RESPONSE ENTITY BODY:
 
@@ -838,7 +833,7 @@ class UserInbox(Resource):
 
         # PERFORM OPERATIONS
         # create posts list
-        post_db = g.con.get_posts_by_user(nickname, number_of_messages)
+        post_db = g.con.get_posts_by_user(nickname)
 
         # FILTER AND GENERATE THE RESPONSE
         # Create the envelope
@@ -848,7 +843,7 @@ class UserInbox(Resource):
 
         #PEFORM OPERATIONS INITIAL CHECKS
         #Get the post from db
-        post_db = g.con.get_posts_by_user(nickname, number_of_messages)
+        post_db = g.con.get_posts_by_user(nickname)
         if not post_db:
             return create_error_response(404, "Message not found",
                                          "There is no a message with id %s" % nickname)
@@ -901,7 +896,7 @@ class UserRiver(Resource):
     however, rating is optional in the posts.
     '''
 
-    def get(self, nickname, number_of_messages):
+    def get(self, nickname):
         '''
         Get posts sent to the user which are currently public
 
@@ -911,15 +906,10 @@ class UserRiver(Resource):
             that you want the posts of. if the parameter is None, it
             will raise a ValueError exception.
         :type nickname: nickname of the user
-        :param number_of_messages: sets the number of maximum window of
-            messages returned. if None, it returns a list of all the
-            posts made by the requested user.
-        :type number_of_messages: integer
 
         OUTPUT:
             * Return 200 if the nickname exists.
             * Return 404 if the nickname not found.
-            TODO : (check) checking on number_of_messages
 
         RESPONSE ENTITY BODY:
 
@@ -951,7 +941,7 @@ class UserRiver(Resource):
 
         # PEFORM OPERATIONS INITIAL CHECKS
         # Get the post from db and create posts list
-        post_db = g.con.get_posts_by_user(nickname, number_of_messages)
+        post_db = g.con.get_posts_by_user(nickname)
         if not post_db:
             return create_error_response(404, "Message not found",
                                          "There is no a message with id %s" % nickname)
@@ -1084,7 +1074,7 @@ class Rating(Resource):
     track of the ratings.
     '''
 
-    def get(self, ratingId):
+    def get(self, rating_id):
         return Response('NOT IMPLEMENTED', 200)
 
     def put(self, rating_id):
