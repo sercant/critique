@@ -5,6 +5,7 @@ Provides the database API to access the critique persistent data.
 
 @author: sercant
 @author: mina
+@author: moamen
 
     REFERENCEs:
     -   [1] Programmable Web Project, Exercise1, forum.database.py

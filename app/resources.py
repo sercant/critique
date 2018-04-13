@@ -23,6 +23,7 @@ from app.model.mason import MasonObject
 MASON = "application/vnd.mason+json"
 JSON = "application/json"
 CRITIQUE_USER_PROFILE = "/profiles/user-profile/"
+CRITIQUE_POST_PROFILE = "/profiles/post_profile/"
 CRITIQUE_RATING_PROFILE = "/profiles/rating-profile/"
 ERROR_PROFILE = "/profiles/error-profile"
 
@@ -864,12 +865,12 @@ class UserInbox(Resource):
                 items.append(item)
                 item.add_control("self",
                                  href=api.url_for(UserInbox, postId=post["post_id"]))
-                item.add_control("profile", href=CRITIQUE_USER_PROFILE)
+                item.add_control("profile", href=CRITIQUE_POST_PROFILE)
 
         envelope.add_namespace("critique", LINK_RELATIONS_URL)
         envelope.add_control_user_inbox(nickname)
         envelope.add_control_reply_to(nickname)
-        envelope.add_control("profile", href=CRITIQUE_USER_PROFILE)
+        envelope.add_control("profile", href=CRITIQUE_POST_PROFILE)
         envelope.add_control("self", href=api.url_for(
             UserInbox, messageid=nickname))
 
@@ -880,7 +881,7 @@ class UserInbox(Resource):
             envelope.add_control("atom-thread:in-reply-to", href=None)
 
         #RENDER
-        return Response(json.dumps(envelope), 200, mimetype=MASON+";" + CRITIQUE_USER_PROFILE)
+        return Response(json.dumps(envelope), 200, mimetype=MASON+";" + CRITIQUE_POST_PROFILE)
 
     def post(self, nickname):
         '''
@@ -992,13 +993,13 @@ class UserRiver(Resource):
                 items.append(item)
                 item.add_control("self",
                                  href=api.url_for(UserRiver, postId=post["post_id"]))
-                item.add_control("profile", href=CRITIQUE_USER_PROFILE)
+                item.add_control("profile", href=CRITIQUE_POST_PROFILE)
 
         envelope.add_namespace("critique", LINK_RELATIONS_URL)
         envelope.add_control_user_river(nickname)
         # TODO : check
         envelope.add_control_reply_to(nickname)
-        envelope.add_control("profile", href=CRITIQUE_USER_PROFILE)
+        envelope.add_control("profile", href=CRITIQUE_POST_PROFILE)
         envelope.add_control("self", href=api.url_for(
             UserRiver, messageid=nickname))
 
@@ -1009,7 +1010,7 @@ class UserRiver(Resource):
             envelope.add_control("atom-thread:in-reply-to", href=None)
 
         #RENDER
-        return Response(json.dumps(envelope), 200, mimetype=MASON+";" + CRITIQUE_USER_PROFILE)
+        return Response(json.dumps(envelope), 200, mimetype=MASON+";" + CRITIQUE_POST_PROFILE)
 
 
 class Ratings(Resource):
@@ -1086,16 +1087,20 @@ class Post(Resource):
         if not post_db:
             return create_error_response(404, "Post not found.")
 
-        post = post_db['post']
+        # post = post_db['post']
 
         request_body = request.get_json()
         if not request_body:
             return create_error_response(415, "Format of the input is not json.")
 
-        body['post_text'] = request_body.get(
-            'post_text', body['post_text'])
+        post_db['post_text'] = request_body.get(
+            'post_text', post_db['post_text'])
+        post_db['rating'] = request_body.get(
+            'rating', post_db['rating'])
+        post_db['public'] = request_body.get(
+            'public', post_db['public'])
 
-        if not g.con.modify_post(post_id, body):
+        if not g.con.modify_post(post_id, post_db):
             return create_error_response(500, "The system has failed. Please, contact the administrator.")
 
         return Response(status=204,
@@ -1144,19 +1149,16 @@ class Rating(Resource):
         if not rating_db:
             return create_error_response(404, "User not found.")
 
-        rating = rating_db['post']
+        # rating = rating_db['post']
 
         request_body = request.get_json()
         if not request_body:
             return create_error_response(415, "Format of the input is not json.")
 
-        rating_id['rating_id'] = request_body.get(
-            'rating_id', rating_id['rating_id'])
+        rating_db['rating'] = request_body.get(
+            'rating', rating_db['rating'])
 
-        new_value['new_rating'] = request_body.get(
-            'new_rating', new_value['new_rating'])
-
-        if not g.con.modify_rating(rating_id, new_value):
+        if not g.con.modify_rating(rating_id, rating_db):
             return create_error_response(500, "The system has failed. Please, contact the administrator.")
 
         return Response(status=204,
