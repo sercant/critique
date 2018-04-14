@@ -708,6 +708,77 @@ class UserRatings(Resource):
     track of the ratings.
     '''
 
+    # def post(self, nickname):
+    #    '''
+    #     Adds a new rating in the database.
+
+    #     REQUEST ENTITY BODY:
+    #      * Media type: JSON
+    #      * Profile: rating-profile
+
+    #     Semantic descriptors used in template: nickname (string), avatar (string), bio (string)
+
+
+    #     RESPONSE STATUS CODE:
+    #      * Returns 201 + the url of the new resource in the Location header
+    #      * Return 400 User info is not well formed or entity body is missing.
+    #      * Return 415 if it receives a media type != application/json
+
+    #     NOTE:
+    #      * The attribute givenName is obtained from the column users_profile.firstname
+    #      * The attribute familyName is obtained from the column users_profile.lastname
+    #      * The rest of attributes match one-to-one with column names in the
+    #        database.
+
+    #     NOTE:
+    #     The: py: method:`Connection.append_rating()` receives as a parameter a
+    #     dictionary with the following format.
+
+    #         {
+    #             'rating_id': '',
+    #             'timestamp': '',
+    #             'sender': '',
+    #             'receiver': '',
+    #             'rating': ''
+    #         }
+
+    #     '''
+    #     if JSON != request.headers.get("Content-Type", ""):
+    #         abort(415)
+
+    #     # PARSE THE REQUEST:
+    #     request_body = request.get_json(force=True)
+    #     if not request_body:
+    #         return create_error_response(415,
+    #                                      "Unsupported Media Type")
+
+    #     # pick up rating_id so we can check for conflicts
+    #     try:
+    #         sender = request_body["sender"]
+    #         receiver = request_body["receiver"]
+    #         rating = request_body["rating"]
+
+    #     except KeyError:
+    #         return create_error_response(400,
+    #                                      "Wrong request format")
+    #     # optional fields
+
+    #     # Conflict if user already exist
+    #     if g.con.contains_rating(rating_id):
+    #         return create_error_response(422,
+    #                                      "Rating id already exist in the users list.")
+
+    #     try:
+    #         rating_id = g.con.create_rating(nickname, sender, receiver, rating)
+    #     except ValueError:
+    #         return create_error_response(400,
+    #                                      "Wrong request format")
+
+    #     # CREATE RESPONSE AND RENDER
+    #     return Response(status=201,
+    #                     headers={"Location": api.url_for(User, nickname=nickname)})
+
+
     def get(self, nickname):
         '''
         Extracts the ratings given to the user.
@@ -842,7 +913,7 @@ class UserInbox(Resource):
 
         #PEFORM OPERATIONS INITIAL CHECKS
         #Get the post from db
-        post_db = g.con.get_posts_by_user(nickname)
+        post_db = g.con.get_posts_by_user(nickname,False)
         if not post_db:
             return create_error_response(404, "Posts not found",
                                          "There is no posts for %s" % nickname)
@@ -968,7 +1039,7 @@ class UserRiver(Resource):
 
         # PEFORM OPERATIONS INITIAL CHECKS
         # Get the post from db and create posts list
-        post_db = g.con.get_posts_by_user(nickname)
+        post_db = g.con.get_posts_by_user(nickname,False)
         if not post_db:
             return create_error_response(404, "Message not found",
                                          "There is no a message with id %s" % nickname)
@@ -977,7 +1048,6 @@ class UserRiver(Resource):
             item = CritiqueObject(
                 postId=post["post_id"],
                 ratingValue=post['rating'],
-                # sender=post['sender'],
                 receiver=post['receiver'],
                 replyTo=post['reply_to'],
                 post_Text=post['post_text'],
@@ -994,7 +1064,6 @@ class UserRiver(Resource):
 
         envelope.add_namespace("critique", LINK_RELATIONS_URL)
         envelope.add_control_user_river(nickname)
-        # TODO : check
         envelope.add_control_reply_to(nickname)
         envelope.add_control("profile", href=CRITIQUE_POST_PROFILE)
         envelope.add_control("self", href=api.url_for(
@@ -1032,7 +1101,7 @@ class Post(Resource):
     While anonymous is the same but indicates whether the user wants to post it without being known.
     '''
 
-    def get(parametself, nicknameer_list):
+    def get(self, postId):
         '''
         Extracts a post and all it’s information.
 
@@ -1041,7 +1110,7 @@ class Post(Resource):
         '''
         return Response('NOT IMPLEMENTED', 200)
 
-    def post(self, nickname):
+    def post(self, postId):
         '''
         Modifies the contents of a specified post.
 
@@ -1050,7 +1119,7 @@ class Post(Resource):
         '''
         return Response('NOT IMPLEMENTED', 200)
 
-    def delete(self, nickname):
+    def delete(self, postId):
         '''
         Deletes a specific post.
 
@@ -1059,7 +1128,7 @@ class Post(Resource):
         '''
         return Response('NOT IMPLEMENTED', 200)
 
-    def put(self, post_id):
+    def put(self, postId):
         '''
         Modifies the contents of a specified post.
 
@@ -1080,11 +1149,9 @@ class Post(Resource):
            database.
         '''
 
-        post_db = g.con.get_user(post_id)
+        post_db = g.con.get_user(postId)
         if not post_db:
             return create_error_response(404, "Post not found.")
-
-        # post = post_db['post']
 
         request_body = request.get_json()
         if not request_body:
@@ -1097,11 +1164,11 @@ class Post(Resource):
         post_db['public'] = request_body.get(
             'public', post_db['public'])
 
-        if not g.con.modify_post(post_id, post_db):
+        if not g.con.modify_post(postId, post_db):
             return create_error_response(500, "The system has failed. Please, contact the administrator.")
 
         return Response(status=204,
-                        headers={"Location": api.url_for(Post, post_id=post_id)})
+                        headers={"Location": api.url_for(Post, postId=postId)})
 
 
 class Rating(Resource):
@@ -1112,13 +1179,13 @@ class Rating(Resource):
     track of the ratings.
     '''
 
-    def get(self, ratingId):
+    def get(self, ratingId, nickname):
         '''
 
         '''
         return Response('NOT IMPLEMENTED', 200)
 
-    def put(self, rating_id):
+    def put(self, ratingId, nickname):
         '''
         Modifies a rating.
 
@@ -1126,7 +1193,7 @@ class Rating(Resource):
          * Media type: JSON
          * Profile: Critique_User
 
-        Semantic descriptors used in template: rating_id (required), new_rating (optional)
+        Semantic descriptors used in template: ratingId (required), new_rating (optional)
 
         RESPONSE STATUS CODE:
          * Returns 204 + the url of the edited resource in the Location header
@@ -1136,17 +1203,15 @@ class Rating(Resource):
 
 
         NOTE:
-         * The attribute rating_id is obtained from the column ratings_profile.rating_id
+         * The attribute ratingId is obtained from the column ratings_profile.ratingId
          * The attribute new_rating is obtained from the column ratings_profile.new_rating
          * The rest of attributes match one-to-one with column names in the
            database.
         '''
 
-        rating_db = g.con.get_rating(rating_id)
+        rating_db = g.con.get_rating(ratingId)
         if not rating_db:
             return create_error_response(404, "User not found.")
-
-        # rating = rating_db['post']
 
         request_body = request.get_json()
         if not request_body:
@@ -1155,13 +1220,13 @@ class Rating(Resource):
         rating_db['rating'] = request_body.get(
             'rating', rating_db['rating'])
 
-        if not g.con.modify_rating(rating_id, rating_db):
+        if not g.con.modify_rating(ratingId, rating_db):
             return create_error_response(500, "The system has failed. Please, contact the administrator.")
 
         return Response(status=204,
-                        headers={"Location": api.url_for(Rating, rating_id=rating_id)})
+                        headers={"Location": api.url_for(Rating, rating_id=ratingId)})
 
-    def delete(self, ratingId):
+    def delete(self, ratingId, nickname):
         '''
         Deletes the specified rating.
 
@@ -1220,6 +1285,8 @@ api.add_resource(Rating, "/critique/api/users/<nickname>/ratings/<ratingId>/",
                  endpoint="rating")
 api.add_resource(Posts, "/critique/api/posts/",
                  endpoint="posts")
+api.add_resource(Post, "/critique/api/posts/<postId>/",
+                endpoint="post")
 
 # Redirect profile
 

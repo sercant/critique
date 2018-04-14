@@ -37,7 +37,7 @@ resources.app.config.update({"Engine": ENGINE})
 # Other database parameters.
 initial_users = 5
 scott_ratings_count = 4
-scott_posts_count = 4
+scott_posts_count = 2
 scott_inbox_count = 1
 
 class ResourcesAPITestCase(unittest.TestCase): # Borrowed from lab exercises [1]
@@ -588,15 +588,6 @@ class UserRatingsTestCase(ResourcesAPITestCase):
 
 class UserRiverTestCase(ResourcesAPITestCase):
 
-    post_mod_req_1 = {
-        "anonymous": False,
-        "sender": "Scott",
-        "receiver": "Kim",
-        "reply_to": "Stephen",
-        "post_text": "You are such a cool actor. Can we get a photo",
-        "ratingValue": 5,
-        "public":1
-    }
 
     CREATE_POSTS_SCHEMA = json.load(open('app/schema/create_posts.json'))
 
@@ -784,7 +775,7 @@ class UserInboxTestCase(ResourcesAPITestCase):
         for item in items:
             self.assertIn("postId", item)
             self.assertIn("ratingValue", item)
-            self.assertIn("reply_to", item)
+            self.assertIn("replyTo", item)
             self.assertIn("receiver", item)
             self.assertIn("post_Text", item)
             self.assertIn("anonymous", item)
@@ -823,10 +814,192 @@ class UserInboxTestCase(ResourcesAPITestCase):
                          "{};{}".format(MASON_JSON, CRITIQUE_POST_PROFILE))
 
 
-# class UserRatingTestCase(ResourcesAPITestCase):
+class UserRatingTestCase(ResourcesAPITestCase):
 
 
-# class UserPostTestCase(ResourcesAPITestCase):
+    rating_mod_req_1 = {
+        "sender": "Scott",
+        "receiver": "Kim",
+        "rating": 2
+    }
+
+    CREATE_RATING_SCHEMA = json.load(open('app/schema/create_rating.json'))
+
+    def setUp(self):
+        super(UserRatingTestCase, self).setUp()
+        self.url = resources.api.url_for(resources.Rating,
+                                         nickname="Scott",
+                                         ratingId="rtg-1",
+                                         _external=False)
+        self.url_wrong = resources.api.url_for(resources.Rating,
+                                               nickname="Kim",
+                                               ratingId="rtg-5",
+                                               _external=False)
+
+    def test_url(self):
+        """
+        Checks that the URL points to the right resource
+        """
+        _url = "/critique/api/users/Scott/ratings/rtg-01/"
+        print("("+self.test_url.__name__+")", self.test_url.__doc__, end=' ')
+        with resources.app.test_request_context(_url):
+            rule = flask.request.url_rule
+            view_point = resources.app.view_functions[rule.endpoint].view_class
+            self.assertEqual(view_point, resources.Rating)
+
+    def test_wrong_url(self):
+        """
+        Checks that GET user Rating return correct status code if given a
+        wrong ratingId
+        """
+        resp = self.client.get(self.url_wrong)
+        self.assertEqual(resp.status_code, 404)
+
+    def test_modify_rating(self):
+        """
+        Modify an existing Rating and check that the Rating has been modified correctly in the server
+        """
+        print("("+self.test_modify_rating.__name__+")",
+              self.test_modify_rating.__doc__)
+        resp = self.client.put(self.url,
+                               data=json.dumps(self.rating_mod_req_1),
+                               headers={"Content-Type": JSON})
+        self.assertEqual(resp.status_code, 204)
+
+        # Check that the Rating has been modified
+        resp2 = self.client.get(self.url)
+        self.assertEqual(resp2.status_code, 200)
+        data = json.loads(resp2.data.decode("utf-8"))
+
+        # Check that the fields returned correctly
+        for key in self.rating_mod_req_1.keys():
+            self.assertEqual(data[key], self.rating_mod_req_1[key])
+
+    def test_modify_nonexisting_rating(self):
+        """
+        Try to modify a Rating that does not exist
+        """
+        print("("+self.test_modify_nonexisting_rating.__name__+")",
+              self.test_modify_nonexisting_rating.__doc__)
+        resp = self.client.put(self.url_wrong,
+                               data=json.dumps(self.rating_mod_req_1),
+                               headers={"Content-Type": JSON})
+        self.assertEqual(resp.status_code, 404)
+
+    def test_delete_rating(self):
+        """
+        Checks that Delete Rating return correct status code if corrected delete
+        """
+        print("("+self.test_delete_rating.__name__+")",
+              self.test_delete_rating.__doc__)
+        resp = self.client.delete(self.url)
+        self.assertEqual(resp.status_code, 204)
+        resp2 = self.client.get(self.url)
+        self.assertEqual(resp2.status_code, 404)
+
+    def test_delete_nonexisting_rating(self):
+        """
+        Checks that Delete rating return correct status code if given a wrong address
+        """
+        print("("+self.test_delete_nonexisting_rating.__name__+")",
+              self.test_delete_nonexisting_rating.__doc__)
+        resp = self.client.delete(self.url_wrong)
+        self.assertEqual(resp.status_code, 404)
+
+
+class UserPostTestCase(ResourcesAPITestCase):
+
+    post_mod_req_1 = {
+        "anonymous": 0,
+        "sender": "Scott",
+        "receiver": "Kim",
+        "reply_to": "Stephen",
+        "post_text": "You are the worst actor ever",
+        "ratingValue": 2,
+        "public": 0
+    }
+
+    CREATE_POSTS_SCHEMA = json.load(open('app/schema/create_posts.json'))
+
+    def setUp(self):
+        super(UserPostTestCase, self).setUp()
+        self.url = resources.api.url_for(resources.Post,
+                                         postId="p-1",
+                                         _external=False)
+        self.url_wrong = resources.api.url_for(resources.Post,
+                                               postId="p-2",
+                                               _external=False)
+
+    def test_url(self):
+        """
+        Checks that the URL points to the right resource
+        """
+        _url = "/critique/api/posts/"
+        print("("+self.test_url.__name__+")", self.test_url.__doc__, end=' ')
+        with resources.app.test_request_context(_url):
+            rule = flask.request.url_rule
+            view_point = resources.app.view_functions[rule.endpoint].view_class
+            self.assertEqual(view_point, resources.Posts)
+
+    def test_wrong_url(self):
+        """
+        Checks that GET user post return correct status code if given a
+        wrong post id
+        """
+        resp = self.client.get(self.url_wrong)
+        self.assertEqual(resp.status_code, 404)
+
+    def test_modify_post(self):
+        """
+        Modify an existing post and check that the post has been modified correctly in the server
+        """
+        print("("+self.test_modify_post.__name__+")",
+              self.test_modify_post.__doc__)
+        resp = self.client.put(self.url,
+                               data=json.dumps(self.post_mod_req_1),
+                               headers={"Content-Type": JSON})
+        self.assertEqual(resp.status_code, 204)
+
+        # Check that the post has been modified
+        resp2 = self.client.get(self.url)
+        self.assertEqual(resp2.status_code, 200)
+        data = json.loads(resp2.data.decode("utf-8"))
+
+        # Check that the fields returned correctly
+        for key in self.post_mod_req_1.keys():
+            self.assertEqual(data[key], self.post_mod_req_1[key])
+
+    def test_modify_nonexisting_post(self):
+        """
+        Try to modify a post that does not exist
+        """
+        print("("+self.test_modify_nonexisting_post.__name__+")",
+              self.test_modify_nonexisting_post.__doc__)
+        resp = self.client.put(self.url_wrong,
+                               data=json.dumps(self.post_mod_req_1),
+                               headers={"Content-Type": JSON})
+        self.assertEqual(resp.status_code, 404)
+
+    # def test_delete_post(self):
+    #     """
+    #     Checks that Delete post return correct status code if corrected delete
+    #     """
+    #     print("("+self.test_delete_post.__name__+")",
+    #           self.test_delete_post.__doc__)
+    #     resp = self.client.delete(self.url)
+    #     self.assertEqual(resp.status_code, 204)
+    #     resp2 = self.client.get(self.url)
+    #     self.assertEqual(resp2.status_code, 404)
+
+    # def test_delete_nonexisting_post(self):
+    #     """
+    #     Checks that Delete post return correct status code if given a wrong address
+    #     """
+    #     print("("+self.test_delete_nonexisting_post.__name__+")",
+    #           self.test_delete_nonexisting_post.__doc__)
+    #     resp = self.client.delete(self.url_wrong)
+    #     self.assertEqual(resp.status_code, 404)
+
 
 
 if __name__ == "__main__": # Borrowed from lab exercises [1]

@@ -768,6 +768,8 @@ class Connection(object):
         '''
         if rating_id is None:
             raise ValueError("No rating ID inserted to delete.")
+        m=re.search('\d+')
+        rating_id = m.group(1)
         queryParameter = (rating_id, )
 
         # Create the SQL Statement
@@ -1329,6 +1331,7 @@ class Connection(object):
         post = {
             'post_id': str(row['post_id']),
             'receiver': row['receiver'],
+            'sender': row['sender'],
             'timestamp': row['timestamp'],
             'reply_to': str(row['reply_to']),
             'post_text': row['post_text'],
@@ -1338,7 +1341,7 @@ class Connection(object):
         }
         return post
 
-    def get_posts_by_user(self, nickname=None):
+    def get_posts_by_user(self, nickname=None, is_sender=True):
         '''
         Used to retrieve some posts posted by a user.
 
@@ -1364,7 +1367,10 @@ class Connection(object):
 
         # create the SQL query
         # TODO : this might need to change format
-        query = 'SELECT posts.*, sender.nickname sender, receiver.nickname receiver FROM posts INNER JOIN users sender ON sender.user_id = posts.sender_id INNER JOIN users receiver ON receiver.user_id = posts.receiver_id WHERE sender = ? ORDER BY timestamp DESC'
+        field = 'sender'
+        if not is_sender:
+            field = 'receiver'
+        query = 'SELECT posts.*, sender.nickname sender, receiver.nickname receiver FROM posts INNER JOIN users sender ON sender.user_id = posts.sender_id INNER JOIN users receiver ON receiver.user_id = posts.receiver_id WHERE ' + field + ' = ? ORDER BY timestamp DESC'
 
         # set foreign keys support
         self.set_foreign_keys_support()
