@@ -15,6 +15,36 @@
             "title": "Email",
             "description": "User email",
             "type": "string"
+        },
+        "bio": {
+            "title": "bio",
+            "description": "User bio",
+            "type": "string"
+        },
+        "avatar": {
+            "title": "avatar",
+            "description": "User avatar",
+            "type": "string"
+        },
+        "familyName": {
+            "title": "familyName",
+            "description": "User familyName",
+            "type": "string"
+        },
+        "birthDate": {
+            "title": "birthDate",
+            "description": "User birthDate",
+            "type": "string"
+        },
+        "telephone": {
+            "title": "telephone",
+            "description": "User telephone",
+            "type": "string"
+        },
+        "gender": {
+            "title": "gender",
+            "description": "User gender",
+            "type": "string"
         }
     },
     "required": [
