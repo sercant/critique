@@ -9,6 +9,26 @@ Critique is a simple API allowing interactions to the platfrom.
 
 This document uses IANA standard link relations (http://www.iana.org/assignments/link-relations/link-relations.xhtml). In addition the following link relations have been defined:
 
+## all-users [/critique/link-relations/all-users]
+
+Returns the list of users in the platform via `GET`.
+
+### GET
+
+Return the link relation description in HTML format.
+
++ Response 200 (text/html)
+
+## all-posts [/critique/link-relations/all-posts]
+
+Returns the list of posts in the platform via `GET`.
+
+### GET
+
+Return the link relation description in HTML format.
+
++ Response 200 (text/html)
+
 ## add-user [/critique/link-relations/add-user]
 
 Creates a new user via `POST`.
@@ -89,8 +109,25 @@ Return the link relation description in HTML format.
 
 + Response 200 (text/html)
 
+## sender [/critique/link-relations/sender]
 
+Returns the sender of the resource such as rating or post via `GET`.
 
+### GET
+
+Return the link relation description in HTML format.
+
++ Response 200 (text/html)
+
+## receiver [/critique/link-relations/receiver]
+
+Returns the receiver of the resource such as rating or post via `GET`.
+
+### GET
+
+Return the link relation description in HTML format.
+
++ Response 200 (text/html)
 
 # Group Profiles
 
@@ -339,10 +376,47 @@ Extracts all users summary in the database.
                                     "title": "Email",
                                     "description": "User email",
                                     "type": "string"
+                                },
+                                "bio": {
+                                    "title": "bio",
+                                    "description": "User bio",
+                                    "type": "string"
+                                },
+                                "avatar": {
+                                    "title": "avatar",
+                                    "description": "User avatar",
+                                    "type": "string"
+                                },
+                                "familyName": {
+                                    "title": "familyName",
+                                    "description": "User familyName",
+                                    "type": "string"
+                                },
+                                "birthDate": {
+                                    "title": "birthDate",
+                                    "description": "User birthDate",
+                                    "type": "string"
+                                },
+                                "telephone": {
+                                    "title": "telephone",
+                                    "description": "User telephone",
+                                    "type": "string"
+                                },
+                                "gender": {
+                                    "title": "gender",
+                                    "description": "User gender",
+                                    "type": "string"
                                 }
                             },
-                            "required": ["nickname", "givenName", "email"]
+                            "required": [
+                                "nickname",
+                                "givenName",
+                                "email"
+                            ]
                         }
+                    },
+                    "critique:all-posts": {
+                        "href": "/forum/api/posts/"
                     }
                 }
             }
@@ -699,119 +773,6 @@ Deletes the specified user.
                 "resource_url": "/critique/api/users/{nickname}/"
             }
 
-## User's ratings [/critique/api/users/{nickname}/ratings/]
-
-Contains the ratings list with ratings from all other users to this specific user. It should have a track of the ratings made by users to each other including the person who made the rating and that who received it. Also, it contains the rating id to keep track of the ratings.
-
-+ Parameters
-    + nickname: `Scott` (string) - The nickname of the user.
-
-
-### Receive users ratings [GET]
-
-Extracts the ratings given to the user.
-
-+ Relation: user-ratings
-
-+ Request
-
-    + Headers
-
-            Accept: application/vnd.mason+json
-
-+ Response 200 (application/vnd.mason+json)
-
-    + Body
-
-            {
-                "items": [
-                    {
-                        "ratingId": "rtg-015",
-                        "bestRating": 10,
-                        "ratingValue": 8,
-                        "sender": "Scott",
-                        "receiver": "Kim",
-                        "@controls": {
-                            "self": {
-                                "href": "/critique/api/ratings/rtg-015/"
-                            },
-                            "profile": {
-                                "href": "/critique/profiles/rating-profile/"
-                            }
-                        }
-                    },
-                    {
-                        "ratingId": "rtg-016",
-                        "bestRating": 10,
-                        "ratingValue": 4,
-                        "sender": "Kim",
-                        "receiver": "Scott",
-                        "@controls": {
-                            "self": {
-                                "href": "/critique/api/ratings/rtg-016/"
-                            },
-                            "profile": {
-                                "href": "/critique/profiles/rating-profile/"
-                            }
-                        }
-                    }
-                ],
-                "@namespaces": {
-                    "critique": {
-                        "name": "/critique/link-relations/"
-                    }
-                },
-                "@controls": {
-                    "self": {
-                        "href": "/forum/api/users/Kim/ratings/"
-                    },
-                    "critique:add-rating": {
-                        "href": "/forum/api/ratings/",
-                        "encoding": "json",
-                        "method": "POST",
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "ratingValue": {
-                                    "title": "Rating",
-                                    "description": "Rating for the user",
-                                    "type": "number"
-                                },
-                                "sender": {
-                                    "title": "Sender",
-                                    "description": "Nickname of sender of the rating",
-                                    "type": "string"
-                                },
-                                "receiver": {
-                                    "title": "Receiver",
-                                    "description": "Nickname of receiver of the rating",
-                                    "type": "string"
-                                }
-                            },
-                            "required": [
-                                "ratingValue",
-                                "sender",
-                                "receiver"
-                            ]
-                        }
-                    }
-                }
-            }
-
-
-+ Response 404 (application/vnd.mason+json)
-
-    User not found.
-
-    + Body
-
-            {
-                "@error": {
-                    "@message": "User not found."
-                },
-                "resource_url": "/critique/api/users/{nickname}/ratings/"
-            }
-
 ## User's river [/critique/api/users/{nickname}/river/]
 
 The river contains the posts sent to users, these posts should be the public ones, after the user has accepted the post sent to him/her. Posts have their ratings and fields indicating whether they were posted anonymously or not.
@@ -983,18 +944,8 @@ Posts sent to the user which are currently private.
                 "@error": {
                     "@message": "User not found."
                 },
-                "resource_url": "/critique/api/users/{nickname}/inbox/"
+                "resource_url": "/critique/api/users/Scott/inbox/"
             }
-
-# Group Posts
-
-All these resources use the [Post Profile](#profiles-post-profile).
-
-In addition all error messages follow the [Error Profile](#profiles-error-profile).
-
-## Posts List [/critique/api/posts/]
-
-Contains the list of posts for a specific user. Extracts all the posts’ summary from the database and creates a new post to the list of posts. It contains the posts sent to users whether public or private posts. Posts have their ratings.
 
 ### Create a new post [POST]
 
@@ -1012,11 +963,9 @@ Creates a new post to the list of posts. Returns the post URI.
 
             {
                 "sender": "Scott",
-                "receiver": "Kim",
                 "body": "She is great! (sometimes)",
                 "anonymous": false,
-                "ratingValue": 8,
-                "public": false
+                "ratingValue": 8
             }
 
 + Response 201
@@ -1038,7 +987,20 @@ Creates a new post to the list of posts. Returns the post URI.
                 "@error": {
                     "@message": "Post info is not well formed or entity body is missing."
                 },
-                "resource_url": "/critique/api/posts/"
+                "resource_url": "/critique/api/users/Scott/inbox"
+            }
+
++ Response 404 (application/vnd.mason+json)
+
+    User not found.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "User not found."
+                },
+                "resource_url": "/critique/api/users/{nickname}/posts/"
             }
 
 + Response 415 (application/vnd.mason+json)
@@ -1051,7 +1013,7 @@ Creates a new post to the list of posts. Returns the post URI.
                 "@error": {
                     "@message": "Format of the input is not json."
                 },
-                "resource_url": "/critique/api/posts/"
+                "resource_url": "/critique/api/users/Scott/inbox"
             }
 
 + Response 422 (application/vnd.mason+json)
@@ -1062,9 +1024,9 @@ Creates a new post to the list of posts. Returns the post URI.
 
             {
                 "@error": {
-                    "@message": "Sender or receiver not found."
+                    "@message": "Sender not found."
                 },
-                "resource_url": "/critique/api/posts/"
+                "resource_url": "/critique/api/users/Scott/inbox"
             }
 
 + Response 500 (application/vnd.mason+json)
@@ -1077,8 +1039,29 @@ Creates a new post to the list of posts. Returns the post URI.
                 "@error": {
                     "@message": "The system has failed. Please, contact the administrator."
                 },
-                "resource_url": "/critique/api/posts/"
+                "resource_url": "/critique/api/users/Scott/inbox"
             }
+
+# Group Posts
+
+All these resources use the [Post Profile](#profiles-post-profile).
+
+In addition all error messages follow the [Error Profile](#profiles-error-profile).
+
+## Posts List [/critique/api/posts/]
+
+Contains the list of posts for a specific user. Extracts all the posts’ summary from the database and creates a new post to the list of posts. It contains the posts sent to users whether public or private posts. Posts have their ratings.
+
+
+### Posts list [GET]
+
+NOT IMPLEMENTED
+
++ Response 200 (application/vnd.mason+json)
+
+    + Body
+
+            NOT IMPLEMENTED
 
 ## Post [/critique/api/posts/{postId}/]
 
@@ -1184,6 +1167,12 @@ Extracts a post and all it’s information.
                     "critique:delete": {
                         "href": "/critique/api/posts/p-1",
                         "method": "DELETE"
+                    },
+                    "critique:sender": {
+                        "href": "/critique/api/users/Scott"
+                    },
+                    "critique:receiver": {
+                        "href": "/critique/api/users/Kim"
                     }
                 }
             }
@@ -1429,19 +1418,23 @@ Posts a new post as a reply to a given post.
 
 # Group Ratings
 
-All these resources use the [Post Profile](#profiles-post-profile).
+All these resources use the [Rating Profile](#profiles-rating-profile).
 
 In addition all error messages follow the [Error Profile](#profiles-error-profile).
 
-## Ratings list [/critique/api/ratings/]
+## User's ratings [/critique/api/users/{nickname}/ratings/]
 
-A list that contains all ratings made. This resource is basically for adding new rating.
+Contains the ratings list with ratings from all other users to this specific user. It should have a track of the ratings made by users to each other including the person who made the rating and that who received it. Also, it contains the rating id to keep track of the ratings.
 
-### List ratings [GET]
++ Parameters
+    + nickname: `Scott` (string) - The nickname of the user.
 
-NOT IMPLEMENTED
 
-+ Relation: self
+### Receive users ratings [GET]
+
+Extracts the ratings given to the user.
+
++ Relation: user-ratings
 
 + Request
 
@@ -1451,56 +1444,88 @@ NOT IMPLEMENTED
 
 + Response 200 (application/vnd.mason+json)
 
-    + Headers
-
-            Location: URL of the newly created resource.
-
-    + Body
-
-            { NOT IMPLEMENTED }
-
-+ Response 400 (application/vnd.mason+json)
-
     + Body
 
             {
-                "@error": {
-                    "@message": "Rating info is not well formed or entity body is missing."
+                "items": [
+                    {
+                        "ratingId": "rtg-015",
+                        "bestRating": 10,
+                        "ratingValue": 8,
+                        "sender": "Scott",
+                        "receiver": "Kim",
+                        "@controls": {
+                            "self": {
+                                "href": "/critique/api/ratings/rtg-015/"
+                            },
+                            "profile": {
+                                "href": "/critique/profiles/rating-profile/"
+                            }
+                        }
+                    },
+                    {
+                        "ratingId": "rtg-016",
+                        "bestRating": 10,
+                        "ratingValue": 4,
+                        "sender": "Kim",
+                        "receiver": "Scott",
+                        "@controls": {
+                            "self": {
+                                "href": "/critique/api/ratings/rtg-016/"
+                            },
+                            "profile": {
+                                "href": "/critique/profiles/rating-profile/"
+                            }
+                        }
+                    }
+                ],
+                "@namespaces": {
+                    "critique": {
+                        "name": "/critique/link-relations/"
+                    }
                 },
-                "resource_url": "/critique/api/ratings/"
+                "@controls": {
+                    "self": {
+                        "href": "/critique/api/users/Kim/ratings/"
+                    },
+                    "critique:add-rating": {
+                        "href": "/critique/api/users/Kim/ratings/",
+                        "encoding": "json",
+                        "method": "POST",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "ratingValue": {
+                                    "title": "Rating",
+                                    "description": "Rating for the user",
+                                    "type": "number"
+                                },
+                                "sender": {
+                                    "title": "Sender",
+                                    "description": "Nickname of sender of the rating",
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "ratingValue",
+                                "sender"
+                            ]
+                        }
+                    }
+                }
             }
 
-+ Response 415 (application/vnd.mason+json)
++ Response 404 (application/vnd.mason+json)
+
+    User not found.
 
     + Body
 
             {
                 "@error": {
-                    "@message": "Format of the input is not json."
+                    "@message": "User not found."
                 },
-                "resource_url": "/critique/api/ratings/"
-            }
-
-+ Response 422 (application/vnd.mason+json)
-
-    + Body
-
-            {
-                "@error": {
-                    "@message": "Sender or receiver not found."
-                },
-                "resource_url": "/critique/api/ratings/"
-            }
-
-+ Response 500 (application/vnd.mason+json)
-
-    + Body
-
-            {
-                "@error": {
-                    "@message": "The system has failed. Please, contact the administrator."
-                },
-                "resource_url": "/critique/api/ratings/"
+                "resource_url": "/critique/api/users/{nickname}/ratings/"
             }
 
 ### Create a new rating [POST]
@@ -1519,8 +1544,7 @@ Appends a new rating to the list of ratings.
 
             {
                 "ratingValue": 8,
-                "sender": "Scott",
-                "receiver": "Kim"
+                "sender": "Scott"
             }
 
 
@@ -1543,7 +1567,20 @@ Appends a new rating to the list of ratings.
                 "@error": {
                     "@message": "Rating info is not well formed or entity body is missing."
                 },
-                "resource_url": "/critique/api/ratings/"
+                "resource_url": "/critique/api/users/Kim/ratings/"
+            }
+
++ Response 404 (application/vnd.mason+json)
+
+    User not found.
+
+    + Body
+
+            {
+                "@error": {
+                    "@message": "User not found."
+                },
+                "resource_url": "/critique/api/users/Kim/ratings/"
             }
 
 + Response 415 (application/vnd.mason+json)
@@ -1556,7 +1593,7 @@ Appends a new rating to the list of ratings.
                 "@error": {
                     "@message": "Format of the input is not json."
                 },
-                "resource_url": "/critique/api/ratings/"
+                "resource_url": "/critique/api/users/Kim/ratings/"
             }
 
 + Response 422 (application/vnd.mason+json)
@@ -1567,9 +1604,9 @@ Appends a new rating to the list of ratings.
 
             {
                 "@error": {
-                    "@message": "Sender or receiver not found."
+                    "@message": "Sender not found."
                 },
-                "resource_url": "/critique/api/ratings/"
+                "resource_url": "/critique/api/users/Kim/ratings/"
             }
 
 + Response 500 (application/vnd.mason+json)
@@ -1582,15 +1619,15 @@ Appends a new rating to the list of ratings.
                 "@error": {
                     "@message": "The system has failed. Please, contact the administrator."
                 },
-                "resource_url": "/critique/api/ratings/"
+                "resource_url": "/critique/api/users/Kim/ratings/"
             }
 
-## Rating [/critique/api/ratings/{ratingId}/]
+## Rating [/critique/api/users/{nickname}/ratings/{ratingId}/]
 
 Contains a specific rating to this specific user. It is in integer  indicating the number for rating to the user. Can be modified after stating it.
 
 + Parameters
-
+    + nickname: `Scott` (string) - The nickname of the user.
     + ratingId: `rtg-015` (string) - Rating id.
 
 ### Receive rating's information [GET]
@@ -1645,6 +1682,12 @@ Extracts a rating from the database.
                         "critique:delete": {
                             "href": "/critique/api/ratings/rtg-015",
                             "method": "DELETE"
+                        },
+                        "critique:sender": {
+                            "href": "/critique/api/users/Scott"
+                        },
+                        "critique:receiver": {
+                            "href": "/critique/api/users/Kim"
                         }
                     }
                 }
