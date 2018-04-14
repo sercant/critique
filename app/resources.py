@@ -402,7 +402,7 @@ class Users(Resource):
            database.
 
         NOTE:
-        The: py: method:`Connection.append_user()` receives as a parameter a
+        The: py: method:`Connection.create_user()` receives as a parameter a
         dictionary with the following format.
 
             {
@@ -892,8 +892,10 @@ class UserInbox(Resource):
         Creates a new post to the list of posts. Returns the post URI.
         
         INPUT PARAMETERS:
-        :param nickname: nickname of the user that we are sending to.
+        :param nickname: nickname of the user who is sending.
         :type nickname: string
+        :param receiver_nickname: nickname of the user that we are sending to.
+        :type receiver_nickname: string
 
         REQUEST ENTITY BODY:
         * Media type: application/vnd.mason+json
@@ -901,14 +903,28 @@ class UserInbox(Resource):
         * Profile: Inbox
                 /profiles/post_profile
 
-        Semantic descriptors used in template: messageBody(mandatory),
-        anonymous(optional)
+        Semantic descriptors used in template: post_text(mandatory),
+        anonymous(mandatory)
 
         RESPONSE STATUS CODE:
          * Returns 201 + the url of the new resource in the Location header
          * Return 400 Post info is not well formed or entity body is missing.
          * Return 415 if it receives a media type != application/json
          * Return 422 Conflict if the sender or receiver are not found
+
+        NOTE:
+        The: py: method:`Connection.create_post()` receives as a parameter
+        a dictionary with the following format:
+            {
+                'post_id': '',
+                'receiver': '',
+                'timestamp': '',
+                'reply_to': '',
+                'post_text': '',
+                'rating': '',
+                'anonymous': '',
+                'public': ''
+            }
          '''
         # CONTENT TYPE CHECK
         if JSON != request.headers.get("Content-Type", ""):
@@ -920,8 +936,38 @@ class UserInbox(Resource):
             return create_error_response(415,
                                         "Unsupported Media Type")
 
+        # CHECK IF USER EXISTS
+        userExist = g.con.contains_user(nickname)
+        if not userExist:
+            return create_error_response(404,"Sending user not found")
         
-        return Response('NOT IMPLEMENTED', 200)
+
+        # check mandatory fields
+        try:
+            post_text = request_body["post_text"]
+            receiver_nickname = request_body["receiver_nickname"]
+            anonymous = request_body["anonymous"]
+        except KeyError:
+            return create_error_response(400, "Wrong request format", "Post body missing")
+
+        userExist = g.con.contains_user(receiver_nickname)
+        if not userExist:
+            return create_error_response(404, "Receiving user not found")
+
+        new_post_id = g.con.create_post(nickname = nickname,
+                                        receiver_nickname = receiver_nickname,
+                                        reply_to = None, 
+                                        post_text = post_text,
+                                        anonymous = anonymous,
+                                        public = 0,
+                                        rating = None)
+        if not new_post_id:
+            return create_error_response(500, "Problem with database",
+                                            "can not access database.")
+        
+        url = api.url_for(UserInbox, nickname = nickname )
+
+        return Response(status = 201,  headers={"Location": url})
 
 
 class UserRiver(Resource):
