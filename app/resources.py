@@ -36,6 +36,8 @@ APIARY_RELATIONS_URL = APIARY_PROJECT+"/#reference/link-relations/"
 CREATE_USER_SCHEMA = json.load(open('app/schema/create_user.json'))
 CREATE_RATING_SCHEMA = json.load(open('app/schema/create_rating.json'))
 EDIT_USER_SCHEMA = json.load(open('app/schema/edit_user.json'))
+CREATE_POSTS_SCHEMA = json.load(open('app/schema/create_posts.json'))
+
 
 PRIVATE_PROFILE_SCHEMA_URL = "/critique/schema/private-profile/"
 LINK_RELATIONS_URL = "/critique/link-relations/"
@@ -155,16 +157,16 @@ class CritiqueObject(MasonObject):  # Borrowed from lab exercises [1]
             "href": api.url_for(UserRatings, nickname=nickname),
         }
 
-    def add_control_reply_to(self, post_id):
+    def add_control_reply_to(self, receiver):
         '''
         This adds the reply to a post control to an object. Intended for the
         document object.
 
-        : param str post_id: The id of the post
+        : param str receiver: The receiver of the reply
         '''
 
         self["@controls"]["critique:add-reply"] = {
-            "href": api.url_for(Post, post_id=post_id),
+            "href": api.url_for(Posts, receiver=receiver),
         }
 
     def add_control_delete_user(self, nickname):
@@ -832,10 +834,6 @@ class UserInbox(Resource):
         if not userExist:
             return create_error_response(404, "User not found.")
 
-        # PERFORM OPERATIONS
-        # create posts list
-        post_db = g.con.get_posts_by_user(nickname)
-
         # FILTER AND GENERATE THE RESPONSE
         # Create the envelope
         envelope = CritiqueObject()
@@ -853,18 +851,17 @@ class UserInbox(Resource):
             item = CritiqueObject(
                 postId=post["post_id"],
                 ratingValue=post['rating'],
-                sender=post['sender'],
                 receiver=post['receiver'],
                 replyTo=post['reply_to'],
                 post_Text=post['post_text'],
                 anonymous=post['anonymous'],
                 public=post['public']
             )
-            if (public == 0):
-                # check if the post is public and then append
+            if (post['public'] == 0):
+                # check if the post is not public and then append
                 items.append(item)
                 item.add_control("self",
-                                 href=api.url_for(UserInbox, postId=post["post_id"]))
+                                 href=api.url_for(UserInbox, nickname=post['receiver']))
                 item.add_control("profile", href=CRITIQUE_POST_PROFILE)
 
         envelope.add_namespace("critique", LINK_RELATIONS_URL)
@@ -872,13 +869,13 @@ class UserInbox(Resource):
         envelope.add_control_reply_to(nickname)
         envelope.add_control("profile", href=CRITIQUE_POST_PROFILE)
         envelope.add_control("self", href=api.url_for(
-            UserInbox, messageid=nickname))
+            UserInbox, nickname=nickname))
 
-        if parent:
-            envelope.add_control("atom-thread:in-reply-to",
-                                 href=api.url_for(UserInbox, messageid=parent))
-        else:
-            envelope.add_control("atom-thread:in-reply-to", href=None)
+        # if post['reply_to']:
+        #     envelope.add_control("atom-thread:in-reply-to",
+        #                          href=api.url_for(Post, postId=post['post_id']))
+        # else:
+        #     envelope.add_control("atom-thread:in-reply-to", href=None)
 
         #RENDER
         return Response(json.dumps(envelope), 200, mimetype=MASON+";" + CRITIQUE_POST_PROFILE)
@@ -980,7 +977,7 @@ class UserRiver(Resource):
             item = CritiqueObject(
                 postId=post["post_id"],
                 ratingValue=post['rating'],
-                sender=post['sender'],
+                # sender=post['sender'],
                 receiver=post['receiver'],
                 replyTo=post['reply_to'],
                 post_Text=post['post_text'],
@@ -988,11 +985,11 @@ class UserRiver(Resource):
                 public=post['public']
             )
 
-            if (public == 1):
+            if (post['public'] == 1):
                 # check if the post is public and then append
                 items.append(item)
                 item.add_control("self",
-                                 href=api.url_for(UserRiver, postId=post["post_id"]))
+                                 href=api.url_for(UserRiver, nickname=post['receiver']))
                 item.add_control("profile", href=CRITIQUE_POST_PROFILE)
 
         envelope.add_namespace("critique", LINK_RELATIONS_URL)
@@ -1001,13 +998,13 @@ class UserRiver(Resource):
         envelope.add_control_reply_to(nickname)
         envelope.add_control("profile", href=CRITIQUE_POST_PROFILE)
         envelope.add_control("self", href=api.url_for(
-            UserRiver, messageid=nickname))
+            UserRiver, nickname=nickname))
 
-        if parent:
-            envelope.add_control("atom-thread:in-reply-to",
-                                 href=api.url_for(UserRiver, messageid=parent))
-        else:
-            envelope.add_control("atom-thread:in-reply-to", href=None)
+        # if post['reply_to']:
+        #     envelope.add_control("atom-thread:in-reply-to",
+        #                          href=api.url_for(Post, postId=post['post_id']))
+        # else:
+        #     envelope.add_control("atom-thread:in-reply-to", href=None)
 
         #RENDER
         return Response(json.dumps(envelope), 200, mimetype=MASON+";" + CRITIQUE_POST_PROFILE)
