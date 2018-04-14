@@ -1225,7 +1225,7 @@ class Post(Resource):
            database.
         '''
 
-        post_db = g.con.get_user(postId)
+        post_db = g.con.get_post(postId)
         if not post_db:
             return create_error_response(404, "Post not found.")
 
@@ -1240,7 +1240,7 @@ class Post(Resource):
         post_db['public'] = request_body.get(
             'public', post_db['public'])
 
-        if not g.con.modify_post(postId, post_db):
+        if not g.con.modify_post(postId, post_db['post_text']):
             return create_error_response(500, "The system has failed. Please, contact the administrator.")
 
         return Response(status=204,
