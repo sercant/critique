@@ -893,8 +893,8 @@ class UserInbox(Resource):
         REQUEST ENTITY BODY:
         * Media type: application/vnd.mason+json
                 https://github.com/JornWildt/Mason
-        * Profile: Inbox
-                /profiles/post_profile
+        * Profile: Post Profile
+                /critique/profiles/post_profile
 
         Semantic descriptors used in template: post_text(mandatory),
         anonymous(mandatory)
@@ -929,7 +929,6 @@ class UserInbox(Resource):
             return create_error_response(415,
                                         "Unsupported Media Type")
 
-<<<<<<< HEAD
         # CHECK IF USER EXISTS
         userExist = g.con.contains_user(nickname)
         if not userExist:
@@ -962,10 +961,6 @@ class UserInbox(Resource):
         url = api.url_for(UserInbox, nickname = nickname )
 
         return Response(status = 201,  headers={"Location": url})
-=======
-
-        return Response('NOT IMPLEMENTED', 200)
->>>>>>> 73d93044280f872aec42f317d940ad5fce6b6b2a
 
 
 class UserRiver(Resource):
@@ -1165,9 +1160,58 @@ class Rating(Resource):
 
     def get(self, ratingId):
         '''
+        Extract a rating from the database.
+
+        Returns status code 404 if the ratingId does not exist in the database.
+
+        INPUT PARAMETER
+        :param str ratingId: ID of the rating to be retrieved from the system.
+
+        OUTPUT:
+         * Return 200 if the rating ID exists.
+         * Return 404 if the rating ID not found.
+         * Return 500 in case of system failure.
+
+        RESPONSE ENTITY BODY:
+
+        OUTPUT:
+            * Media type: application/vnd.mason+json
+                https://github.com/JornWildt/Mason
+            * Profile: Rating Profile
+                /critique/profiles/rating-profile
+
+        Link relations used: add-rating, edit, delete, self, profile, collection.
 
         '''
-        return Response('NOT IMPLEMENTED', 200)
+        
+        ratingExist = g.con.contains_rating(ratingId)
+        if not ratingExist:
+            return create_error_response(404, "Rating not found",
+                            "There is no rating with the given ID.")
+
+        # Filter and generate the response
+        # Create the envelope
+        # get the rating from DB
+        rating_db = g.con.get_rating(ratingId)
+        item = CritiqueObject(
+            ratingId = rating_db["rating_id"],
+            bestRating = 10,
+            ratingValue = rating_db["rating"],
+            sender = rating_db["sender"],
+            receiver = rating_db["receiver"]
+        )
+        item.add_namespace("critique", LINK_RELATIONS_URL)
+
+        item.add_control("self", href = api.url_for(
+            Rating, ratingId = user["rating_id"]))
+        item.add_control("profile", href = CRITIQUE_RATING_PROFILE)
+        item.add_control("collection", href = api.url_for(Ratings))
+        item.add_control_edit_rating(ratingId)
+        item.add_control_delete_rating(ratingId)
+        item.add_control_sender(nickname = rating_db["sender"])
+        item.add_control_receiver(nickname = rating_db["receiver"])
+
+        return Response(json.dumps(item), 200, mimetype=MASON+";" + CRITIQUE_RATING_PROFILE)
 
     def put(self, rating_id):
         '''
