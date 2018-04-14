@@ -603,7 +603,7 @@ class User(Resource):
            database.
 
         NOTE:
-        The: py: method:`Connection.edit_user()` receives as a parameter a
+        The: py: method:`Connection.modify_user()` receives as a parameter a
         dictionary with the following format.
 
             {
