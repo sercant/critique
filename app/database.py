@@ -5,6 +5,7 @@ Provides the database API to access the critique persistent data.
 
 @author: sercant
 @author: mina
+@author: moamen
 
     REFERENCEs:
     -   [1] Programmable Web Project, Exercise1, forum.database.py
@@ -1337,7 +1338,7 @@ class Connection(object):
         }
         return post
 
-    def get_posts_by_user(self, nickname=None, number_of_messages=None):
+    def get_posts_by_user(self, nickname=None):
         '''
         Used to retrieve some posts posted by a user.
 
@@ -1345,10 +1346,6 @@ class Connection(object):
             that you want the posts of. if the parameter is None, it
             will raise a ValueError exception.
         :type nickname: nickname of the user
-        :param number_of_messages: sets the number of maximum window of
-            messages returned. if None, it returns a list of all the
-            posts made by the requested user.
-        :type number_of_messages: integer
 
         :return: a list of posts made by the mentioned user. each
             message is a dictionary containing the keys mentioned in
@@ -1393,10 +1390,6 @@ class Connection(object):
         for row in rows:
             post = self._create_post_list_object(row)
             posts.append(post)
-            if number_of_messages is not None:
-                postsCounter += 1
-                if (postsCounter == number_of_messages):
-                    break
         return posts
 
     def delete_post(self, post_id=None):

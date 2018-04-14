@@ -1,0 +1,30 @@
+{
+    "type": "object",
+    "properties": {
+        "public": {
+            "title": "Nickname",
+            "description": "User nickname",
+            "type": "string"
+        },
+        "sender": {
+            "title": "Sender",
+            "description": "Sender nickname",
+            "type": "string"
+        },
+        "receiver": {
+            "title": "Receiver",
+            "description": "Receiver nickname",
+            "type": "string"
+        },
+        "post_text": {
+            "title": "Post text",
+            "description": "Text of the post",
+            "type": "string"
+        }
+    },
+    "required": [
+        "public",
+        "sender",
+        "post_text"
+    ]
+}
