@@ -37,7 +37,7 @@ CREATE_USER_SCHEMA = json.load(open('app/schema/create_user.json'))
 CREATE_RATING_SCHEMA = json.load(open('app/schema/create_rating.json'))
 EDIT_USER_SCHEMA = json.load(open('app/schema/edit_user.json'))
 CREATE_POSTS_SCHEMA = json.load(open('app/schema/create_posts.json'))
-
+EDIT_RATING_SCHEMA = json.load(open('app/schema/edit_rating.json'))
 
 PRIVATE_PROFILE_SCHEMA_URL = "/critique/schema/private-profile/"
 LINK_RELATIONS_URL = "/critique/link-relations/"
@@ -212,6 +212,36 @@ class CritiqueObject(MasonObject):  # Borrowed from lab exercises [1]
             "method": "PUT",
             "encoding": "json",
             "schema": EDIT_USER_SCHEMA
+        }
+
+    def add_control_edit_rating(self, ratingId , nickname):
+        '''
+        Adds the edit control to an object. This is intended for any
+        object that represents a user.
+
+        : param integer ratingId: The id of the rating to edit
+        '''
+
+        self["@controls"]["edit"] = {
+            "href": api.url_for(Rating, ratingId=ratingId , nickname=nickname),
+            "title": "Edit this rating",
+            "method": "PUT",
+            "encoding": "json",
+            "schema": EDIT_RATING_SCHEMA
+        }
+
+    def add_control_delete_rating(self, ratingId, nickname):
+        '''
+        Adds the edit control to an object. This is intended for any
+        object that represents a user.
+
+        : param str ratingId: The id of the rating to delete
+        '''
+
+        self["@controls"]["critique:delete"] = {
+            "href": api.url_for(Rating, ratingId=ratingId, nickname=nickname),
+            "title": "Delete a rating",
+            "method": "DELETE"
         }
 
     def add_control_add_rating(self, nickname):
@@ -1004,7 +1034,7 @@ class UserInbox(Resource):
         userExist = g.con.contains_user(nickname)
         if not userExist:
             return create_error_response(404,"Sending user not found")
-        
+
 
         # check mandatory fields
         try:
@@ -1020,7 +1050,7 @@ class UserInbox(Resource):
 
         new_post_id = g.con.create_post(nickname = nickname,
                                         receiver_nickname = receiver_nickname,
-                                        reply_to = None, 
+                                        reply_to = None,
                                         post_text = post_text,
                                         anonymous = anonymous,
                                         public = 0,
@@ -1028,7 +1058,7 @@ class UserInbox(Resource):
         if not new_post_id:
             return create_error_response(500, "Problem with database",
                                             "can not access database.")
-        
+
         url = api.url_for(UserInbox, nickname = nickname )
 
         return Response(status = 201,  headers={"Location": url})
@@ -1250,7 +1280,7 @@ class Rating(Resource):
         Link relations used: add-rating, edit, delete, self, profile, collection.
 
         '''
-        
+
         ratingExist = g.con.contains_rating(ratingId)
         if not ratingExist:
             return create_error_response(404, "Rating not found",
@@ -1270,11 +1300,11 @@ class Rating(Resource):
         item.add_namespace("critique", LINK_RELATIONS_URL)
 
         item.add_control("self", href = api.url_for(
-            Rating, ratingId = user["rating_id"]))
+            Rating, nickname=item["receiver"] , ratingId=item["ratingId"]))
         item.add_control("profile", href = CRITIQUE_RATING_PROFILE)
-        item.add_control("collection", href = api.url_for(Ratings))
-        item.add_control_edit_rating(ratingId)
-        item.add_control_delete_rating(ratingId)
+        item.add_control("collection", href = api.url_for(UserRatings, nickname=item["receiver"]))
+        item.add_control_edit_rating(ratingId, nickname=item["receiver"])
+        item.add_control_delete_rating(ratingId, nickname=item["receiver"])
         item.add_control_sender(nickname = rating_db["sender"])
         item.add_control_receiver(nickname = rating_db["receiver"])
 
