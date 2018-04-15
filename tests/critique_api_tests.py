@@ -973,6 +973,22 @@ class UserPostTestCase(ResourcesAPITestCase):
         "public": 1
     }
 
+    post_create_good = {
+        "anonymous": 1,
+        "sender": "Kim",
+        "receiver": "Stephen",
+        "post_text": "We went to the school together and you were the best",
+        "public": 1
+    }
+
+    post_create_bad = {
+        "anonymous": 0,
+        "sender": "Moamen",
+        "receiver": "Stephen",
+        "post_text": "You are the worst actor ever",
+        "public": 1
+    }
+
     CREATE_POSTS_SCHEMA = json.load(open('app/schema/create_posts.json'))
 
     def setUp(self):
@@ -1057,8 +1073,41 @@ class UserPostTestCase(ResourcesAPITestCase):
         resp = self.client.delete(self.url_wrong)
         self.assertEqual(resp.status_code, 404)
 
-    
+    def test_create_post(self):
+        """
+        Creates a new post and appends it to the database
+        """
+        print("("+self.test_create_post.__name__+")",
+              self.test_create_post.__doc__)
+
+        data=json.dumps(self.post_create_good)
+        resp = self.client.post(resources.api.url_for(resources.UserInbox,
+                                nickname = self.post_create_good['receiver']),
+                                headers={"Content-Type": JSON},
+                                data=json.dumps(self.post_create_good))
+        self.assertEqual(resp.status_code, 201)
         
+        self.assertIn("Location", resp.headers)
+        url = resp.headers["Location"]
+
+        resp2 = self.client.get(url)
+        self.assertEqual(resp2.status_code, 200)
+
+
+
+    def test_create_wrong_post(self):
+        """
+        Creates a faulty post
+        """
+        print("("+self.test_create_wrong_post.__name__+")",
+              self.test_create_wrong_post.__doc__)
+        data=json.dumps(self.post_create_bad)
+        resp = self.client.post(resources.api.url_for(resources.UserInbox,
+                                nickname = self.post_create_bad['receiver']),
+                                headers={"Content-Type": JSON},
+                                data=json.dumps(self.post_create_bad))
+        self.assertEqual(resp.status_code, 404)
+
 
 if __name__ == "__main__": # Borrowed from lab exercises [1]
     print("Start running tests")

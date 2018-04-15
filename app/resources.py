@@ -1046,11 +1046,15 @@ class UserInbox(Resource):
         if not userExist:
             return create_error_response(404,"Sending user not found")
 
+        # CHECK IF USER EXISTS
+        userExist = g.con.contains_user(request_body["sender"])
+        if not userExist:
+            return create_error_response(404,"Sending user not found")
 
         # check mandatory fields
         try:
             post_text = request_body["post_text"]
-            receiver_nickname = request_body["receiver_nickname"]
+            receiver_nickname = request_body["receiver"]
             anonymous = request_body["anonymous"]
         except KeyError:
             return create_error_response(400, "Wrong request format", "Post body missing")
@@ -1059,8 +1063,8 @@ class UserInbox(Resource):
         if not userExist:
             return create_error_response(404, "Receiving user not found")
 
-        new_post_id = g.con.create_post(sender_nickname = nickname,
-                                        receiver_nickname = receiver_nickname,
+        new_post_id = g.con.create_post(sender_nickname = receiver_nickname,
+                                        receiver_nickname = nickname,
                                         reply_to = None,
                                         post_text = post_text,
                                         anonymous = anonymous,
@@ -1070,7 +1074,7 @@ class UserInbox(Resource):
             return create_error_response(500, "Problem with database",
                                             "can not access database.")
 
-        url = api.url_for(UserInbox, postId = new_post_id )
+        url = api.url_for(UserInbox,nickname = nickname , postId = new_post_id )
 
         return Response(status = 201,  headers={"Location": url})
 
