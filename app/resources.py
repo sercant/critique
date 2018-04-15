@@ -748,75 +748,75 @@ class UserRatings(Resource):
     track of the ratings.
     '''
 
-    # def post(self, nickname):
-    #    '''
-    #     Adds a new rating in the database.
+    def post(self, nickname):
+        '''
+        Adds a new rating in the database.
 
-    #     REQUEST ENTITY BODY:
-    #      * Media type: JSON
-    #      * Profile: rating-profile
+        REQUEST ENTITY BODY:
+         * Media type: JSON
+         * Profile: rating-profile
 
-    #     Semantic descriptors used in template: nickname (string), avatar (string), bio (string)
+        Semantic descriptors used in template: nickname (string), avatar (string), bio (string)
 
 
-    #     RESPONSE STATUS CODE:
-    #      * Returns 201 + the url of the new resource in the Location header
-    #      * Return 400 User info is not well formed or entity body is missing.
-    #      * Return 415 if it receives a media type != application/json
+        RESPONSE STATUS CODE:
+         * Returns 201 + the url of the new resource in the Location header
+         * Return 400 User info is not well formed or entity body is missing.
+         * Return 415 if it receives a media type != application/json
 
-    #     NOTE:
-    #      * The attribute givenName is obtained from the column users_profile.firstname
-    #      * The attribute familyName is obtained from the column users_profile.lastname
-    #      * The rest of attributes match one-to-one with column names in the
-    #        database.
+        NOTE:
+         * The attribute givenName is obtained from the column users_profile.firstname
+         * The attribute familyName is obtained from the column users_profile.lastname
+         * The rest of attributes match one-to-one with column names in the
+           database.
 
-    #     NOTE:
-    #     The: py: method:`Connection.append_rating()` receives as a parameter a
-    #     dictionary with the following format.
+        NOTE:
+        The: py: method:`Connection.create_rating()` receives as a parameter a
+        dictionary with the following format.
 
-    #         {
-    #             'rating_id': '',
-    #             'timestamp': '',
-    #             'sender': '',
-    #             'receiver': '',
-    #             'rating': ''
-    #         }
+            {
+                'rating_id': '',
+                'timestamp': '',
+                'sender': '',
+                'receiver': '',
+                'rating': ''
+            }
+        '''
 
-    #     '''
-    #     if JSON != request.headers.get("Content-Type", ""):
-    #         abort(415)
+        if JSON != request.headers.get("Content-Type", ""):
+            abort(415)
 
-    #     # PARSE THE REQUEST:
-    #     request_body = request.get_json(force=True)
-    #     if not request_body:
-    #         return create_error_response(415,
-    #                                      "Unsupported Media Type")
+        # PARSE THE REQUEST:
+        request_body = request.get_json(force=True)
+        if not request_body:
+            return create_error_response(415,
+                                         "Unsupported Media Type")
 
-    #     # pick up rating_id so we can check for conflicts
-    #     try:
-    #         sender = request_body["sender"]
-    #         receiver = request_body["receiver"]
-    #         rating = request_body["rating"]
+        # pick up rating_id so we can check for conflicts
+        try:
+            sender = request_body["sender"]
+            receiver = request_body["receiver"]
+            rating = request_body["rating"]
 
-    #     except KeyError:
-    #         return create_error_response(400,
-    #                                      "Wrong request format")
-    #     # optional fields
+        except KeyError:
+            return create_error_response(400,
+                                         "Wrong request format")
+        # optional fields
 
-    #     # Conflict if user already exist
-    #     if g.con.contains_rating(rating_id):
-    #         return create_error_response(422,
-    #                                      "Rating id already exist in the users list.")
+        # if g.con.contains_rating(rating_id):
+        #     return create_error_response(422,
+        #                                  "Rating id already exist in the users list.")
 
-    #     try:
-    #         rating_id = g.con.create_rating(nickname, sender, receiver, rating)
-    #     except ValueError:
-    #         return create_error_response(400,
-    #                                      "Wrong request format")
+        try:
+            rating_id = g.con.create_rating(sender, receiver, rating)
+        except ValueError:
+            return create_error_response(400,
+                                         "Wrong request format")
 
-    #     # CREATE RESPONSE AND RENDER
-    #     return Response(status=201,
-    #                     headers={"Location": api.url_for(User, nickname=nickname)})
+        # CREATE RESPONSE AND RENDER
+        return Response(status=201,
+                        headers={"Location": api.url_for(Rating,
+                         nickname = request_body["receiver"], ratingId = rating_id)})
 
 
     def get(self, nickname):

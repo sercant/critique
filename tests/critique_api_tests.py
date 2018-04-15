@@ -831,6 +831,18 @@ class UserRatingTestCase(ResourcesAPITestCase):
         "rating": 5
     }
 
+    rating_create_good = {
+        "sender": "Knives",
+        "receiver": "Kim",
+        "rating": 6
+    }
+    
+    rating_create_bad = {
+        "sender": "Knives",
+        "receiver": "lapland",
+        "rating": 6
+    }
+
     CREATE_RATING_SCHEMA = json.load(open('app/schema/create_rating.json'))
 
     def setUp(self):
@@ -914,6 +926,41 @@ class UserRatingTestCase(ResourcesAPITestCase):
         resp = self.client.delete(self.url_wrong)
         self.assertEqual(resp.status_code, 404)
 
+    def test_create_rating(self):
+        """
+        Creates a new rating and appends it to the database
+        """
+        print("("+self.test_create_rating.__name__+")",
+              self.test_create_rating.__doc__)
+
+        data=json.dumps(self.rating_create_good)
+        resp = self.client.post(resources.api.url_for(resources.UserRatings,
+                                nickname = self.rating_create_good['receiver']),
+                                headers={"Content-Type": JSON},
+                                data=json.dumps(self.rating_create_good))
+        self.assertEqual(resp.status_code, 201)
+        
+        self.assertIn("Location", resp.headers)
+        url = resp.headers["Location"]
+
+        resp2 = self.client.get(url)
+        self.assertEqual(resp2.status_code, 200)
+
+        data = json.loads(resp2.data.decode("utf-8"))
+        self.assertEqual(data['ratingValue'], self.rating_create_good['rating'])
+
+    def test_create_faulty_rating(self):
+        """
+        Creates a faulty rating
+        """
+        print("("+self.test_create_rating.__name__+")",
+              self.test_create_rating.__doc__)
+        data=json.dumps(self.rating_create_bad)
+        resp = self.client.post(resources.api.url_for(resources.UserRatings,
+                                nickname = self.rating_create_bad['receiver']),
+                                headers={"Content-Type": JSON},
+                                data=json.dumps(self.rating_create_bad))
+        self.assertEqual(resp.status_code, 400)
 
 class UserPostTestCase(ResourcesAPITestCase):
 
@@ -958,12 +1005,12 @@ class UserPostTestCase(ResourcesAPITestCase):
         self.assertEqual(resp.status_code, 404)
 
 
-    def test_modify_post_text(self):
+    def test_modify_post(self):
         """
         Modify an existing post and check that the post has been modified correctly in the server
         """
-        print("("+self.test_modify_post_text.__name__+")",
-              self.test_modify_post_text.__doc__)
+        print("("+self.test_modify_post.__name__+")",
+              self.test_modify_post.__doc__)
         resp = self.client.put(self.url,
                                data=json.dumps(self.post_mod_req_1),
                                headers={"Content-Type": JSON})
@@ -976,6 +1023,8 @@ class UserPostTestCase(ResourcesAPITestCase):
 
         # Check that the fields returned correctly
         self.assertEqual(data_modified['post_text'], self.post_mod_req_1['post_text'])
+        self.assertEqual(data_modified['public'], self.post_mod_req_1['public'])
+        self.assertEqual(data_modified['ratingValue'], self.post_mod_req_1['ratingValue'])
 
     def test_modify_nonexisting_post(self):
         """
@@ -1009,6 +1058,7 @@ class UserPostTestCase(ResourcesAPITestCase):
         self.assertEqual(resp.status_code, 404)
 
     
+        
 
 if __name__ == "__main__": # Borrowed from lab exercises [1]
     print("Start running tests")
