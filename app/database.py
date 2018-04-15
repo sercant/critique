@@ -1473,12 +1473,12 @@ class Connection(object):
         
         return self.get_post(post_id) is not None
 
-    def modify_post(self, post_id, body):
+    def modify_post(self, post_id, post_text):
         '''
         Modify the body text with the id ``post_id``
 
         :param int post_id: The id of the post to remove.
-        :param str body: the post's content
+        :param str post_text: the post's content
         :return: the id of the edited post or None if the post was
               not found.
         :raises ValueError: if the post id not input.
@@ -1496,7 +1496,7 @@ class Connection(object):
         try:
             cur = self.con.cursor()
             # Execute the statement to extract the id associated to a nickname
-            pvalue = (body, post_id)
+            pvalue = (post_text, post_id)
             cur.execute(query, pvalue)
             self.con.commit()
         except sqlite3.Error as excp:

@@ -903,6 +903,7 @@ class UserRatings(Resource):
 
 
 class UserInbox(Resource):
+    
     '''
     Contains private posts sent to the user, it should include text as the actual post,
     however, rating is optional in the message.
@@ -964,7 +965,7 @@ class UserInbox(Resource):
                 ratingValue=post['rating'],
                 receiver=post['receiver'],
                 replyTo=post['reply_to'],
-                post_Text=post['post_text'],
+                post_text=post['post_text'],
                 anonymous=post['anonymous'],
                 public=post['public']
             )
@@ -1132,14 +1133,19 @@ class UserRiver(Resource):
                                          "There is no a message with id %s" % nickname)
 
         for post in post_db:
+            if post["anonymous"]:
+                senderPerson = "Anonymous"
+            else:
+                senderPerson = post["sender"]
             item = CritiqueObject(
                 postId=post["post_id"],
                 ratingValue=post['rating'],
                 receiver=post['receiver'],
                 replyTo=post['reply_to'],
-                post_Text=post['post_text'],
+                post_text=post['post_text'],
                 anonymous=post['anonymous'],
-                public=post['public']
+                public=post['public'],
+                sender = senderPerson
             )
 
             if (post['public'] == 1):
@@ -1219,7 +1225,7 @@ class Post(Resource):
             receiver = post_db["receiver"],
             timestamp = post_db["timestamp"] ,
             postId = post_db["post_id"] ,
-            body = post_db["post_text"] ,
+            post_text = post_db["post_text"] ,
             anonymous = post_db["anonymous"] ,
             public = post_db["public"] ,
             bestRating = 10,
@@ -1359,17 +1365,23 @@ class Post(Resource):
         if not post_db:
             return create_error_response(404, "Post not found.")
 
-        request_body = request.get_json()
+        if JSON != request.headers.get("Content-Type",""):
+            return create_error_response(415, "UnsupportedMediaType",
+                                         "Use a JSON compatible format")
+
+        request_body = request.get_json(force = True)
         if not request_body:
             return create_error_response(415, "Format of the input is not json.")
-
-        post_db['post_text'] = request_body.get(
-            'post_text', post_db['post_text'])
-        post_db['rating'] = request_body.get(
-            'rating', post_db['rating'])
-        post_db['public'] = request_body.get(
-            'public', post_db['public'])
-
+        try:
+            post_db['post_text'] = request_body.get(
+                'post_text', post_db['post_text'])
+            post_db['rating'] = request_body.get(
+                'ratingValue', post_db['rating'])
+            post_db['public'] = request_body.get(
+                'public', post_db['public'])
+        except KeyError:
+            return create_error_response(400, "Wrong request format",
+             "Can't acquire, either post body, rating or public value")
         if not g.con.modify_post(postId, post_db['post_text']):
             return create_error_response(500, "The system has failed. Please, contact the administrator.")
 

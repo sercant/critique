@@ -658,7 +658,7 @@ class UserRiverTestCase(ResourcesAPITestCase):
             self.assertIn("ratingValue", item)
             self.assertIn("replyTo", item)
             self.assertIn("receiver", item)
-            self.assertIn("post_Text", item)
+            self.assertIn("post_text", item)
             self.assertIn("anonymous", item)
             self.assertIn("public", item)
 
@@ -738,6 +738,10 @@ class UserInboxTestCase(ResourcesAPITestCase):
         resp = self.client.get(self.url_wrong)
         self.assertEqual(resp.status_code, 404)
 
+    def test_posting_to_inbox(self):
+        pass 
+        
+    
     def test_get_posts_by_user(self):
         """
         Checks that GET get_posts_by_user return correct status code and data format
@@ -777,7 +781,7 @@ class UserInboxTestCase(ResourcesAPITestCase):
             self.assertIn("ratingValue", item)
             self.assertIn("replyTo", item)
             self.assertIn("receiver", item)
-            self.assertIn("post_Text", item)
+            self.assertIn("post_text", item)
             self.assertIn("anonymous", item)
             self.assertIn("public", item)
 
@@ -912,11 +916,10 @@ class UserPostTestCase(ResourcesAPITestCase):
     post_mod_req_1 = {
         "anonymous": 0,
         "sender": "Scott",
-        "receiver": "Kim",
-        "reply_to": "Stephen",
+        "receiver": "Stephen",
         "post_text": "You are the worst actor ever",
-        "ratingValue": 2,
-        "public": 0
+        "ratingValue": 5,
+        "public": 1
     }
 
     CREATE_POSTS_SCHEMA = json.load(open('app/schema/create_posts.json'))
@@ -950,12 +953,20 @@ class UserPostTestCase(ResourcesAPITestCase):
         resp = self.client.get(self.url_wrong)
         self.assertEqual(resp.status_code, 404)
 
-    def test_modify_post(self):
+    def test_posting_post(self):
+        pass 
+
+    def test_getting_post(self):
+        pass 
+
+    def test_
+
+    def test_modify_post_text(self):
         """
         Modify an existing post and check that the post has been modified correctly in the server
         """
-        print("("+self.test_modify_post.__name__+")",
-              self.test_modify_post.__doc__)
+        print("("+self.test_modify_post_text.__name__+")",
+              self.test_modify_post_text.__doc__)
         resp = self.client.put(self.url,
                                data=json.dumps(self.post_mod_req_1),
                                headers={"Content-Type": JSON})
@@ -964,11 +975,10 @@ class UserPostTestCase(ResourcesAPITestCase):
         # Check that the post has been modified
         resp2 = self.client.get(self.url)
         self.assertEqual(resp2.status_code, 200)
-        data = json.loads(resp2.data.decode("utf-8"))
+        data_modified = json.loads(resp2.data.decode("utf-8"))
 
         # Check that the fields returned correctly
-        for key in self.post_mod_req_1.keys():
-            self.assertEqual(data[key], self.post_mod_req_1[key])
+        self.assertEqual(data_modified['post_text'], self.post_mod_req_1['post_text'])
 
     def test_modify_nonexisting_post(self):
         """
@@ -1001,7 +1011,7 @@ class UserPostTestCase(ResourcesAPITestCase):
         resp = self.client.delete(self.url_wrong)
         self.assertEqual(resp.status_code, 404)
 
-
+    
 
 if __name__ == "__main__": # Borrowed from lab exercises [1]
     print("Start running tests")
