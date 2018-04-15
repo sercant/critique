@@ -975,6 +975,8 @@ class Connection(object):
         REFERENCEs:
         -   [1]
         '''
+
+        
         # first check if the input is valid
         if post_id is None:
             raise ValueError("No input post id")
