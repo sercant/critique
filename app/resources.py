@@ -251,8 +251,8 @@ class CritiqueObject(MasonObject):  # Borrowed from lab exercises [1]
             "href": api.url_for(User, nickname=nickname),
             "title": "Receiver of the resource",
         }
-    
-    def add_control_edit_rating(self, ratingId):
+
+    def add_control_edit_rating(self,nickname, ratingId):
         '''
         This adds the link to edit a given rating for the
         document object.
@@ -265,7 +265,7 @@ class CritiqueObject(MasonObject):  # Borrowed from lab exercises [1]
             "schema": EDIT_USER_SCHEMA
         }
 
-    def add_control_delete_rating(self, ratingId):
+    def add_control_delete_rating(self, nickname, ratingId):
         '''
         This adds the link to delete a given rating for the
         document object.
@@ -1231,7 +1231,7 @@ class Post(Resource):
         envelope.add_control("collection", href=api.url_for(Posts))
         envelope.add_control_edit_post(postId = postId)
         envelope.add_control_reply_to(receiver = post_db["receiver"])
-        envelope.add_control_delete_post(nickname = , post_id = postId)
+        envelope.add_control_delete_post(post_id = postId)
         envelope.add_control_sender(nickname = post_db["sender"])
         envelope.add_control_receiver(nickname = post_db["receiver"] )
 
@@ -1384,7 +1384,7 @@ class Rating(Resource):
     track of the ratings.
     '''
 
-    def get(self, ratingId):
+    def get(self,nickname, ratingId):
         '''
         Extract a rating from the database.
 
@@ -1432,8 +1432,10 @@ class Rating(Resource):
             Rating, nickname=item["receiver"] , ratingId=item["ratingId"]))
         item.add_control("profile", href = CRITIQUE_RATING_PROFILE)
         item.add_control("collection", href = api.url_for(UserRatings, nickname=item["receiver"]))
-        item.add_control_edit_rating(ratingId, nickname=item["receiver"])
-        item.add_control_delete_rating(ratingId, nickname=item["receiver"])
+        item.add_control_edit_rating(
+            ratingId=ratingId, nickname=item["receiver"])
+        item.add_control_delete_rating(
+            ratingId=ratingId, nickname=item["receiver"])
         item.add_control_sender(nickname = rating_db["sender"])
         item.add_control_receiver(nickname = rating_db["receiver"])
 
