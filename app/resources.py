@@ -195,7 +195,7 @@ class CritiqueObject(MasonObject):  # Borrowed from lab exercises [1]
         '''
 
         self["@controls"]["critique:delete"] = {
-            "href": api.url_for(UserRiver, nickname=nickname),
+            "href": api.url_for(UserRiver, nickname=nickname, postId = post_id),
             "title": "Delete a user's post",
             "method": "DELETE"
         }
@@ -1115,7 +1115,8 @@ class UserRiver(Resource):
 
         userExist = g.con.contains_user(nickname)
         if not userExist:
-            return create_error_response(404, "User not found.")
+            return create_error_response(404, "User not found.",
+                                        "can't find a user to retrieve their river")
 
         # FILTER AND GENERATE THE RESPONSE
         # Create the envelope
@@ -1231,7 +1232,7 @@ class Post(Resource):
         envelope.add_control("collection", href=api.url_for(Posts))
         envelope.add_control_edit_post(postId = postId)
         envelope.add_control_reply_to(receiver = post_db["receiver"])
-        envelope.add_control_delete_post(nickname = , post_id = postId)
+        envelope.add_control_delete_post(nickname = post_db["sender"] , post_id = postId)
         envelope.add_control_sender(nickname = post_db["sender"])
         envelope.add_control_receiver(nickname = post_db["receiver"] )
 
@@ -1384,7 +1385,7 @@ class Rating(Resource):
     track of the ratings.
     '''
 
-    def get(self, ratingId):
+    def get(self, nickname ,ratingId):
         '''
         Extract a rating from the database.
 
@@ -1415,6 +1416,10 @@ class Rating(Resource):
             return create_error_response(404, "Rating not found",
                             "There is no rating with the given ID.")
 
+        userExist = g.con.contains_user(nickname)
+        if not userExist:
+            return create_error_response(404, "Resquested user not found",
+                                    "There is no user with the given nickname")
         # Filter and generate the response
         # Create the envelope
         # get the rating from DB
@@ -1515,6 +1520,9 @@ class Rating(Resource):
 
 class Posts(Resource):
     def get(self):
+        '''
+        Gets a list of all posts
+        '''
         return Response('NOT IMPLEMENTED', 200)
 
 

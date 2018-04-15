@@ -2,7 +2,7 @@
 Created on 01.05.2018
 @author: sercant
          moamen
-
+         mina
     REFERENCEs:
     -   [1] Programmable Web Project, Exercise3, exercise3_api_tests.py
 """
@@ -833,7 +833,7 @@ class UserRatingTestCase(ResourcesAPITestCase):
                                          _external=False)
         self.url_wrong = resources.api.url_for(resources.Rating,
                                                nickname="Kim",
-                                               ratingId="rtg-5",
+                                               ratingId="rtg-44",
                                                _external=False)
 
     def test_url(self):
@@ -924,11 +924,12 @@ class UserPostTestCase(ResourcesAPITestCase):
     def setUp(self):
         super(UserPostTestCase, self).setUp()
         self.url = resources.api.url_for(resources.Post,
-                                         postId="p-1",
+                                         postId="1",
                                          _external=False)
         self.url_wrong = resources.api.url_for(resources.Post,
-                                               postId="p-2",
+                                               postId="807",
                                                _external=False)
+
 
     def test_url(self):
         """
@@ -980,25 +981,25 @@ class UserPostTestCase(ResourcesAPITestCase):
                                headers={"Content-Type": JSON})
         self.assertEqual(resp.status_code, 404)
 
-    # def test_delete_post(self):
-    #     """
-    #     Checks that Delete post return correct status code if corrected delete
-    #     """
-    #     print("("+self.test_delete_post.__name__+")",
-    #           self.test_delete_post.__doc__)
-    #     resp = self.client.delete(self.url)
-    #     self.assertEqual(resp.status_code, 204)
-    #     resp2 = self.client.get(self.url)
-    #     self.assertEqual(resp2.status_code, 404)
+    def test_delete_post(self):
+        """
+        Checks that Delete post return correct status code if corrected delete
+        """
+        print("("+self.test_delete_post.__name__+")",
+              self.test_delete_post.__doc__)
+        resp = self.client.delete(self.url)
+        self.assertEqual(resp.status_code, 204)
+        resp2 = self.client.get(self.url)
+        self.assertEqual(resp2.status_code, 404)
 
-    # def test_delete_nonexisting_post(self):
-    #     """
-    #     Checks that Delete post return correct status code if given a wrong address
-    #     """
-    #     print("("+self.test_delete_nonexisting_post.__name__+")",
-    #           self.test_delete_nonexisting_post.__doc__)
-    #     resp = self.client.delete(self.url_wrong)
-    #     self.assertEqual(resp.status_code, 404)
+    def test_delete_nonexisting_post(self):
+        """
+        Checks that Delete post return correct status code if given a wrong address
+        """
+        print("("+self.test_delete_nonexisting_post.__name__+")",
+              self.test_delete_nonexisting_post.__doc__)
+        resp = self.client.delete(self.url_wrong)
+        self.assertEqual(resp.status_code, 404)
 
 
 
