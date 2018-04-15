@@ -1232,11 +1232,7 @@ class Post(Resource):
         envelope.add_control("collection", href=api.url_for(Posts))
         envelope.add_control_edit_post(postId = postId)
         envelope.add_control_reply_to(receiver = post_db["receiver"])
-<<<<<<< HEAD
-        envelope.add_control_delete_post(post_id = postId)
-=======
         envelope.add_control_delete_post(nickname = post_db["sender"] , post_id = postId)
->>>>>>> refs/remotes/origin/master
         envelope.add_control_sender(nickname = post_db["sender"])
         envelope.add_control_receiver(nickname = post_db["receiver"] )
 
@@ -1389,11 +1385,7 @@ class Rating(Resource):
     track of the ratings.
     '''
 
-<<<<<<< HEAD
-    def get(self,nickname, ratingId):
-=======
     def get(self, nickname ,ratingId):
->>>>>>> refs/remotes/origin/master
         '''
         Extract a rating from the database.
 
