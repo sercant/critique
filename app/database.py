@@ -787,7 +787,7 @@ class Connection(object):
             # It allows to execute SQL code and traverse the result set
             cur = self.con.cursor()
             # execute the pragma command, OFF
-            cur.execute(query, queryParameter)
+            cur.execute(query, queryParameter, [last])
             if cur.rowcount < 1:
                 print("No ratings with rating_id = %s" % str(rating_id))
                 return False
@@ -976,7 +976,7 @@ class Connection(object):
         -   [1]
         '''
 
-        
+
         # first check if the input is valid
         if post_id is None:
             raise ValueError("No input post id")
@@ -1470,7 +1470,7 @@ class Connection(object):
         '''
         :returns: ``True`` if the post is in the database, else ``False``
         '''
-        
+
         return self.get_post(post_id) is not None
 
     def modify_post(self, post_id, post_text):

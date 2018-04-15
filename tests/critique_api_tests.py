@@ -822,9 +822,18 @@ class UserRatingTestCase(ResourcesAPITestCase):
 
 
     rating_mod_req_1 = {
+        "rating_id":"rtg-1",
         "sender": "Scott",
+        "nickname":"Scott",
         "receiver": "Kim",
         "rating": 2
+    }
+
+    rating_mod_req_2 = {
+        "rating_id": "rtg-44",
+        "sender": "Moamen",
+        "receiver": "Kim",
+        "rating": 5
     }
 
     CREATE_RATING_SCHEMA = json.load(open('app/schema/create_rating.json'))
@@ -886,7 +895,7 @@ class UserRatingTestCase(ResourcesAPITestCase):
         print("("+self.test_modify_nonexisting_rating.__name__+")",
               self.test_modify_nonexisting_rating.__doc__)
         resp = self.client.put(self.url_wrong,
-                               data=json.dumps(self.rating_mod_req_1),
+                               data=json.dumps(self.rating_mod_req_2),
                                headers={"Content-Type": JSON})
         self.assertEqual(resp.status_code, 404)
 

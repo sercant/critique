@@ -1437,7 +1437,6 @@ class Rating(Resource):
         # get the rating from DB
         rating_db = g.con.get_rating(ratingId)
         item = CritiqueObject(
-            ratingId = rating_db["rating_id"],
             bestRating = 10,
             ratingValue = rating_db["rating"],
             sender = rating_db["sender"],
@@ -1493,7 +1492,7 @@ class Rating(Resource):
         rating_db['rating'] = request_body.get(
             'rating', rating_db['rating'])
 
-        if not g.con.modify_rating(ratingId, rating_db):
+        if not g.con.modify_rating(ratingId, rating_db['rating']):
             return create_error_response(500, "The system has failed. Please, contact the administrator.")
 
         return Response(status=204,
