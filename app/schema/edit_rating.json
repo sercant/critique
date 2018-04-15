@@ -1,11 +1,14 @@
 {
     "type": "object",
     "properties": {
-        "ratingValue": {
-            "title": "Rating",
-            "description": "Given rating to the user",
-            "type": "number"
-        }
-    },
-    "required": []
+        "rating": {
+            "ratingValue": {
+                "title": "Rating",
+                "description": "Rating given",
+                "description": "Given rating to the user",
+                "type": "number"
+            }
+        },
+        "required": []
+    }
 }

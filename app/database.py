@@ -1464,6 +1464,13 @@ class Connection(object):
 
         return rating is not None
 
+    def contains_post(self, post_id):
+        '''
+        :returns: ``True`` if the post is in the database, else ``False``
+        '''
+        
+        return self.get_post(post_id) is not None
+
     def modify_post(self, post_id, body):
         '''
         Modify the body text with the id ``post_id``

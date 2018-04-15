@@ -38,11 +38,8 @@ CREATE_RATING_SCHEMA = json.load(open('app/schema/create_rating.json'))
 EDIT_USER_SCHEMA = json.load(open('app/schema/edit_user.json'))
 CREATE_POSTS_SCHEMA = json.load(open('app/schema/create_posts.json'))
 EDIT_RATING_SCHEMA = json.load(open('app/schema/edit_rating.json'))
-<<<<<<< HEAD
 EDIT_POST_SCHEMA = json.load(open('app/schema/edit_post.json'))
 
-=======
->>>>>>> a5e6568b288663011f66c4a869593b38da930f25
 
 PRIVATE_PROFILE_SCHEMA_URL = "/critique/schema/private-profile/"
 LINK_RELATIONS_URL = "/critique/link-relations/"
@@ -219,36 +216,6 @@ class CritiqueObject(MasonObject):  # Borrowed from lab exercises [1]
             "schema": EDIT_USER_SCHEMA
         }
 
-    def add_control_edit_rating(self, ratingId , nickname):
-        '''
-        Adds the edit control to an object. This is intended for any
-        object that represents a user.
-
-        : param integer ratingId: The id of the rating to edit
-        '''
-
-        self["@controls"]["edit"] = {
-            "href": api.url_for(Rating, ratingId=ratingId , nickname=nickname),
-            "title": "Edit this rating",
-            "method": "PUT",
-            "encoding": "json",
-            "schema": EDIT_RATING_SCHEMA
-        }
-
-    def add_control_delete_rating(self, ratingId, nickname):
-        '''
-        Adds the edit control to an object. This is intended for any
-        object that represents a user.
-
-        : param str ratingId: The id of the rating to delete
-        '''
-
-        self["@controls"]["critique:delete"] = {
-            "href": api.url_for(Rating, ratingId=ratingId, nickname=nickname),
-            "title": "Delete a rating",
-            "method": "DELETE"
-        }
-
     def add_control_add_rating(self, nickname):
         '''
         This adds the add-rating control to an object. Intended for the
@@ -284,6 +251,7 @@ class CritiqueObject(MasonObject):  # Borrowed from lab exercises [1]
             "href": api.url_for(User, nickname=nickname),
             "title": "Receiver of the resource",
         }
+    
     def add_control_edit_rating(self, ratingId):
         '''
         This adds the link to edit a given rating for the
@@ -1090,7 +1058,7 @@ class UserInbox(Resource):
         if not userExist:
             return create_error_response(404, "Receiving user not found")
 
-        new_post_id = g.con.create_post(nickname = nickname,
+        new_post_id = g.con.create_post(sender_nickname = nickname,
                                         receiver_nickname = receiver_nickname,
                                         reply_to = None,
                                         post_text = post_text,
@@ -1101,7 +1069,7 @@ class UserInbox(Resource):
             return create_error_response(500, "Problem with database",
                                             "can not access database.")
 
-        url = api.url_for(UserInbox, nickname = nickname )
+        url = api.url_for(UserInbox, postId = new_post_id )
 
         return Response(status = 201,  headers={"Location": url})
 
@@ -1271,12 +1239,80 @@ class Post(Resource):
 
     def post(self, postId):
         '''
-        Modifies the contents of a specified post.
+        posts a post as reply.
+
+        REQUEST ENTITY BODY:
+         * Media type: JSON
+         * Profile: Critique_Post
+
+        RESPONSE STATUS CODE:
+         * Returns 201 + the url of the new resource in the Location header
+         * Return 400 Post info is not well formed or entity body is missing.
+         * Return 404 Post not found.
+         * Return 415 if it receives a media type != application/json
+         * Return 422 Sender not found.
 
         Link relations used: self, profile, add-reply, delete, edit,
         collection, post-rating
+
+        NOTE:
+        The: py: method:`Connection.create_post()` receives as a parameter
+        a dictionary with the following format:
+            {
+                'post_id': '',
+                'sender': '',
+                'timestamp': '',
+                'reply_to': '',
+                'post_text': '',
+                'rating': '',
+                'anonymous': '',
+                'public': ''
+            }
         '''
-        return Response('NOT IMPLEMENTED', 200)
+        # check format
+        if JSON != request.headers.get("Content-Type", ""):
+            abort(415)
+
+        # check if postId is available
+        postExists = g.con.contains_post(post_id = postId)
+        if not postExists:
+            return create_error_response(404, "Post not found",
+                                    "There is no post with id %s" %postId)
+
+        # parse request
+        request_body = request.get_json(force = True)
+        if not request_body:
+            return create_error_response(415, "Unsupported Media Type")
+
+        try:
+            sender = request_body['sender']
+            post_text = request_body['post_text']
+        except KeyError:
+            return create_error_response(400, "Wrong request format",
+             "Post body missing or sender nickname invalid")
+
+        userExist = g.con.contains_user(sender)
+        if not userExist:
+            return create_error_response(404,"Sending user not found")
+
+        # getting the receiving user
+        parent_post_db = g.con.get_post(postId)
+        receiver = parent_post_db['sender']
+
+        new_post_id = g.con.create_post(sender_nickname = sender,
+                                        receiver_nickname = receiver,
+                                        reply_to = postId,
+                                        post_text = post_text,
+                                        anonymous = request_body.get('anonymous', True),
+                                        public = request_body.get('public', False),
+                                        rating = None)
+        if not new_post_id:
+            return create_error_response(500, "Problem with database",
+                                            "can not access database.")
+
+        url = api.url_for(Post, postId = new_post_id )
+
+        return Response(status = 201,  headers={"Location": url})
 
     def delete(self, postId):
         '''
