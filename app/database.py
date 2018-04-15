@@ -922,8 +922,8 @@ class Connection(object):
 
                 * ``post_id``: id of the post
                 * ``timestamp``: the time of creation (int)
-                * ``sender_id``: id of the sending user
-                * ``receiver_id``: id of the receiving user
+                * ``sender``: nickname of the sending user
+                * ``receiver``: nickname of the receiving user
                 * ``reply_to``: if of the parent post
                 * ``post_text``: post's text
                 * ``rating``: rating of the post given by users (int)

@@ -1,0 +1,21 @@
+{
+    "type": "object",
+    "properties": {
+        "ratingValue": {
+            "title": "Rating",
+            "description": "Rating given in the post",
+            "type": "number"
+        },
+        "body": {
+            "title": "Body",
+            "description": "Text of the post",
+            "type": "number"
+        },
+        "public": {
+            "title": "Public",
+            "description": "Publicity of the post",
+            "type": "boolean"
+        }
+    },
+    "required": []
+}

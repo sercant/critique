@@ -1,9 +1,9 @@
 {
     "type": "object",
     "properties": {
-        "rating": {
+        "ratingValue": {
             "title": "Rating",
-            "description": "Rating given",
+            "description": "Given rating to the user",
             "type": "number"
         }
     },

@@ -37,6 +37,8 @@ CREATE_USER_SCHEMA = json.load(open('app/schema/create_user.json'))
 CREATE_RATING_SCHEMA = json.load(open('app/schema/create_rating.json'))
 EDIT_USER_SCHEMA = json.load(open('app/schema/edit_user.json'))
 CREATE_POSTS_SCHEMA = json.load(open('app/schema/create_posts.json'))
+EDIT_RATING_SCHEMA = json.load(open('app/schema/edit_rating.json'))
+EDIT_POST_SCHEMA = json.load(open('app/schema/edit_post.json'))
 
 
 PRIVATE_PROFILE_SCHEMA_URL = "/critique/schema/private-profile/"
@@ -248,6 +250,43 @@ class CritiqueObject(MasonObject):  # Borrowed from lab exercises [1]
         self["@controls"]["critique:receiver"] = {
             "href": api.url_for(User, nickname=nickname),
             "title": "Receiver of the resource",
+        }
+    def add_control_edit_rating(self, ratingId):
+        '''
+        This adds the link to edit a given rating for the
+        document object.
+        '''
+        self["@controls"]["edit"] = {
+            "href": api.url_for(Rating, ratingId=ratingId),
+            "title": "Edit Rating",
+            "method": "PUT",
+            "encoding": "json",
+            "schema": EDIT_USER_SCHEMA
+        }
+
+    def add_control_delete_rating(self, ratingId):
+        '''
+        This adds the link to delete a given rating for the
+        document object.
+        '''
+        self["@controls"]["critique:delete"] = {
+            "href": api.url_for(Rating, ratingId=ratingId),
+            "method": "DELETE"
+        }
+
+    def add_control_edit_post(self, postId):
+        '''
+        Adds the edit control to an object. Intended for any object
+        that represents a post.
+
+        :param str postId: ID of a specific post.
+        '''
+        self["@controls"]["edit"] = {
+            "href": api.url_for(Post, postId=postId),
+            "title": "Edit a post",
+            "method": "PUT",
+            "encoding": "json",
+            "schema": EDIT_POST_SCHEMA
         }
 
 
@@ -505,7 +544,7 @@ class User(Resource):
             * Media type: application/vnd.mason+json
                 https://github.com/JornWildt/Mason
             * Profile: User
-                /profiles/user-profile
+                /critique/profiles/user-profile/
 
         Link relations used: self, collection, delete, user-inbox, edit,
         user-river, user-ratings, profile
@@ -1151,10 +1190,51 @@ class Post(Resource):
         '''
         Extracts a post and all it’s information.
 
+        :param str postId: ID of the requested post
+
+        OUTPUT:
+         * Return 200 if the post exists.
+         * Return 404 if the post is not found.
+         * Return 500 in case of system failure.
+
+        RESPONSE ENTITY BODY:
+
+        OUTPUT:
+         * Media type: application/vnd.mason+json
+                https://github.com/JornWildt/Mason
+         * Profile: Post
+                /critique/profiles/post-profile/
+
         Link relations used: self, profile, add-reply, delete, edit,
         collection, post-rating
         '''
-        return Response('NOT IMPLEMENTED', 200)
+        post_db = g.con.get_post(postId)
+        if not post_db:
+            return create_error_response(404, "Post not found.")
+
+        envelope = CritiqueObject(
+            sender = post_db["sender"],
+            receiver = post_db["receiver"],
+            timestamp = post_db["timestamp"] ,
+            postId = post_db["post_id"] ,
+            body = post_db["post_text"] ,
+            anonymous = post_db["anonymous"] ,
+            public = post_db["public"] ,
+            bestRating = 10,
+            ratingValue = post_db["rating"]
+        )
+        envelope.add_namespace("critique", LINK_RELATIONS_URL)
+
+        envelope.add_control("self", href=api.url_for(Post, postId = postId))
+        envelope.add_control("profile", href=CRITIQUE_POST_PROFILE)
+        envelope.add_control("collection", href=api.url_for(Posts))
+        envelope.add_control_edit_post(postId = postId)
+        envelope.add_control_reply_to(receiver = post_db["receiver"])
+        envelope.add_control_delete_post(nickname = , post_id = postId)
+        envelope.add_control_sender(nickname = post_db["sender"])
+        envelope.add_control_receiver(nickname = post_db["receiver"] )
+
+        return Response(json.dumps(envelope), 200, mimetype=MASON+";"+ CRITIQUE_POST_PROFILE)
 
     def post(self, postId):
         '''
@@ -1381,7 +1461,7 @@ api.add_resource(Rating, "/critique/api/users/<nickname>/ratings/<ratingId>/",
 api.add_resource(Posts, "/critique/api/posts/",
                  endpoint="posts")
 api.add_resource(Post, "/critique/api/posts/<postId>/",
-                endpoint="post")
+                 endpoint="post")
 
 # Redirect profile
 
