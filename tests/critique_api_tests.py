@@ -737,10 +737,6 @@ class UserInboxTestCase(ResourcesAPITestCase):
         """
         resp = self.client.get(self.url_wrong)
         self.assertEqual(resp.status_code, 404)
-
-    def test_posting_to_inbox(self):
-        pass 
-        
     
     def test_get_posts_by_user(self):
         """
@@ -824,7 +820,6 @@ class UserRatingTestCase(ResourcesAPITestCase):
     rating_mod_req_1 = {
         "rating_id":"rtg-1",
         "sender": "Scott",
-        "nickname":"Scott",
         "receiver": "Kim",
         "rating": 2
     }
@@ -841,7 +836,7 @@ class UserRatingTestCase(ResourcesAPITestCase):
     def setUp(self):
         super(UserRatingTestCase, self).setUp()
         self.url = resources.api.url_for(resources.Rating,
-                                         nickname="Scott",
+                                         nickname="Kim",
                                          ratingId="rtg-1",
                                          _external=False)
         self.url_wrong = resources.api.url_for(resources.Rating,
@@ -853,7 +848,7 @@ class UserRatingTestCase(ResourcesAPITestCase):
         """
         Checks that the URL points to the right resource
         """
-        _url = "/critique/api/users/Scott/ratings/rtg-01/"
+        _url = "/critique/api/users/Scott/ratings/rtg-1/"
         print("("+self.test_url.__name__+")", self.test_url.__doc__, end=' ')
         with resources.app.test_request_context(_url):
             rule = flask.request.url_rule
@@ -885,8 +880,8 @@ class UserRatingTestCase(ResourcesAPITestCase):
         data = json.loads(resp2.data.decode("utf-8"))
 
         # Check that the fields returned correctly
-        for key in self.rating_mod_req_1.keys():
-            self.assertEqual(data[key], self.rating_mod_req_1[key])
+
+        self.assertEqual(data['ratingValue'], self.rating_mod_req_1['rating'])
 
     def test_modify_nonexisting_rating(self):
         """
@@ -962,13 +957,6 @@ class UserPostTestCase(ResourcesAPITestCase):
         resp = self.client.get(self.url_wrong)
         self.assertEqual(resp.status_code, 404)
 
-    def test_posting_post(self):
-        pass 
-
-    def test_getting_post(self):
-        pass 
-
-    def test_
 
     def test_modify_post_text(self):
         """

@@ -258,11 +258,11 @@ class CritiqueObject(MasonObject):  # Borrowed from lab exercises [1]
         document object.
         '''
         self["@controls"]["edit"] = {
-            "href": api.url_for(Rating, ratingId=ratingId),
+            "href": api.url_for(Rating, nickname = nickname, ratingId=ratingId),
             "title": "Edit Rating",
             "method": "PUT",
             "encoding": "json",
-            "schema": EDIT_USER_SCHEMA
+            "schema": EDIT_RATING_SCHEMA
         }
 
     def add_control_delete_rating(self, nickname, ratingId):
@@ -271,7 +271,7 @@ class CritiqueObject(MasonObject):  # Borrowed from lab exercises [1]
         document object.
         '''
         self["@controls"]["critique:delete"] = {
-            "href": api.url_for(Rating, ratingId=ratingId),
+            "href": api.url_for(Rating, nickname = nickname, ratingId=ratingId),
             "method": "DELETE"
         }
 
@@ -1385,6 +1385,12 @@ class Post(Resource):
         if not g.con.modify_post(postId, post_db['post_text']):
             return create_error_response(500, "The system has failed. Please, contact the administrator.")
 
+        if not g.con.modify_post_rating(postId, post_db['rating']):
+            return create_error_response(500, "The system has failed. Please, contact the administrator.")
+
+        if not g.con.modify_post_publicity(postId, post_db['public']):
+            return create_error_response(500, "The system has failed. Please, contact the administrator.")
+
         return Response(status=204,
                         headers={"Location": api.url_for(Post, postId=postId)})
 
@@ -1445,19 +1451,19 @@ class Rating(Resource):
         item.add_namespace("critique", LINK_RELATIONS_URL)
 
         item.add_control("self", href = api.url_for(
-            Rating, nickname=item["receiver"] , ratingId=item["ratingId"]))
+            Rating, nickname = rating_db["receiver"] , ratingId = rating_db["rating_id"]))
         item.add_control("profile", href = CRITIQUE_RATING_PROFILE)
-        item.add_control("collection", href = api.url_for(UserRatings, nickname=item["receiver"]))
+        item.add_control("collection", href = api.url_for(UserRatings, nickname=rating_db["receiver"]))
         item.add_control_edit_rating(
-            ratingId=ratingId, nickname=item["receiver"])
+            ratingId=rating_db["rating_id"], nickname=rating_db["receiver"])
         item.add_control_delete_rating(
-            ratingId=ratingId, nickname=item["receiver"])
+            ratingId=rating_db["rating_id"], nickname=rating_db["receiver"])
         item.add_control_sender(nickname = rating_db["sender"])
         item.add_control_receiver(nickname = rating_db["receiver"])
 
         return Response(json.dumps(item), 200, mimetype=MASON+";" + CRITIQUE_RATING_PROFILE)
 
-    def put(self, ratingId, nickname):
+    def put(self, nickname, ratingId):
         '''
         Modifies a rating.
 
@@ -1485,20 +1491,23 @@ class Rating(Resource):
         if not rating_db:
             return create_error_response(404, "User not found.")
 
-        request_body = request.get_json()
+        request_body = request.get_json(force = True)
         if not request_body:
             return create_error_response(415, "Format of the input is not json.")
-
-        rating_db['rating'] = request_body.get(
-            'rating', rating_db['rating'])
+        try:
+            rating_db['rating'] = request_body.get(
+                'rating', rating_db['rating'])
+        except KeyError:
+            return create_error_response(400, "Wrong request format",
+             "rating missing")
 
         if not g.con.modify_rating(ratingId, rating_db['rating']):
             return create_error_response(500, "The system has failed. Please, contact the administrator.")
 
         return Response(status=204,
-                        headers={"Location": api.url_for(Rating, rating_id=ratingId)})
+                        headers={"Location": api.url_for(Rating, nickname = nickname,ratingId=ratingId)})
 
-    def delete(self, ratingId, nickname):
+    def delete(self, nickname, ratingId):
         '''
         Deletes the specified rating.
 
@@ -1520,16 +1529,11 @@ class Rating(Resource):
         # returns None.
 
         try:
-            if g.con.delete_rating(ratingId):
-                # RENDER RESPONSE
-                return Response('', 204)
-            else:
-                # GENERATE ERROR RESPONSE
-                return create_error_response(404, "Rating not found.")
+            g.con.delete_rating(ratingId)
         except:
             return create_error_response(500,
                                          "The system has failed. Please, contact the administrator.")
-
+        return Response('', 204)
 
 class Posts(Resource):
     def get(self):

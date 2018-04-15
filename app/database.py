@@ -756,7 +756,7 @@ class Connection(object):
             return None
         return 'rtg-' + str(rating_id)
 
-    def delete_rating(self, rating_id=None):
+    def delete_rating(self, rating_id):
         '''
         Delete the rating with id given as parameter.
 
@@ -768,9 +768,9 @@ class Connection(object):
         '''
         if rating_id is None:
             raise ValueError("No rating ID inserted to delete.")
-        m=re.search('\d+')
-        rating_id = m.group(1)
-        queryParameter = (rating_id, )
+        m=re.search('rtg-(\d+)',rating_id)
+        rating_id_db = m.group(1)
+        queryParameter = (rating_id_db, )
 
         # Create the SQL Statement
         query = 'DELETE FROM ratings WHERE rating_id = ?'
@@ -787,7 +787,7 @@ class Connection(object):
             # It allows to execute SQL code and traverse the result set
             cur = self.con.cursor()
             # execute the pragma command, OFF
-            cur.execute(query, queryParameter, [last])
+            cur.execute(query, queryParameter)
             if cur.rowcount < 1:
                 print("No ratings with rating_id = %s" % str(rating_id))
                 return False
@@ -1614,3 +1614,76 @@ class Connection(object):
 
         # Return the id in
         return lid if lid is not None else None
+
+    def modify_post_rating(self, post_id, rating):
+        '''
+        Modify the post rating with the post id ``post_id``
+
+        :param int post_id: The id of the post to remove.
+        :param int rating: the post's rating
+        :return: the id of the edited post or None if the post was
+              not found.
+        :raises ValueError: if the post id not input.
+
+        '''
+        # SQL Statement to update the messages table
+        query = 'UPDATE posts SET rating = ? WHERE post_id = ?'
+
+        # Activate foreign key support
+        self.set_foreign_keys_support()
+
+        # Cursor and row initialization
+        self.con.row_factory = sqlite3.Row
+
+        try:
+            cur = self.con.cursor()
+            # Execute the statement to extract the id associated to a nickname
+            pvalue = (rating, post_id)
+            cur.execute(query, pvalue)
+            self.con.commit()
+        except sqlite3.Error as excp:
+            print("Error %s:" % excp.args[0])
+            return None
+
+        # Check that I have modified the user
+        if cur.rowcount < 1:
+            print("I am making NONE")
+            return None
+        return post_id
+
+
+    def modify_post_publicity(self, post_id, public):
+        '''
+        Modify the post publicity with the post id ``post_id``
+
+        :param int post_id: The id of the post to remove.
+        :param int public: the post's publicity
+        :return: the id of the edited post or None if the post was
+              not found.
+        :raises ValueError: if the post id not input.
+
+        '''
+        # SQL Statement to update the messages table
+        query = 'UPDATE posts SET public = ? WHERE post_id = ?'
+
+        # Activate foreign key support
+        self.set_foreign_keys_support()
+
+        # Cursor and row initialization
+        self.con.row_factory = sqlite3.Row
+
+        try:
+            cur = self.con.cursor()
+            # Execute the statement to extract the id associated to a nickname
+            pvalue = (public, post_id)
+            cur.execute(query, pvalue)
+            self.con.commit()
+        except sqlite3.Error as excp:
+            print("Error %s:" % excp.args[0])
+            return None
+
+        # Check that I have modified the user
+        if cur.rowcount < 1:
+            print("I am making NONE")
+            return None
+        return post_id
