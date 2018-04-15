@@ -1252,9 +1252,6 @@ class Post(Resource):
          * Return 415 if it receives a media type != application/json
          * Return 422 Sender not found.
 
-        Link relations used: self, profile, add-reply, delete, edit,
-        collection, post-rating
-
         NOTE:
         The: py: method:`Connection.create_post()` receives as a parameter
         a dictionary with the following format:
@@ -1318,10 +1315,23 @@ class Post(Resource):
         '''
         Deletes a specific post.
 
-        Link relations used: self, profile, add-reply, delete, edit,
-        collection, post-rating
+        :param str postId: ID of the post to delete.
+
+        RESPONSE STATUS CODE:
+         * Return 204 Post deleted successfully.
+         * Return 404 Post not found.
+         * Return 500 The system has failed. Please, contact the administrator.
         '''
-        return Response('NOT IMPLEMENTED', 200)
+        postExist = g.con.contains_post(postId)
+        if not postExist:
+            return create_error_response(404, "Post not found.")
+
+        try:
+            g.con.delete_post(postId)
+        except:
+            return create_error_response(500,
+                "The system has failed. Please, contact the administrator.")
+        return Response('', 204)
 
     def put(self, postId):
         '''
@@ -1374,7 +1384,7 @@ class Rating(Resource):
     track of the ratings.
     '''
 
-    def get(self, ratingId, nickname):
+    def get(self, ratingId):
         '''
         Extract a rating from the database.
 
