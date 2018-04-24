@@ -223,9 +223,9 @@ class PostDBAPITestCase(unittest.TestCase):
               self.test_get_post.__doc__)
 
         # Test with an existing message
-        post = self.connection.get_post(POST0_ID)
+        post = self.connection.get_post('p-'+str(POST0_ID))
         self.assertDictContainsSubset(post, POST0)
-        post = self.connection.get_post(POST1_ID)
+        post = self.connection.get_post('p-'+str(POST1_ID))
         self.assertDictContainsSubset(post, POST1)
 
     # TODO : make test for malformed post_id after implementing the format of the post (post-#######)
@@ -252,15 +252,15 @@ class PostDBAPITestCase(unittest.TestCase):
 
     def test_delete_post(self):
         '''
-        Test that post with post_id = 0, has been deleted
+        Test that post with post_id = 1, has been deleted
         '''
         print('('+self.test_delete_post.__name__+')', \
               self.test_delete_post.__doc__)
-        resp = self.connection.delete_post(POST0_ID)
+        resp = self.connection.delete_post('p-'+str(POST1_ID))
         self.assertTrue(resp)
 
         # Check that the messages has been really deleted throug a get
-        resp2 = self.connection.get_post(POST0_ID)
+        resp2 = self.connection.get_post('p-'+str(POST1_ID))
         self.assertIsNone(resp2)
 
     def test_modify_post(self):
@@ -269,11 +269,12 @@ class PostDBAPITestCase(unittest.TestCase):
         '''
         print('('+self.test_modify_post.__name__+')', \
               self.test_modify_post.__doc__)
-        resp = self.connection.modify_post(POST0_ID, 'new text')
+        resp = self.connection.modify_post(
+            'p-'+str(POST0_ID), 'new text', rating=3, publicity=1)
         self.assertEqual(resp, POST0_ID)
 
         # Check that the messages has been really modified through a get
-        resp2 = self.connection.get_post(POST0_ID)
+        resp2 = self.connection.get_post('p-'+str(POST0_ID))
         self.assertDictContainsSubset(resp2, POST0_MODIFIED)
 
     def test_create_post(self):
@@ -293,7 +294,7 @@ class PostDBAPITestCase(unittest.TestCase):
         new_post['post_text'] = "This is a newly-created post"
 
         # Check that the messages has been really modified through a get
-        resp2 = self.connection.get_post(post_id)
+        resp2 = self.connection.get_post('p-'+str(post_id))
         self.assertDictContainsSubset(new_post, resp2)
 
         # CHECK NOW NOT REGISTERED USER
