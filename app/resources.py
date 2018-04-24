@@ -960,10 +960,13 @@ class UserInbox(Resource):
         for post in post_db:
             item = CritiqueObject(
                 postId=post["post_id"],
+                sender=post['sender'],
+                timestamp=post['timestamp'],
+                bestRating=10,
                 ratingValue=post['rating'],
                 receiver=post['receiver'],
                 replyTo=post['reply_to'],
-                post_text=post['post_text'],
+                body=post['post_text'],
                 anonymous=post['anonymous'],
                 public=post['public']
             )
@@ -1051,7 +1054,7 @@ class UserInbox(Resource):
 
         # check mandatory fields
         try:
-            post_text = request_body["post_text"]
+            post_text = request_body["body"]
             receiver_nickname = request_body["receiver"]
             anonymous = request_body["anonymous"]
         except KeyError:
@@ -1144,7 +1147,9 @@ class UserRiver(Resource):
                 ratingValue=post['rating'],
                 receiver=post['receiver'],
                 replyTo=post['reply_to'],
-                post_text=post['post_text'],
+                body=post['post_text'],
+                timestamp=post['timestamp'],
+                bestRating=10,
                 anonymous=post['anonymous'],
                 public=post['public'],
                 sender = senderPerson
@@ -1225,11 +1230,12 @@ class Post(Resource):
         envelope = CritiqueObject(
             sender = post_db["sender"],
             receiver = post_db["receiver"],
-            timestamp = post_db["timestamp"] ,
-            postId = post_db["post_id"] ,
-            post_text = post_db["post_text"] ,
-            anonymous = post_db["anonymous"] ,
-            public = post_db["public"] ,
+            timestamp = post_db["timestamp"],
+            postId = post_db["post_id"],
+            body = post_db["post_text"],
+            replyTo = post_db["reply_to"],
+            anonymous = post_db["anonymous"],
+            public = post_db["public"],
             bestRating = 10,
             ratingValue = post_db["rating"]
         )
@@ -1240,7 +1246,7 @@ class Post(Resource):
         envelope.add_control("collection", href=api.url_for(Posts))
         envelope.add_control_edit_post(postId = postId)
         envelope.add_control_reply_to(receiver = post_db["receiver"])
-        envelope.add_control_delete_post(nickname = post_db["sender"] , post_id = postId)
+        envelope.add_control_delete_post(nickname = post_db["sender"], post_id = postId)
         envelope.add_control_sender(nickname = post_db["sender"])
         envelope.add_control_receiver(nickname = post_db["receiver"] )
 
@@ -1292,7 +1298,7 @@ class Post(Resource):
 
         try:
             sender = request_body['sender']
-            post_text = request_body['post_text']
+            post_text = request_body['body']
         except KeyError:
             return create_error_response(400, "Wrong request format",
              "Post body missing or sender nickname invalid")
@@ -1376,7 +1382,7 @@ class Post(Resource):
             return create_error_response(415, "Format of the input is not json.")
         try:
             post_db['post_text'] = request_body.get(
-                'post_text', post_db['post_text'])
+                'body', post_db['post_text'])
             post_db['rating'] = request_body.get(
                 'ratingValue', post_db['rating'])
             post_db['public'] = request_body.get(
@@ -1447,7 +1453,7 @@ class Rating(Resource):
         item.add_namespace("critique", LINK_RELATIONS_URL)
 
         item.add_control("self", href = api.url_for(
-            Rating, nickname = rating_db["receiver"] , ratingId = rating_db["rating_id"]))
+            Rating, nickname = rating_db["receiver"], ratingId = rating_db["rating_id"]))
         item.add_control("profile", href = CRITIQUE_RATING_PROFILE)
         item.add_control("collection", href = api.url_for(UserRatings, nickname=rating_db["receiver"]))
         item.add_control_edit_rating(

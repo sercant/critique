@@ -658,7 +658,9 @@ class UserRiverTestCase(ResourcesAPITestCase):
             self.assertIn("ratingValue", item)
             self.assertIn("replyTo", item)
             self.assertIn("receiver", item)
-            self.assertIn("post_text", item)
+            self.assertIn("body", item)
+            self.assertIn("timestamp", item)
+            self.assertIn("bestRating", item)
             self.assertIn("anonymous", item)
             self.assertIn("public", item)
 
@@ -703,7 +705,7 @@ class UserInboxTestCase(ResourcesAPITestCase):
         "sender": "Scott",
         "receiver": "Kim",
         "reply_to": "Stephen",
-        "post_text": "You are such a cool actor. Can we get a photo",
+        "body": "You are such a cool actor. Can we get a photo",
         "ratingValue": 5,
         "public":0
     }
@@ -777,9 +779,12 @@ class UserInboxTestCase(ResourcesAPITestCase):
             self.assertIn("ratingValue", item)
             self.assertIn("replyTo", item)
             self.assertIn("receiver", item)
-            self.assertIn("post_text", item)
+            self.assertIn("body", item)
             self.assertIn("anonymous", item)
             self.assertIn("public", item)
+            self.assertIn("sender", item)
+            self.assertIn("timestamp", item)
+            self.assertIn("bestRating", item)
 
             self.assertIn("@controls", item)
             self.assertIn("self", item["@controls"])
@@ -968,7 +973,7 @@ class UserPostTestCase(ResourcesAPITestCase):
         "anonymous": 0,
         "sender": "Scott",
         "receiver": "Stephen",
-        "post_text": "You are the worst actor ever",
+        "body": "You are the worst actor ever",
         "ratingValue": 5,
         "public": 1
     }
@@ -977,7 +982,7 @@ class UserPostTestCase(ResourcesAPITestCase):
         "anonymous": 1,
         "sender": "Kim",
         "receiver": "Stephen",
-        "post_text": "We went to the school together and you were the best",
+        "body": "We went to the school together and you were the best",
         "public": 1
     }
 
@@ -985,7 +990,7 @@ class UserPostTestCase(ResourcesAPITestCase):
         "anonymous": 0,
         "sender": "Moamen",
         "receiver": "Stephen",
-        "post_text": "You are the worst actor ever",
+        "body": "You are the worst actor ever",
         "public": 1
     }
 
@@ -1038,7 +1043,7 @@ class UserPostTestCase(ResourcesAPITestCase):
         data_modified = json.loads(resp2.data.decode("utf-8"))
 
         # Check that the fields returned correctly
-        self.assertEqual(data_modified['post_text'], self.post_mod_req_1['post_text'])
+        self.assertEqual(data_modified['body'], self.post_mod_req_1['body'])
         self.assertEqual(data_modified['public'], self.post_mod_req_1['public'])
         self.assertEqual(data_modified['ratingValue'], self.post_mod_req_1['ratingValue'])
 
