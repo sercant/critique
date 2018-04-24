@@ -1419,7 +1419,7 @@ In addition all error messages follow the [Error Profile](#profiles-error-profil
 Contains the ratings list with ratings from all other users to this specific user. It should have a track of the ratings made by users to each other including the person who made the rating and that who received it. Also, it contains the rating id to keep track of the ratings.
 
 + Parameters
-    + nickname: `Scott` (string) - The nickname of the user.
+    + nickname: `Stephen` (string) - The nickname of the user.
 
 
 ### Receive users ratings [GET]
@@ -1439,61 +1439,13 @@ Extracts the ratings given to the user.
     + Body
 
             {
-                "items": [
-                    {
-                        "ratingId": "rtg-015",
-                        "bestRating": 10,
-                        "ratingValue": 8,
-                        "sender": "Scott",
-                        "receiver": "Kim",
-                        "@controls": {
-                            "self": {
-                                "href": "/critique/api/ratings/rtg-015/"
-                            },
-                            "profile": {
-                                "href": "/critique/profiles/rating-profile/"
-                            },
-                            "critique:sender": {
-                                "href": "/critique/api/users/Scott"
-                            },
-                            "critique:receiver": {
-                                "href": "/critique/api/users/Kim"
-                            }
-                        }
-                    },
-                    {
-                        "ratingId": "rtg-016",
-                        "bestRating": 10,
-                        "ratingValue": 4,
-                        "sender": "Kim",
-                        "receiver": "Scott",
-                        "@controls": {
-                            "self": {
-                                "href": "/critique/api/ratings/rtg-016/"
-                            },
-                            "profile": {
-                                "href": "/critique/profiles/rating-profile/"
-                            },
-                            "critique:sender": {
-                                "href": "/critique/api/users/Kim"
-                            },
-                            "critique:receiver": {
-                                "href": "/critique/api/users/Scott"
-                            }
-                        }
-                    }
-                ],
-                "@namespaces": {
-                    "critique": {
-                        "name": "/critique/link-relations/"
-                    }
-                },
                 "@controls": {
                     "self": {
-                        "href": "/critique/api/users/Kim/ratings/"
+                        "href": "/critique/api/users/Stephen/ratings/"
                     },
                     "critique:add-rating": {
-                        "href": "/critique/api/users/Kim/ratings/",
+                        "href": "/critique/api/users/Stephen/ratings/",
+                        "title": "Create a new rating",
                         "encoding": "json",
                         "method": "POST",
                         "schema": {
@@ -1516,6 +1468,82 @@ Extracts the ratings given to the user.
                             ]
                         }
                     }
+                },
+                "items": [
+                    {
+                        "ratingId": "rtg-2",
+                        "bestRating": 10,
+                        "ratingValue": 5,
+                        "sender": "Scott",
+                        "receiver": "Stephen",
+                        "@controls": {
+                            "critique:sender": {
+                                "href": "/critique/api/users/Scott/",
+                                "title": "Sender of the resource"
+                            },
+                            "critique:receiver": {
+                                "href": "/critique/api/users/Stephen/",
+                                "title": "Receiver of the resource"
+                            },
+                            "self": {
+                                "href": "/critique/api/users/Stephen/ratings/rtg-2/"
+                            },
+                            "profile": {
+                                "href": "/critique/profiles/rating-profile/"
+                            }
+                        }
+                    },
+                    {
+                        "ratingId": "rtg-6",
+                        "bestRating": 10,
+                        "ratingValue": 1,
+                        "sender": "Kim",
+                        "receiver": "Stephen",
+                        "@controls": {
+                            "critique:sender": {
+                                "href": "/critique/api/users/Kim/",
+                                "title": "Sender of the resource"
+                            },
+                            "critique:receiver": {
+                                "href": "/critique/api/users/Stephen/",
+                                "title": "Receiver of the resource"
+                            },
+                            "self": {
+                                "href": "/critique/api/users/Stephen/ratings/rtg-6/"
+                            },
+                            "profile": {
+                                "href": "/critique/profiles/rating-profile/"
+                            }
+                        }
+                    },
+                    {
+                        "ratingId": "rtg-15",
+                        "bestRating": 10,
+                        "ratingValue": 4,
+                        "sender": "Young",
+                        "receiver": "Stephen",
+                        "@controls": {
+                            "critique:sender": {
+                                "href": "/critique/api/users/Young/",
+                                "title": "Sender of the resource"
+                            },
+                            "critique:receiver": {
+                                "href": "/critique/api/users/Stephen/",
+                                "title": "Receiver of the resource"
+                            },
+                            "self": {
+                                "href": "/critique/api/users/Stephen/ratings/rtg-15/"
+                            },
+                            "profile": {
+                                "href": "/critique/profiles/rating-profile/"
+                            }
+                        }
+                    }
+                ],
+                "@namespaces": {
+                    "critique": {
+                        "name": "/critique/link-relations/"
+                    }
                 }
             }
 
@@ -1529,7 +1557,7 @@ Extracts the ratings given to the user.
                 "@error": {
                     "@message": "User not found."
                 },
-                "resource_url": "/critique/api/users/{nickname}/ratings/"
+                "resource_url": "/critique/api/users/Stephen/ratings/"
             }
 
 ### Create a new rating [POST]
@@ -1548,7 +1576,7 @@ Appends a new rating to the list of ratings.
 
             {
                 "ratingValue": 8,
-                "sender": "Scott"
+                "sender": "Knives"
             }
 
 
@@ -1571,7 +1599,7 @@ Appends a new rating to the list of ratings.
                 "@error": {
                     "@message": "Rating info is not well formed or entity body is missing."
                 },
-                "resource_url": "/critique/api/users/Kim/ratings/"
+                "resource_url": "/critique/api/users/Stephen/ratings/"
             }
 
 + Response 404 (application/vnd.mason+json)
@@ -1584,7 +1612,7 @@ Appends a new rating to the list of ratings.
                 "@error": {
                     "@message": "User not found."
                 },
-                "resource_url": "/critique/api/users/Kim/ratings/"
+                "resource_url": "/critique/api/users/Stephen/ratings/"
             }
 
 + Response 415 (application/vnd.mason+json)
@@ -1597,7 +1625,7 @@ Appends a new rating to the list of ratings.
                 "@error": {
                     "@message": "Format of the input is not json."
                 },
-                "resource_url": "/critique/api/users/Kim/ratings/"
+                "resource_url": "/critique/api/users/Stephen/ratings/"
             }
 
 + Response 422 (application/vnd.mason+json)
@@ -1610,7 +1638,7 @@ Appends a new rating to the list of ratings.
                 "@error": {
                     "@message": "Sender not found."
                 },
-                "resource_url": "/critique/api/users/Kim/ratings/"
+                "resource_url": "/critique/api/users/Stephen/ratings/"
             }
 
 + Response 500 (application/vnd.mason+json)
@@ -1623,7 +1651,7 @@ Appends a new rating to the list of ratings.
                 "@error": {
                     "@message": "The system has failed. Please, contact the administrator."
                 },
-                "resource_url": "/critique/api/users/Kim/ratings/"
+                "resource_url": "/critique/api/users/Stephen/ratings/"
             }
 
 ## Rating [/critique/api/users/{nickname}/ratings/{ratingId}/]

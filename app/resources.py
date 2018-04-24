@@ -795,23 +795,25 @@ class UserRatings(Resource):
             return create_error_response(415,
                                          "Unsupported Media Type")
 
+        userExist = g.con.contains_user(nickname)
+        if not userExist:
+            return create_error_response(404, "User not found.")
+
         # pick up rating_id so we can check for conflicts
         try:
             sender = request_body["sender"]
-            receiver = request_body["receiver"]
-            rating = request_body["rating"]
-
+            rating = request_body["ratingValue"]
         except KeyError:
             return create_error_response(400,
                                          "Wrong request format")
         # optional fields
 
-        # if g.con.contains_rating(rating_id):
-        #     return create_error_response(422,
-        #                                  "Rating id already exist in the users list.")
+        userExist = g.con.contains_user(sender)
+        if not userExist:
+            return create_error_response(404, "Sender not found.")
 
         try:
-            rating_id = g.con.create_rating(sender, receiver, rating)
+            rating_id = g.con.create_rating(sender, nickname, rating)
         except ValueError:
             return create_error_response(400,
                                          "Wrong request format")
@@ -819,7 +821,7 @@ class UserRatings(Resource):
         # CREATE RESPONSE AND RENDER
         return Response(status=201,
                         headers={"Location": api.url_for(Rating,
-                         nickname = request_body["receiver"], ratingId = rating_id)})
+                         nickname = nickname, ratingId = rating_id)})
 
 
     def get(self, nickname):
@@ -1500,7 +1502,7 @@ class Rating(Resource):
             return create_error_response(415, "Format of the input is not json.")
         try:
             rating_db['rating'] = request_body.get(
-                'rating', rating_db['rating'])
+                'ratingValue', rating_db['rating'])
         except KeyError:
             return create_error_response(400, "Wrong request format",
              "rating missing")

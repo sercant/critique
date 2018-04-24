@@ -874,26 +874,25 @@ class UserRatingTestCase(ResourcesAPITestCase):
         "rating_id":"rtg-1",
         "sender": "Scott",
         "receiver": "Kim",
-        "rating": 2
+        "ratingValue": 2
     }
 
     rating_mod_req_2 = {
         "rating_id": "rtg-44",
         "sender": "Moamen",
         "receiver": "Kim",
-        "rating": 5
+        "ratingValue": 5
     }
 
     rating_create_good = {
         "sender": "Knives",
-        "receiver": "Kim",
-        "rating": 6
+        "ratingValue": 6
     }
 
     rating_create_bad = {
         "sender": "Knives",
         "receiver": "lapland",
-        "rating": 6
+        "ratingValue": 6
     }
 
     CREATE_RATING_SCHEMA = json.load(open('app/schema/create_rating.json'))
@@ -946,7 +945,7 @@ class UserRatingTestCase(ResourcesAPITestCase):
 
         # Check that the fields returned correctly
 
-        self.assertEqual(data['ratingValue'], self.rating_mod_req_1['rating'])
+        self.assertEqual(data['ratingValue'], self.rating_mod_req_1['ratingValue'])
 
     def test_modify_nonexisting_rating(self):
         """
@@ -988,7 +987,7 @@ class UserRatingTestCase(ResourcesAPITestCase):
 
         data=json.dumps(self.rating_create_good)
         resp = self.client.post(resources.api.url_for(resources.UserRatings,
-                                nickname = self.rating_create_good['receiver']),
+                                                      nickname='Stephen'),
                                 headers={"Content-Type": JSON},
                                 data=json.dumps(self.rating_create_good))
         self.assertEqual(resp.status_code, 201)
@@ -1000,7 +999,7 @@ class UserRatingTestCase(ResourcesAPITestCase):
         self.assertEqual(resp2.status_code, 200)
 
         data = json.loads(resp2.data.decode("utf-8"))
-        self.assertEqual(data['ratingValue'], self.rating_create_good['rating'])
+        self.assertEqual(data['ratingValue'], self.rating_create_good['ratingValue'])
 
     def test_create_faulty_rating(self):
         """
@@ -1013,7 +1012,7 @@ class UserRatingTestCase(ResourcesAPITestCase):
                                 nickname = self.rating_create_bad['receiver']),
                                 headers={"Content-Type": JSON},
                                 data=json.dumps(self.rating_create_bad))
-        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(resp.status_code, 404)
 
 class PostTestCase(ResourcesAPITestCase):
 
