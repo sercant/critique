@@ -28,7 +28,7 @@ ENGINE = database.Engine(DB_PATH)
 
 
 #CONSTANTS DEFINING DIFFERENT USERS AND USER PROPERTIES
-RATING1_ID = 'rating-1'
+RATING1_ID = 'rtg-1'
 
 RATING1 = {
     'rating_id': RATING1_ID,
@@ -46,7 +46,7 @@ RATING1_MODIFIED = {
     'rating': 4
 }
 
-RATING2_ID = 'rating-2'
+RATING2_ID = 'rtg-2'
 
 RATING2 = {
     'rating_id': RATING2_ID,
@@ -56,7 +56,7 @@ RATING2 = {
     'rating': 5
 }
 
-WRONG_RATING_ID = 'rating-200'
+WRONG_RATING_ID = 'rtg-200'
 
 INITIAL_SIZE = 17
 
@@ -189,7 +189,7 @@ class RatingDBAPITestCase(unittest.TestCase):
 
     def test_get_ratings(self):
         '''
-        Test get_rating with id rating-1 and rating-2
+        Test get_rating with id rtg-1 and rtg-2
         '''
         print('('+self.test_get_ratings.__name__+')', \
               self.test_get_ratings.__doc__)
@@ -213,7 +213,7 @@ class RatingDBAPITestCase(unittest.TestCase):
 
     def test_get_rating_noexistingid(self):
         '''
-        Test get_rating with rating-200 (no-existing)
+        Test get_rating with rtg-200 (no-existing)
         '''
         print('('+self.test_get_rating_noexistingid.__name__+')',\
               self.test_get_rating_noexistingid.__doc__)
@@ -255,7 +255,7 @@ class RatingDBAPITestCase(unittest.TestCase):
         #Ratings id are 5, 9, 13 and 17
         for rating in ratings:
             self.assertIn(rating['rating_id'],
-                          ('rating-5', 'rating-9', 'rating-13', 'rating-17'))
+                          ('rtg-5', 'rtg-9', 'rtg-13', 'rtg-17'))
 
     def test_get_ratings_of_specific_user(self):
         '''
@@ -270,11 +270,11 @@ class RatingDBAPITestCase(unittest.TestCase):
         #Ratings id are 1, 2, 3 and 4
         for rating in ratings:
             self.assertIn(rating['rating_id'],
-                          ('rating-1', 'rating-2', 'rating-3', 'rating-4'))
+                          ('rtg-1', 'rtg-2', 'rtg-3', 'rtg-4'))
 
     def test_modify_rating(self):
         '''
-        Test that the rating rating-1 is modifed
+        Test that the rating rtg-1 is modifed
         '''
         print('('+self.test_modify_rating.__name__+')', \
               self.test_modify_rating.__doc__)
@@ -299,7 +299,7 @@ class RatingDBAPITestCase(unittest.TestCase):
 
     def test_modify_ratings_noexistingid(self):
         '''
-        Test modify_ratings with rating-200 (no-existing)
+        Test modify_ratings with rtg-200 (no-existing)
         '''
         print('('+self.test_modify_ratings_noexistingid.__name__+')',\
               self.test_modify_ratings_noexistingid.__doc__)
@@ -340,7 +340,7 @@ class RatingDBAPITestCase(unittest.TestCase):
 
     def test_not_contains_rating(self):
         '''
-        Check if the database does not contain rating with id rating-200
+        Check if the database does not contain rating with id rtg-200
 
         '''
         print('('+self.test_not_contains_rating.__name__+')',
@@ -349,7 +349,7 @@ class RatingDBAPITestCase(unittest.TestCase):
 
     def test_contains_rating(self):
         '''
-        Check if the database contains ratings with id rating-1 and rating-2
+        Check if the database contains ratings with id rtg-1 and rtg-2
 
         '''
         print('('+self.test_contains_rating.__name__+')', \
