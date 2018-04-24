@@ -17,7 +17,7 @@ Returns the list of users in the platform via `GET`.
 
 Return the link relation description in HTML format.
 
-+ Response 200 (text/html)
++ Response 301 (text/html; charset=utf-8)
 
 ## all-posts [/critique/link-relations/all-posts]
 
@@ -27,7 +27,7 @@ Returns the list of posts in the platform via `GET`.
 
 Return the link relation description in HTML format.
 
-+ Response 200 (text/html)
++ Response 301 (text/html; charset=utf-8)
 
 ## add-user [/critique/link-relations/add-user]
 
@@ -37,7 +37,7 @@ Creates a new user via `POST`.
 
 Return the link relation description in HTML format.
 
-+ Response 200 (text/html)
++ Response 301 (text/html; charset=utf-8)
 
 ## add-post [/critique/link-relations/add-post]
 
@@ -47,7 +47,7 @@ Creates a new post via `POST`.
 
 Return the link relation description in HTML format.
 
-+ Response 200 (text/html)
++ Response 301 (text/html; charset=utf-8)
 
 ## add-reply [/critique/link-relations/add-reply]
 
@@ -57,7 +57,7 @@ Creates a new reply to a post via `POST`.
 
 Return the link relation description in HTML format.
 
-+ Response 200 (text/html)
++ Response 301 (text/html; charset=utf-8)
 
 ## add-rating [/critique/link-relations/add-rating]
 
@@ -67,7 +67,7 @@ Creates a new rating via `POST`.
 
 Return the link relation description in HTML format.
 
-+ Response 200 (text/html)
++ Response 301 (text/html; charset=utf-8)
 
 ## user-inbox [/critique/link-relations/user-inbox]
 
@@ -77,7 +77,7 @@ Returns the posts sent to the user which are currently not public via `GET`.
 
 Return the link relation description in HTML format.
 
-+ Response 200 (text/html)
++ Response 301 (text/html; charset=utf-8)
 
 ## user-river [/critique/link-relations/user-river]
 
@@ -87,7 +87,7 @@ Returns the posts sent to the user which are currently public via `GET`.
 
 Return the link relation description in HTML format.
 
-+ Response 200 (text/html)
++ Response 301 (text/html; charset=utf-8)
 
 ## user-ratings [/critique/link-relations/ratings]
 
@@ -97,7 +97,7 @@ Returns the ratings sent to the user via `GET`.
 
 Return the link relation description in HTML format.
 
-+ Response 200 (text/html)
++ Response 301 (text/html; charset=utf-8)
 
 ## delete [/critique/link-relations/delete]
 
@@ -107,7 +107,7 @@ Deletes the current context. Use via `DELETE`.
 
 Return the link relation description in HTML format.
 
-+ Response 200 (text/html)
++ Response 301 (text/html; charset=utf-8)
 
 ## sender [/critique/link-relations/sender]
 
@@ -117,7 +117,7 @@ Returns the sender of the resource such as rating or post via `GET`.
 
 Return the link relation description in HTML format.
 
-+ Response 200 (text/html)
++ Response 301 (text/html; charset=utf-8)
 
 ## receiver [/critique/link-relations/receiver]
 
@@ -127,7 +127,7 @@ Returns the receiver of the resource such as rating or post via `GET`.
 
 Return the link relation description in HTML format.
 
-+ Response 200 (text/html)
++ Response 301 (text/html; charset=utf-8)
 
 # Group Profiles
 
@@ -145,7 +145,7 @@ Profile definition for all errors messages in the system.
 
 Return the User Profile in HTML format.
 
-+ Response 200 (text/html)
++ Response 301 (text/html; charset=utf-8)
 
 ## User Profile [/critique/profiles/user_profile]
 
@@ -193,7 +193,7 @@ Inherited from [Person](http://schema.org/Person):
 
 Return the User Profile in HTML format.
 
-+ Response 200 (text/html)
++ Response 301 (text/html; charset=utf-8)
 
 ## Post Profile [/critique/profiles/post_profile]
 
@@ -240,7 +240,7 @@ Inherited from [Rating](http://schema.org/Rating):
 
 Return the post profile in HTML format.
 
-+ Response 200 (text/html)
++ Response 301 (text/html; charset=utf-8)
 
 ## Rating Profile [/critique/profiles/rating-profile]
 
@@ -281,7 +281,7 @@ Inherited from [Rating](http://schema.org/Rating):
 
 Return the Rating Profile in HTML format.
 
-+ Response 200 (text/html)
++ Response 301 (text/html; charset=utf-8)
 
 
 
@@ -538,11 +538,6 @@ Extract information of a user.
                 "birthdate": "1998-01-22",
                 "telephone": null,
                 "gender": "male",
-                "@namespaces": {
-                    "critique": {
-                        "name": "/critique/link-relations/"
-                    }
-                },
                 "@controls": {
                     "self": {
                         "href": "/critique/api/users/Scott/"
@@ -551,13 +546,13 @@ Extract information of a user.
                         "href": "/critique/profiles/user-profile/"
                     },
                     "collection": {
-                        "href": "/forum/api/users/"
+                        "href": "/critique/api/users/"
                     },
                     "edit": {
+                        "href": "/critique/api/users/Scott/",
                         "title": "Edit this user",
-                        "href": "/forum/api/users/Scott/",
-                        "encoding": "json",
                         "method": "PUT",
+                        "encoding": "json",
                         "schema": {
                             "type": "object",
                             "properties": {
@@ -602,21 +597,27 @@ Extract information of a user.
                                     "type": "string"
                                 }
                             },
-                            "required": [ ]
+                            "required": []
                         }
                     },
                     "critique:delete": {
                         "href": "/critique/api/users/Scott/",
+                        "title": "Delete a user",
                         "method": "DELETE"
                     },
                     "critique:user-inbox": {
-                        "href": "/critique/api/users/Scott/inbox"
+                        "href": "/critique/api/users/Scott/inbox/"
                     },
                     "critique:user-river": {
-                        "href": "/critique/api/users/Scott/river"
+                        "href": "/critique/api/users/Scott/river/"
                     },
                     "critique:user-ratings": {
-                        "href": "/critique/api/users/Scott/ratings"
+                        "href": "/critique/api/users/Scott/ratings/"
+                    }
+                },
+                "@namespaces": {
+                    "critique": {
+                        "name": "/critique/link-relations/"
                     }
                 }
             }
@@ -660,7 +661,7 @@ Modifies mutable attributes of the specified user.
                 "gender": "male"
             }
 
-+ Response 204 (application/vnd.mason+json)
++ Response 204
 
     User modified successfully.
 
@@ -740,12 +741,7 @@ Deletes the specified user.
 
 + Relation: delete
 
-+ Response 204 (application/vnd.mason+json)
-
-    User deleted successfully.
-
-    + Headers
-
++ Response 204
 
 + Response 404 (application/vnd.mason+json)
 
@@ -1225,7 +1221,7 @@ Modifies the contents of a specified post.
                 "public": true
             }
 
-+ Response 204 (application/vnd.mason+json)
++ Response 204
 
     + Headers
 
@@ -1289,11 +1285,7 @@ Deletes the specified post.
 
 + Relation: delete
 
-+ Response 204 (application/vnd.mason+json)
-
-    Post deleted successfully.
-
-    + Headers
++ Response 204
 
 + Response 404 (application/vnd.mason+json)
 
@@ -1750,7 +1742,7 @@ Modifies a rating.
                 "ratingValue": 9
             }
 
-+ Response 204 (application/vnd.mason+json)
++ Response 204
 
     + Headers
 
@@ -1815,11 +1807,7 @@ Deletes the specified rating.
 
 + Relation: delete
 
-+ Response 204 (application/vnd.mason+json)
-
-    Rating deleted successfully.
-
-    + Headers
++ Response 204
 
 + Response 404 (application/vnd.mason+json)
 

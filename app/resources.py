@@ -22,10 +22,10 @@ from app.model.mason import MasonObject
 # Constants for hypermedia formats and profiles
 MASON = "application/vnd.mason+json"
 JSON = "application/json"
-CRITIQUE_USER_PROFILE = "/profiles/user-profile/"
-CRITIQUE_POST_PROFILE = "/profiles/post_profile/"
-CRITIQUE_RATING_PROFILE = "/profiles/rating-profile/"
-ERROR_PROFILE = "/profiles/error-profile"
+CRITIQUE_USER_PROFILE = "/critique/profiles/user-profile/"
+CRITIQUE_POST_PROFILE = "/critique/profiles/post_profile/"
+CRITIQUE_RATING_PROFILE = "/critique/profiles/rating-profile/"
+ERROR_PROFILE = "/critique/profiles/error-profile"
 
 # Fill these in
 # Fill with the correct Apiary url"
@@ -41,7 +41,6 @@ EDIT_RATING_SCHEMA = json.load(open('app/schema/edit_rating.json'))
 EDIT_POST_SCHEMA = json.load(open('app/schema/edit_post.json'))
 
 
-PRIVATE_PROFILE_SCHEMA_URL = "/critique/schema/private-profile/"
 LINK_RELATIONS_URL = "/critique/link-relations/"
 
 # Borrowed from lab exercises [1]
@@ -54,7 +53,6 @@ app.debug = True
 app.config.update({"Engine": database.Engine()})
 # Start the RESTFUL API.
 api = Api(app)
-
 
 class CritiqueObject(MasonObject):  # Borrowed from lab exercises [1]
     '''
@@ -94,7 +92,7 @@ class CritiqueObject(MasonObject):  # Borrowed from lab exercises [1]
         This adds the posts collection link to an object. Intended for the document object.
         '''
 
-        self["@controls"]["all-posts"] = {
+        self["@controls"]["critique:all-posts"] = {
             "href": api.url_for(Posts),
             "title": "List posts"
         }
@@ -104,7 +102,7 @@ class CritiqueObject(MasonObject):  # Borrowed from lab exercises [1]
         This adds the users collection link to an object. Intended for the document object.
         '''
 
-        self["@controls"]["all-users"] = {
+        self["@controls"]["critique:all-users"] = {
             "href": api.url_for(Users),
             "title": "List users"
         }
@@ -311,7 +309,7 @@ def create_error_response(status_code, title, message=None):
     envelope = MasonObject(resource_url=resource_url)
     envelope.add_error(title, message)
 
-    return Response(json.dumps(envelope), status_code, mimetype=MASON+";"+ERROR_PROFILE)
+    return Response(json.dumps(envelope), status_code, mimetype=MASON) #+";"+ERROR_PROFILE)
 
 
 @app.errorhandler(404)
@@ -418,7 +416,7 @@ class Users(Resource):
         envelope.add_control("self", href=api.url_for(Users))
 
         # RENDER
-        return Response(json.dumps(envelope), 200, mimetype=MASON+";" + CRITIQUE_USER_PROFILE)
+        return Response(json.dumps(envelope), 200, mimetype=MASON) #+";" + CRITIQUE_USER_PROFILE)
 
     def post(self):
         '''
@@ -616,7 +614,7 @@ class User(Resource):
         envelope.add_control_user_river(nickname)
         envelope.add_control_user_ratings(nickname)
 
-        return Response(json.dumps(envelope), 200, mimetype=MASON+";" + CRITIQUE_USER_PROFILE)
+        return Response(json.dumps(envelope), 200, mimetype=MASON) #+";" + CRITIQUE_USER_PROFILE)
 
     def put(self, nickname):
         '''
@@ -899,11 +897,11 @@ class UserRatings(Resource):
         envelope.add_control_add_rating(nickname)
 
         # RENDER
-        return Response(json.dumps(envelope), 200, mimetype=MASON+";" + CRITIQUE_RATING_PROFILE)
+        return Response(json.dumps(envelope), 200, mimetype=MASON) #+";" + CRITIQUE_RATING_PROFILE)
 
 
 class UserInbox(Resource):
-    
+
     '''
     Contains private posts sent to the user, it should include text as the actual post,
     however, rating is optional in the message.
@@ -990,7 +988,7 @@ class UserInbox(Resource):
         #     envelope.add_control("atom-thread:in-reply-to", href=None)
 
         #RENDER
-        return Response(json.dumps(envelope), 200, mimetype=MASON+";" + CRITIQUE_POST_PROFILE)
+        return Response(json.dumps(envelope), 200, mimetype=MASON) #+";" + CRITIQUE_POST_PROFILE)
 
     def post(self, nickname):
         '''
@@ -1173,7 +1171,7 @@ class UserRiver(Resource):
         #     envelope.add_control("atom-thread:in-reply-to", href=None)
 
         #RENDER
-        return Response(json.dumps(envelope), 200, mimetype=MASON+";" + CRITIQUE_POST_PROFILE)
+        return Response(json.dumps(envelope), 200, mimetype=MASON) #+";" + CRITIQUE_POST_PROFILE)
 
 
 class Ratings(Resource):
@@ -1246,7 +1244,7 @@ class Post(Resource):
         envelope.add_control_sender(nickname = post_db["sender"])
         envelope.add_control_receiver(nickname = post_db["receiver"] )
 
-        return Response(json.dumps(envelope), 200, mimetype=MASON+";"+ CRITIQUE_POST_PROFILE)
+        return Response(json.dumps(envelope), 200, mimetype=MASON) #+";"+ CRITIQUE_POST_PROFILE)
 
     def post(self, postId):
         '''
@@ -1386,13 +1384,7 @@ class Post(Resource):
         except KeyError:
             return create_error_response(400, "Wrong request format",
              "Can't acquire, either post body, rating or public value")
-        if not g.con.modify_post(postId, post_db['post_text']):
-            return create_error_response(500, "The system has failed. Please, contact the administrator.")
-
-        if not g.con.modify_post_rating(postId, post_db['rating']):
-            return create_error_response(500, "The system has failed. Please, contact the administrator.")
-
-        if not g.con.modify_post_publicity(postId, post_db['public']):
+        if not g.con.modify_post(postId, post_db['post_text'], post_db['rating'], post_db['public']):
             return create_error_response(500, "The system has failed. Please, contact the administrator.")
 
         return Response(status=204,
@@ -1465,7 +1457,7 @@ class Rating(Resource):
         item.add_control_sender(nickname = rating_db["sender"])
         item.add_control_receiver(nickname = rating_db["receiver"])
 
-        return Response(json.dumps(item), 200, mimetype=MASON+";" + CRITIQUE_RATING_PROFILE)
+        return Response(json.dumps(item), 200, mimetype=MASON) #+";" + CRITIQUE_RATING_PROFILE)
 
     def put(self, nickname, ratingId):
         '''
@@ -1564,17 +1556,17 @@ api.add_resource(UserRiver, "/critique/api/users/<nickname>/river/",
                  endpoint="river")
 api.add_resource(UserRatings, "/critique/api/users/<nickname>/ratings/",
                  endpoint="user-ratings")
-api.add_resource(Rating, "/critique/api/users/<nickname>/ratings/<ratingId>/",
+api.add_resource(Rating, "/critique/api/users/<nickname>/ratings/<regex('rtg-\d+'):ratingId>/",
                  endpoint="rating")
 api.add_resource(Posts, "/critique/api/posts/",
                  endpoint="posts")
-api.add_resource(Post, "/critique/api/posts/<postId>/",
+api.add_resource(Post, "/critique/api/posts/<regex('p-\d+'):postId>/",
                  endpoint="post")
 
 # Redirect profile
 
 
-@app.route("/profiles/<profile_name>/")  # Borrowed from lab exercises [1]
+@app.route("/critique/profiles/<profile_name>/")  # Borrowed from lab exercises [1]
 def redirect_to_profile(profile_name):
     return redirect(APIARY_PROFILES_URL + profile_name)
 

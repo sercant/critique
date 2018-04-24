@@ -21,9 +21,9 @@ ENGINE = database.Engine(DB_PATH)
 
 MASON_JSON = "application/vnd.mason+json"
 JSON = "application/json"
-CRITIQUE_USER_PROFILE = "/profiles/user-profile/"
-CRITIQUE_RATING_PROFILE = "/profiles/rating-profile/"
-CRITIQUE_POST_PROFILE = "/profiles/post_profile/"
+CRITIQUE_USER_PROFILE = "/critique/profiles/user-profile/"
+CRITIQUE_RATING_PROFILE = "/critique/profiles/rating-profile/"
+CRITIQUE_POST_PROFILE = "/critique/profiles/post_profile/"
 
 
 # Tell Flask that I am running it in testing mode.
@@ -161,8 +161,8 @@ class UsersTestCase (ResourcesAPITestCase):
         self.assertIn("href", controls["self"])
         self.assertEqual(controls["self"]["href"], self.url)
 
-        self.assertIn("href", controls["all-posts"])
-        self.assertEqual(controls["all-posts"]["href"], resources.api.url_for(
+        self.assertIn("href", controls["critique:all-posts"])
+        self.assertEqual(controls["critique:all-posts"]["href"], resources.api.url_for(
             resources.Posts, _external=False))
 
         add_ctrl = controls["critique:add-user"]
@@ -204,7 +204,7 @@ class UsersTestCase (ResourcesAPITestCase):
         resp = self.client.get(self.url)
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.headers.get("Content-Type", None),
-                         "{};{}".format(MASON_JSON, CRITIQUE_USER_PROFILE))
+                         "{}".format(MASON_JSON)) # "{};{}".format(MASON_JSON, CRITIQUE_USER_PROFILE))
 
     def test_add_user(self):
         """
@@ -427,7 +427,7 @@ class UserTestCase(ResourcesAPITestCase):
         # Borrowed from lab exercises [1]
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.headers.get("Content-Type", None),
-                         "{};{}".format(MASON_JSON, CRITIQUE_USER_PROFILE))
+                         "{}".format(MASON_JSON)) # "{};{}".format(MASON_JSON, CRITIQUE_USER_PROFILE))
 
     def test_modify_user(self):
         """
@@ -583,7 +583,7 @@ class UserRatingsTestCase(ResourcesAPITestCase):
         resp = self.client.get(self.url)
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.headers.get("Content-Type", None),
-                         "{};{}".format(MASON_JSON, CRITIQUE_RATING_PROFILE))
+                         "{}".format(MASON_JSON)) # "{};{}".format(MASON_JSON, CRITIQUE_RATING_PROFILE))
 
 
 class UserRiverTestCase(ResourcesAPITestCase):
@@ -693,7 +693,7 @@ class UserRiverTestCase(ResourcesAPITestCase):
         resp = self.client.get(self.url)
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.headers.get("Content-Type", None),
-                         "{};{}".format(MASON_JSON, CRITIQUE_POST_PROFILE))
+                         "{}".format(MASON_JSON)) # "{};{}".format(MASON_JSON, CRITIQUE_POST_PROFILE))
 
 
 class UserInboxTestCase(ResourcesAPITestCase):
@@ -737,7 +737,7 @@ class UserInboxTestCase(ResourcesAPITestCase):
         """
         resp = self.client.get(self.url_wrong)
         self.assertEqual(resp.status_code, 404)
-    
+
     def test_get_posts_by_user(self):
         """
         Checks that GET get_posts_by_user return correct status code and data format
@@ -811,7 +811,7 @@ class UserInboxTestCase(ResourcesAPITestCase):
         resp = self.client.get(self.url)
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.headers.get("Content-Type", None),
-                         "{};{}".format(MASON_JSON, CRITIQUE_POST_PROFILE))
+                         "{}".format(MASON_JSON)) # "{};{}".format(MASON_JSON, CRITIQUE_POST_PROFILE))
 
 
 class UserRatingTestCase(ResourcesAPITestCase):
@@ -836,7 +836,7 @@ class UserRatingTestCase(ResourcesAPITestCase):
         "receiver": "Kim",
         "rating": 6
     }
-    
+
     rating_create_bad = {
         "sender": "Knives",
         "receiver": "lapland",
@@ -939,7 +939,7 @@ class UserRatingTestCase(ResourcesAPITestCase):
                                 headers={"Content-Type": JSON},
                                 data=json.dumps(self.rating_create_good))
         self.assertEqual(resp.status_code, 201)
-        
+
         self.assertIn("Location", resp.headers)
         url = resp.headers["Location"]
 
@@ -994,10 +994,10 @@ class UserPostTestCase(ResourcesAPITestCase):
     def setUp(self):
         super(UserPostTestCase, self).setUp()
         self.url = resources.api.url_for(resources.Post,
-                                         postId="1",
+                                         postId="p-1",
                                          _external=False)
         self.url_wrong = resources.api.url_for(resources.Post,
-                                               postId="807",
+                                               postId="p-807",
                                                _external=False)
 
 
@@ -1086,7 +1086,7 @@ class UserPostTestCase(ResourcesAPITestCase):
                                 headers={"Content-Type": JSON},
                                 data=json.dumps(self.post_create_good))
         self.assertEqual(resp.status_code, 201)
-        
+
         self.assertIn("Location", resp.headers)
         url = resp.headers["Location"]
 

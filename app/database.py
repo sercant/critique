@@ -976,10 +976,14 @@ class Connection(object):
         -   [1]
         '''
 
-
         # first check if the input is valid
         if post_id is None:
             raise ValueError("No input post id")
+
+        m = re.match('p-(\d+)', post_id)
+        if m is None or m.group(1) is None:
+            raise ValueError('post id is malformed')
+        post_id = int(m.group(1))
 
         # setting foreign keys support
         self.set_foreign_keys_support()
@@ -1412,6 +1416,12 @@ class Connection(object):
         '''
         if post_id is None:
             raise ValueError("No post ID inserted to delete.")
+
+        m = re.match('p-(\d+)', post_id)
+        if m is None or m.group(1) is None:
+            raise ValueError('post id is malformed')
+        post_id = int(m.group(1))
+
         queryParameter = (post_id, )
 
         # Create the SQL Statement
@@ -1473,7 +1483,7 @@ class Connection(object):
 
         return self.get_post(post_id) is not None
 
-    def modify_post(self, post_id, post_text):
+    def modify_post(self, post_id, post_text, rating, publicity):
         '''
         Modify the body text with the id ``post_id``
 
@@ -1484,8 +1494,18 @@ class Connection(object):
         :raises ValueError: if the post id not input.
 
         '''
+
+        # first check if the input is valid
+        if post_id is None:
+            raise ValueError("No input post id")
+
+        m = re.match('p-(\d+)', post_id)
+        if m is None or m.group(1) is None:
+            raise ValueError('post id is malformed')
+        post_id = int(m.group(1))
+
         # SQL Statement to update the messages table
-        query = 'UPDATE posts SET post_text = ? WHERE post_id = ?'
+        query = 'UPDATE posts SET post_text = ?, rating = ?, public = ? WHERE post_id = ?'
 
         # Activate foreign key support
         self.set_foreign_keys_support()
@@ -1496,7 +1516,7 @@ class Connection(object):
         try:
             cur = self.con.cursor()
             # Execute the statement to extract the id associated to a nickname
-            pvalue = (post_text, post_id)
+            pvalue = (post_text, rating, publicity, post_id)
             cur.execute(query, pvalue)
             self.con.commit()
         except sqlite3.Error as excp:
