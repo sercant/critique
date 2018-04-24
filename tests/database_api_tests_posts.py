@@ -30,7 +30,7 @@ REFERENCEs:
 -   Programmable Web Projects, Exercise 1, database_api_tests_messages.py
 '''
 #   importing the important modules
-import sqlite3, unittest
+import sqlite3, unittest, re
 
 #   load the database
 from app import database
@@ -283,23 +283,25 @@ class PostDBAPITestCase(unittest.TestCase):
         '''
         print('('+self.test_create_post.__name__+')',\
               self.test_create_post.__doc__)
-        post_id = self.connection.create_post("Scott", "Knives",5,
-                                                   "This is a newly-created post",1,1)
+        post_id = self.connection.create_post(sender_nickname="Scott", receiver_nickname="Knives",rating= 5,
+                                                  post_text= "This is a newly-created post",anonymous= 1,public= 1)
         self.assertIsNotNone(post_id)
 
         # Get the expected modified post
         new_post = {}
-        new_post['post_id'] = post_id
-        new_post['reply_to'] = 5
+        m = re.match('p-(\d+)', post_id)
+        post_id_number = int(m.group(1))
+        new_post['post_id'] = post_id_number
+        new_post['reply_to'] = None
         new_post['post_text'] = "This is a newly-created post"
 
         # Check that the messages has been really modified through a get
-        resp2 = self.connection.get_post('p-'+str(post_id))
+        resp2 = self.connection.get_post(post_id)
         self.assertDictContainsSubset(new_post, resp2)
 
         # CHECK NOW NOT REGISTERED USER
-        post_id = self.connection.create_post("Mina", "Knives",5,
-                                                "This is the non-registered user",1,1)
+        post_id = self.connection.create_post(sender_nickname="Mina", receiver_nickname="Knives", rating=5,
+                                              post_text="This is the non-registered user", anonymous = 1, public = 1)
         self.assertIsNone(post_id)
 
     def test_create_post_invalid_sender_receiver(self):
@@ -310,18 +312,18 @@ class PostDBAPITestCase(unittest.TestCase):
               self.test_create_post_invalid_sender_receiver.__doc__)
 
         # try invalid - invalid
-        post_id = self.connection.create_post(INVALID_USER_NICKNAME, INVALID_USER_NICKNAME,5,
-                                                   "This is a newly-created post",1,1)
+        post_id = self.connection.create_post(sender_nickname = INVALID_USER_NICKNAME, receiver_nickname=INVALID_USER_NICKNAME, rating = 5,
+                                                  post_text = "This is a newly-created post", anonymous = 1, public = 1)
         self.assertIsNone(post_id)
 
         # try invalid - valid
-        post_id = self.connection.create_post(INVALID_USER_NICKNAME, VALID_USER_NICKNAME,5,
-                                                   "This is a newly-created post",1,1)
+        post_id = self.connection.create_post(sender_nickname=INVALID_USER_NICKNAME, receiver_nickname=VALID_USER_NICKNAME, rating = 5,
+                                                   post_text = "This is a newly-created post", anonymous = 1, public = 1)
         self.assertIsNone(post_id)
 
         # try valid - invalid
-        post_id = self.connection.create_post(VALID_USER_NICKNAME, INVALID_USER_NICKNAME,5,
-                                                   "This is a newly-created post",1,1)
+        post_id = self.connection.create_post(sender_nickname=VALID_USER_NICKNAME, receiver_nickname = INVALID_USER_NICKNAME, rating = 5,
+                                              post_text="This is a newly-created post", anonymous=1, public=1)
         self.assertIsNone(post_id)
 
 
