@@ -37,6 +37,7 @@ CREATE_USER_SCHEMA = json.load(open('app/schema/create_user.json'))
 CREATE_RATING_SCHEMA = json.load(open('app/schema/create_rating.json'))
 EDIT_USER_SCHEMA = json.load(open('app/schema/edit_user.json'))
 CREATE_POSTS_SCHEMA = json.load(open('app/schema/create_posts.json'))
+CREATE_REPLY_SCHEMA = json.load(open('app/schema/create_reply.json'))
 EDIT_RATING_SCHEMA = json.load(open('app/schema/edit_rating.json'))
 EDIT_POST_SCHEMA = json.load(open('app/schema/edit_post.json'))
 
@@ -157,16 +158,20 @@ class CritiqueObject(MasonObject):  # Borrowed from lab exercises [1]
             "href": api.url_for(UserRatings, nickname=nickname),
         }
 
-    def add_control_reply_to(self, receiver):
+    def add_control_reply_to(self, postId):
         '''
         This adds the reply to a post control to an object. Intended for the
         document object.
 
-        : param str receiver: The receiver of the reply
+        : param str postId: The postId of the post to be replied
         '''
 
         self["@controls"]["critique:add-reply"] = {
-            "href": api.url_for(Posts, receiver=receiver),
+            "href": api.url_for(Post, postId=postId),
+            "title": "Add reply",
+            "encoding": "json",
+            "method": "POST",
+            "schema": CREATE_REPLY_SCHEMA
         }
 
     def add_control_delete_user(self, nickname):
@@ -1045,26 +1050,21 @@ class UserInbox(Resource):
         # CHECK IF USER EXISTS
         userExist = g.con.contains_user(nickname)
         if not userExist:
-            return create_error_response(404,"Sending user not found")
-
-        # CHECK IF USER EXISTS
-        userExist = g.con.contains_user(request_body["sender"])
-        if not userExist:
-            return create_error_response(404,"Sending user not found")
+            return create_error_response(404, "User not found")
 
         # check mandatory fields
         try:
             post_text = request_body["body"]
-            receiver_nickname = request_body["receiver"]
+            sender_nickname = request_body["sender"]
             anonymous = request_body["anonymous"]
         except KeyError:
-            return create_error_response(400, "Wrong request format", "Post body missing")
+            return create_error_response(400, "Wrong request format")
 
-        userExist = g.con.contains_user(receiver_nickname)
+        userExist = g.con.contains_user(sender_nickname)
         if not userExist:
-            return create_error_response(404, "Receiving user not found")
+            return create_error_response(404, "Sender user not found")
 
-        new_post_id = g.con.create_post(sender_nickname = receiver_nickname,
+        new_post_id = g.con.create_post(sender_nickname = sender_nickname,
                                         receiver_nickname = nickname,
                                         reply_to = None,
                                         post_text = post_text,
@@ -1245,7 +1245,7 @@ class Post(Resource):
         envelope.add_control("profile", href=CRITIQUE_POST_PROFILE)
         envelope.add_control("collection", href=api.url_for(Posts))
         envelope.add_control_edit_post(postId = postId)
-        envelope.add_control_reply_to(receiver = post_db["receiver"])
+        envelope.add_control_reply_to(postId = postId)
         envelope.add_control_delete_post(nickname = post_db["sender"], post_id = postId)
         envelope.add_control_sender(nickname = post_db["sender"])
         if post_db["receiver"] is not None:
@@ -1448,6 +1448,7 @@ class Rating(Resource):
         item = CritiqueObject(
             bestRating = 10,
             ratingValue = rating_db["rating"],
+            ratingId=rating_db["rating_id"],
             sender = rating_db["sender"],
             receiver = rating_db["receiver"]
         )

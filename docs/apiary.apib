@@ -958,8 +958,8 @@ Creates a new post to the list of posts. Returns the post URI.
     + Body
 
             {
-                "sender": "Scott",
-                "body": "She is great! (sometimes)",
+                "sender": "Kim",
+                "body": "He is great! (sometimes)",
                 "anonymous": false,
                 "ratingValue": 8
             }
@@ -1131,9 +1131,9 @@ Extracts a post and all it’s information.
                                     "description": "Publicity of the post",
                                     "type": "boolean"
                                 }
-                            }
-                        },
-                        "required": []
+                            },
+                            "required": []
+                        }
                     },
                     "critique:add-reply": {
                         "title": "Add reply",
@@ -1153,12 +1153,12 @@ Extracts a post and all it’s information.
                                     "description": "Text of the post",
                                     "type": "number"
                                 }
-                            }
-                        },
-                        "required": [
-                            "sender",
-                            "body"
-                        ]
+                            },
+                            "required": [
+                                "sender",
+                                "body"
+                            ]
+                        }
                     },
                     "critique:delete": {
                         "href": "/critique/api/posts/p-1",
@@ -1330,7 +1330,7 @@ Posts a new post as a reply to a given post.
             {
                 "sender": "Scott",
                 "replyTo": "p-1",
-                "body": "It's actually useful",
+                "body": "It's actually useful"
             }
 
 + Response 201
@@ -1658,41 +1658,41 @@ Extracts a rating from the database.
                 "@namespaces": {
                     "critique": {
                         "name": "/critique/link-relations/"
+                    }
+                },
+                "@controls": {
+                    "self": {
+                        "href": "/critique/api/ratings/rtg-015"
                     },
-                    "@controls": {
-                        "self": {
-                            "href": "/critique/api/ratings/rtg-015"
-                        },
-                        "profile": {
-                            "href": "/critique/profiles/rating-profile/"
-                        },
-                        "edit": {
-                            "title": "Edit Rating",
-                            "href": "/critique/api/ratings/rtg-015",
-                            "encoding": "json",
-                            "method": "PUT",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "ratingValue": {
-                                        "title": "Rating",
-                                        "description": "Given rating to the user",
-                                        "type": "number"
-                                    }
+                    "profile": {
+                        "href": "/critique/profiles/rating-profile/"
+                    },
+                    "edit": {
+                        "title": "Edit Rating",
+                        "href": "/critique/api/ratings/rtg-015",
+                        "encoding": "json",
+                        "method": "PUT",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "ratingValue": {
+                                    "title": "Rating",
+                                    "description": "Given rating to the user",
+                                    "type": "number"
                                 }
                             },
-                            "required": [ ]
-                        },
-                        "critique:delete": {
-                            "href": "/critique/api/ratings/rtg-015",
-                            "method": "DELETE"
-                        },
-                        "critique:sender": {
-                            "href": "/critique/api/users/Scott"
-                        },
-                        "critique:receiver": {
-                            "href": "/critique/api/users/Kim"
+                            "required": []
                         }
+                    },
+                    "critique:delete": {
+                        "href": "/critique/api/ratings/rtg-015",
+                        "method": "DELETE"
+                    },
+                    "critique:sender": {
+                        "href": "/critique/api/users/Scott"
+                    },
+                    "critique:receiver": {
+                        "href": "/critique/api/users/Kim"
                     }
                 }
             }

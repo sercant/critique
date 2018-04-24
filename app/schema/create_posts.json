@@ -16,7 +16,7 @@
             "description": "Receiver nickname",
             "type": "string"
         },
-        "post_text": {
+        "body": {
             "title": "Post text",
             "description": "Text of the post",
             "type": "string"

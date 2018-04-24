@@ -6,7 +6,7 @@
             "description": "Rating given in the post",
             "type": "number"
         },
-        "post_text": {
+        "body": {
             "title": "Body",
             "description": "Text of the post",
             "type": "number"
