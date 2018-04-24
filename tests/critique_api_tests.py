@@ -710,6 +710,22 @@ class UserInboxTestCase(ResourcesAPITestCase):
         "public":0
     }
 
+    post_create_good = {
+        "anonymous": 1,
+        "sender": "Kim",
+        "receiver": "Stephen",
+        "body": "We went to the school together and you were the best",
+        "public": 1
+    }
+
+    post_create_bad = {
+        "anonymous": 0,
+        "sender": "Moamen",
+        "receiver": "Stephen",
+        "body": "You are the worst actor ever",
+        "public": 1
+    }
+
     CREATE_POSTS_SCHEMA = json.load(open('app/schema/create_posts.json'))
 
     def setUp(self):
@@ -816,8 +832,40 @@ class UserInboxTestCase(ResourcesAPITestCase):
         resp = self.client.get(self.url)
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.headers.get("Content-Type", None),
-                         "{}".format(MASON_JSON)) # "{};{}".format(MASON_JSON, CRITIQUE_POST_PROFILE))
+                         "{}".format(MASON_JSON))  # "{};{}".format(MASON_JSON, CRITIQUE_POST_PROFILE))
 
+    def test_create_post(self):
+        """
+        Creates a new post and appends it to the database
+        """
+        print("("+self.test_create_post.__name__+")",
+              self.test_create_post.__doc__)
+
+        data = json.dumps(self.post_create_good)
+        resp = self.client.post(resources.api.url_for(resources.UserInbox,
+                                                      nickname=self.post_create_good['receiver']),
+                                headers={"Content-Type": JSON},
+                                data=json.dumps(self.post_create_good))
+        self.assertEqual(resp.status_code, 201)
+
+        self.assertIn("Location", resp.headers)
+        url = resp.headers["Location"]
+
+        resp2 = self.client.get(url)
+        self.assertEqual(resp2.status_code, 200)
+
+    def test_create_wrong_post(self):
+        """
+        Creates a faulty post
+        """
+        print("("+self.test_create_wrong_post.__name__+")",
+              self.test_create_wrong_post.__doc__)
+        data = json.dumps(self.post_create_bad)
+        resp = self.client.post(resources.api.url_for(resources.UserInbox,
+                                                      nickname=self.post_create_bad['receiver']),
+                                headers={"Content-Type": JSON},
+                                data=json.dumps(self.post_create_bad))
+        self.assertEqual(resp.status_code, 404)
 
 class UserRatingTestCase(ResourcesAPITestCase):
 
@@ -967,7 +1015,7 @@ class UserRatingTestCase(ResourcesAPITestCase):
                                 data=json.dumps(self.rating_create_bad))
         self.assertEqual(resp.status_code, 400)
 
-class UserPostTestCase(ResourcesAPITestCase):
+class PostTestCase(ResourcesAPITestCase):
 
     post_mod_req_1 = {
         "anonymous": 0,
@@ -978,26 +1026,20 @@ class UserPostTestCase(ResourcesAPITestCase):
         "public": 1
     }
 
-    post_create_good = {
-        "anonymous": 1,
+    reply_create_good = {
         "sender": "Kim",
-        "receiver": "Stephen",
         "body": "We went to the school together and you were the best",
-        "public": 1
     }
 
-    post_create_bad = {
-        "anonymous": 0,
+    reply_create_bad = {
         "sender": "Moamen",
-        "receiver": "Stephen",
         "body": "You are the worst actor ever",
-        "public": 1
     }
 
     CREATE_POSTS_SCHEMA = json.load(open('app/schema/create_posts.json'))
 
     def setUp(self):
-        super(UserPostTestCase, self).setUp()
+        super(PostTestCase, self).setUp()
         self.url = resources.api.url_for(resources.Post,
                                          postId="p-1",
                                          _external=False)
@@ -1078,18 +1120,18 @@ class UserPostTestCase(ResourcesAPITestCase):
         resp = self.client.delete(self.url_wrong)
         self.assertEqual(resp.status_code, 404)
 
-    def test_create_post(self):
+    def test_create_reply(self):
         """
-        Creates a new post and appends it to the database
+        Creates a new reply and appends it to the database
         """
-        print("("+self.test_create_post.__name__+")",
-              self.test_create_post.__doc__)
+        print("("+self.test_create_reply.__name__+")",
+              self.test_create_reply.__doc__)
 
-        data=json.dumps(self.post_create_good)
-        resp = self.client.post(resources.api.url_for(resources.UserInbox,
-                                nickname = self.post_create_good['receiver']),
+        data = json.dumps(self.reply_create_good)
+        resp = self.client.post(resources.api.url_for(resources.Post,
+                                                      postId='p-1'),
                                 headers={"Content-Type": JSON},
-                                data=json.dumps(self.post_create_good))
+                                data=json.dumps(self.reply_create_good))
         self.assertEqual(resp.status_code, 201)
 
         self.assertIn("Location", resp.headers)
@@ -1098,19 +1140,17 @@ class UserPostTestCase(ResourcesAPITestCase):
         resp2 = self.client.get(url)
         self.assertEqual(resp2.status_code, 200)
 
-
-
-    def test_create_wrong_post(self):
+    def test_create_wrong_reply(self):
         """
-        Creates a faulty post
+        Creates a faulty reply
         """
-        print("("+self.test_create_wrong_post.__name__+")",
-              self.test_create_wrong_post.__doc__)
-        data=json.dumps(self.post_create_bad)
-        resp = self.client.post(resources.api.url_for(resources.UserInbox,
-                                nickname = self.post_create_bad['receiver']),
+        print("("+self.test_create_wrong_reply.__name__+")",
+              self.test_create_wrong_reply.__doc__)
+        data = json.dumps(self.reply_create_bad)
+        resp = self.client.post(resources.api.url_for(resources.Post,
+                                                      postId='p-1'),
                                 headers={"Content-Type": JSON},
-                                data=json.dumps(self.post_create_bad))
+                                data=json.dumps(self.reply_create_bad))
         self.assertEqual(resp.status_code, 404)
 
 

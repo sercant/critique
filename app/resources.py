@@ -1248,7 +1248,8 @@ class Post(Resource):
         envelope.add_control_reply_to(receiver = post_db["receiver"])
         envelope.add_control_delete_post(nickname = post_db["sender"], post_id = postId)
         envelope.add_control_sender(nickname = post_db["sender"])
-        envelope.add_control_receiver(nickname = post_db["receiver"] )
+        if post_db["receiver"] is not None:
+            envelope.add_control_receiver(nickname = post_db["receiver"])
 
         return Response(json.dumps(envelope), 200, mimetype=MASON) #+";"+ CRITIQUE_POST_PROFILE)
 
@@ -1308,15 +1309,15 @@ class Post(Resource):
             return create_error_response(404,"Sending user not found")
 
         # getting the receiving user
-        parent_post_db = g.con.get_post(postId)
-        receiver = parent_post_db['sender']
+        # parent_post_db = g.con.get_post(postId)
+        # reply_to = parent_post_db['post_id']
 
         new_post_id = g.con.create_post(sender_nickname = sender,
-                                        receiver_nickname = receiver,
+                                        receiver_nickname = None,
                                         reply_to = postId,
                                         post_text = post_text,
-                                        anonymous = request_body.get('anonymous', True),
-                                        public = request_body.get('public', False),
+                                        anonymous = 0,
+                                        public = 1,
                                         rating = None)
         if not new_post_id:
             return create_error_response(500, "Problem with database",

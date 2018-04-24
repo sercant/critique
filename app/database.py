@@ -943,11 +943,15 @@ class Connection(object):
         REFERENCEs:
         -   [1]
         '''
+        try:
+            receiver = row['receiver']
+        except:
+            receiver = None
         post = {
             'post_id': row['post_id'],
             'timestamp': row['timestamp'],
             'sender': row['sender'],
-            'receiver': row['receiver'],
+            'receiver': receiver,
             'reply_to': row['reply_to'],
             'post_text': row['post_text'],
             'rating': row['rating'],
@@ -1006,7 +1010,19 @@ class Connection(object):
         # or not. if not, function will return None
         row = cur.fetchone()
         if row is None:
-            return None
+            # try if its a reply
+            query = 'SELECT posts.*, sender.nickname sender FROM posts INNER JOIN users sender ON sender.user_id = posts.sender_id WHERE post_id = ? '
+
+            # putting the query parameter in a tuple
+            # to be able to execute.
+            queryPostId = (post_id,)
+            cur.execute(query, queryPostId)
+
+            # checking if the returned value contains a post
+            # or not. if not, function will return None
+            row = cur.fetchone()
+            if row is None:
+                return None
 
         # however, in case it has returned an actual post
         # it has to be parsed before returning
@@ -1554,7 +1570,7 @@ class Connection(object):
 
         if sender_nickname is None:
             raise ValueError("No input Sender nickname")
-        if receiver_nickname is None:
+        if reply_to is None and receiver_nickname is None:
             raise ValueError("No input Receiver nickname")
         if post_text is None:
             raise ValueError("Empty post")
@@ -1593,6 +1609,11 @@ class Connection(object):
         # If exists the replyto argument, check that the post exists in
         # the database table
         if reply_to is not None:
+            m = re.match('p-(\d+)', reply_to)
+            if m is None or m.group(1) is None:
+                raise ValueError('post id is malformed')
+            reply_to = int(m.group(1))
+
             pvalue = (reply_to,)
             cur.execute(query1, pvalue)
             posts = cur.fetchall()
@@ -1610,20 +1631,21 @@ class Connection(object):
         else:
             return None
 
-        # Execute SQL Statement to get sender id given nickname
-        pvalue = (receiver_nickname,)
-        cur.execute(query2, pvalue)
+        if receiver_nickname is not None:
+            # Execute SQL Statement to get sender id given nickname
+            pvalue = (receiver_nickname,)
+            cur.execute(query2, pvalue)
 
-        # Extract user id
-        row = cur.fetchone()
-        if row is not None:
-            receiver_id = row["user_id"]
-        else:
-            return None
+            # Extract user id
+            row = cur.fetchone()
+            if row is not None:
+                receiver_id = row["user_id"]
+            else:
+                return None
 
         # Generate the values for SQL statement
         pvalue = (timestamp, sender_id, receiver_id, reply_to,
-                  post_text, rating, anonymous, public)
+                post_text, rating, anonymous, public)
 
         # Execute the statement
         cur.execute(stmnt, pvalue)
@@ -1633,7 +1655,7 @@ class Connection(object):
         lid = cur.lastrowid
 
         # Return the id in
-        return lid if lid is not None else None
+        return ('p-' + str(lid)) if lid is not None else None
 
     def modify_post_rating(self, post_id, rating):
         '''
