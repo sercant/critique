@@ -1350,9 +1350,13 @@ class Connection(object):
                     0 is False, 1 is True
         Note: all returned values are strings, unless otherwise stated.
         '''
+        try:
+            receiver = row['receiver']
+        except:
+            receiver = None
         post = {
             'post_id': str(row['post_id']),
-            'receiver': row['receiver'],
+            'receiver': receiver,
             'sender': row['sender'],
             'timestamp': row['timestamp'],
             'reply_to': str(row['reply_to']),
@@ -1362,6 +1366,51 @@ class Connection(object):
             'public': row['public']
         }
         return post
+
+
+    def get_posts(self):
+        '''
+        Used to retrieve some posts posted by a user.
+
+        :param user_id: default is None, takes the user id of the user
+            that you want the posts of. if the parameter is None, it
+            will raise a ValueError exception.
+        :type nickname: nickname of the user
+
+        :return: a list of posts made by the mentioned user. each
+            message is a dictionary containing the keys mentioned in
+            :py:meth:`_create_posts_list_object`
+
+            or returns None, if no posts found for the specified
+            user.
+        '''
+        query = 'SELECT posts.*, sender.nickname sender, receiver.nickname receiver FROM posts INNER JOIN users sender ON sender.user_id = posts.sender_id INNER JOIN users receiver ON receiver.user_id = posts.receiver_id ORDER BY timestamp DESC'
+
+        # set foreign keys support
+        self.set_foreign_keys_support()
+
+        # using cursor and row initalization to enable
+        # reading and returning the data in a dictionary
+        # format, with key-value pairs
+        self.con.row_factory = sqlite3.Row
+        cur = self.con.cursor()
+
+        # execute the SQL query
+        cur.execute(query)
+
+        # fetching the results
+        rows = cur.fetchall()
+
+        # check if there are posts fetched or not
+        if rows is None:
+            return None
+
+        # initiate the list object to hold the returned posts
+        posts = []
+        for row in rows:
+            post = self._create_post_list_object(row)
+            posts.append(post)
+        return posts
 
     def get_posts_by_user(self, nickname=None, is_sender=True):
         '''

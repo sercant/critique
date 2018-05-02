@@ -18,6 +18,7 @@ from werkzeug.exceptions import NotFound, UnsupportedMediaType
 from app.utils import RegexConverter
 from app import database
 from app.model.mason import MasonObject
+import geopy.distance
 
 # Constants for hypermedia formats and profiles
 MASON = "application/vnd.mason+json"
@@ -156,6 +157,15 @@ class CritiqueObject(MasonObject):  # Borrowed from lab exercises [1]
 
         self["@controls"]["critique:user-ratings"] = {
             "href": api.url_for(UserRatings, nickname=nickname),
+        }
+
+    def add_control_user_feed(self, nickname):
+        '''
+        : param str nickname: The nickname of the user
+        '''
+
+        self["@controls"]["critique:user-feed"] = {
+            "href": api.url_for(Posts)#, nickname=nickname),
         }
 
     def add_control_reply_to(self, postId):
@@ -618,6 +628,7 @@ class User(Resource):
         envelope.add_control_user_inbox(nickname)
         envelope.add_control_user_river(nickname)
         envelope.add_control_user_ratings(nickname)
+        envelope.add_control_user_feed(nickname)
 
         return Response(json.dumps(envelope), 200, mimetype=MASON) #+";" + CRITIQUE_USER_PROFILE)
 
@@ -1546,7 +1557,42 @@ class Posts(Resource):
         '''
         Gets a list of all posts
         '''
-        return Response('NOT IMPLEMENTED', 200)
+
+        # PERFORM OPERATIONS
+        # create users list
+        posts_db = g.con.get_posts()
+
+        # FILTER AND GENERATE THE RESPONSE
+        # Create the envelope
+        envelope = CritiqueObject()
+
+        items = envelope["items"] = []
+
+        for post in posts_db:
+            item = CritiqueObject(
+                sender=post["sender"],
+                receiver=post["receiver"],
+                timestamp=post["timestamp"],
+                postId=post["post_id"],
+                body=post["post_text"],
+                replyTo=post["reply_to"],
+                anonymous=post["anonymous"],
+                public=post["public"],
+                bestRating=10,
+                ratingValue=post["rating"]
+            )
+            items.append(item)
+            item.add_control("self", href=api.url_for(
+                Post, postId=post["post_id"]))
+            item.add_control("profile", href=CRITIQUE_POST_PROFILE)
+
+        envelope.add_namespace("critique", LINK_RELATIONS_URL)
+        envelope.add_control_all_posts()
+
+        envelope.add_control_all_users()
+        envelope.add_control("self", href=api.url_for(Posts))
+
+        return Response(json.dumps(envelope), 200, mimetype=MASON)
 
 
 # Add the Regex Converter so we can use regex expressions when we define the
