@@ -188,17 +188,16 @@ class CritiqueObject(MasonObject):  # Borrowed from lab exercises [1]
             "method": "DELETE"
         }
 
-    def add_control_delete_post(self, nickname, post_id):
+    def add_control_delete_post(self, post_id):
         '''
         Adds the delete control to an object. This is intended for any
         object that represents a user's post.
 
-        : param str nickname: The nickname of the user to remove
         : param integer post_id : The id of the post to be deleted
         '''
 
         self["@controls"]["critique:delete"] = {
-            "href": api.url_for(UserRiver, nickname=nickname, postId = post_id),
+            "href": api.url_for(Post, postId=post_id),
             "title": "Delete a user's post",
             "method": "DELETE"
         }
@@ -255,13 +254,13 @@ class CritiqueObject(MasonObject):  # Borrowed from lab exercises [1]
             "title": "Receiver of the resource",
         }
 
-    def add_control_edit_rating(self,nickname, ratingId):
+    def add_control_edit_rating(self, nickname, ratingId):
         '''
         This adds the link to edit a given rating for the
         document object.
         '''
         self["@controls"]["edit"] = {
-            "href": api.url_for(Rating, nickname = nickname, ratingId=ratingId),
+            "href": api.url_for(Rating, nickname=nickname, ratingId=ratingId),
             "title": "Edit Rating",
             "method": "PUT",
             "encoding": "json",
@@ -274,7 +273,7 @@ class CritiqueObject(MasonObject):  # Borrowed from lab exercises [1]
         document object.
         '''
         self["@controls"]["critique:delete"] = {
-            "href": api.url_for(Rating, nickname = nickname, ratingId=ratingId),
+            "href": api.url_for(Rating, nickname=nickname, ratingId=ratingId),
             "method": "DELETE"
         }
 
@@ -314,7 +313,8 @@ def create_error_response(status_code, title, message=None):
     envelope = MasonObject(resource_url=resource_url)
     envelope.add_error(title, message)
 
-    return Response(json.dumps(envelope), status_code, mimetype=MASON) #+";"+ERROR_PROFILE)
+    # +";"+ERROR_PROFILE)
+    return Response(json.dumps(envelope), status_code, mimetype=MASON)
 
 
 @app.errorhandler(404)
@@ -421,7 +421,8 @@ class Users(Resource):
         envelope.add_control("self", href=api.url_for(Users))
 
         # RENDER
-        return Response(json.dumps(envelope), 200, mimetype=MASON) #+";" + CRITIQUE_USER_PROFILE)
+        # +";" + CRITIQUE_USER_PROFILE)
+        return Response(json.dumps(envelope), 200, mimetype=MASON)
 
     def post(self):
         '''
@@ -619,7 +620,8 @@ class User(Resource):
         envelope.add_control_user_river(nickname)
         envelope.add_control_user_ratings(nickname)
 
-        return Response(json.dumps(envelope), 200, mimetype=MASON) #+";" + CRITIQUE_USER_PROFILE)
+        # +";" + CRITIQUE_USER_PROFILE)
+        return Response(json.dumps(envelope), 200, mimetype=MASON)
 
     def put(self, nickname):
         '''
@@ -821,8 +823,7 @@ class UserRatings(Resource):
         # CREATE RESPONSE AND RENDER
         return Response(status=201,
                         headers={"Location": api.url_for(Rating,
-                         nickname = nickname, ratingId = rating_id)})
-
+                                                         nickname=nickname, ratingId=rating_id)})
 
     def get(self, nickname):
         '''
@@ -904,7 +905,8 @@ class UserRatings(Resource):
         envelope.add_control_add_rating(nickname)
 
         # RENDER
-        return Response(json.dumps(envelope), 200, mimetype=MASON) #+";" + CRITIQUE_RATING_PROFILE)
+        # +";" + CRITIQUE_RATING_PROFILE)
+        return Response(json.dumps(envelope), 200, mimetype=MASON)
 
 
 class UserInbox(Resource):
@@ -957,9 +959,9 @@ class UserInbox(Resource):
 
         items = envelope["items"] = []
 
-        #PEFORM OPERATIONS INITIAL CHECKS
-        #Get the post from db
-        post_db = g.con.get_posts_by_user(nickname,False)
+        # PEFORM OPERATIONS INITIAL CHECKS
+        # Get the post from db
+        post_db = g.con.get_posts_by_user(nickname, False)
         if not post_db:
             return create_error_response(404, "Posts not found",
                                          "There is no posts for %s" % nickname)
@@ -983,6 +985,8 @@ class UserInbox(Resource):
                 item.add_control("self",
                                  href=api.url_for(UserInbox, nickname=post['receiver']))
                 item.add_control("profile", href=CRITIQUE_POST_PROFILE)
+                item.add_control_delete_post(post['post_id'])
+                item.add_control_edit_post(post['post_id'])
 
         envelope.add_namespace("critique", LINK_RELATIONS_URL)
         envelope.add_control_user_inbox(nickname)
@@ -997,8 +1001,9 @@ class UserInbox(Resource):
         # else:
         #     envelope.add_control("atom-thread:in-reply-to", href=None)
 
-        #RENDER
-        return Response(json.dumps(envelope), 200, mimetype=MASON) #+";" + CRITIQUE_POST_PROFILE)
+        # RENDER
+        # +";" + CRITIQUE_POST_PROFILE)
+        return Response(json.dumps(envelope), 200, mimetype=MASON)
 
     def post(self, nickname):
         '''
@@ -1044,10 +1049,10 @@ class UserInbox(Resource):
             abort(415)
 
         # PARSE REQUEST
-        request_body = request.get_json(force = True)
+        request_body = request.get_json(force=True)
         if not request_body:
             return create_error_response(415,
-                                        "Unsupported Media Type")
+                                         "Unsupported Media Type")
 
         # CHECK IF USER EXISTS
         userExist = g.con.contains_user(nickname)
@@ -1066,20 +1071,20 @@ class UserInbox(Resource):
         if not userExist:
             return create_error_response(404, "Sender user not found")
 
-        new_post_id = g.con.create_post(sender_nickname = sender_nickname,
-                                        receiver_nickname = nickname,
-                                        reply_to = None,
-                                        post_text = post_text,
-                                        anonymous = anonymous,
-                                        public = 0,
-                                        rating = None)
+        new_post_id = g.con.create_post(sender_nickname=sender_nickname,
+                                        receiver_nickname=nickname,
+                                        reply_to=None,
+                                        post_text=post_text,
+                                        anonymous=anonymous,
+                                        public=0,
+                                        rating=None)
         if not new_post_id:
             return create_error_response(500, "Problem with database",
-                                            "can not access database.")
+                                         "can not access database.")
 
-        url = api.url_for(UserInbox,nickname = nickname , postId = new_post_id )
+        url = api.url_for(UserInbox, nickname=nickname, postId=new_post_id)
 
-        return Response(status = 201,  headers={"Location": url})
+        return Response(status=201,  headers={"Location": url})
 
 
 class UserRiver(Resource):
@@ -1124,7 +1129,7 @@ class UserRiver(Resource):
         userExist = g.con.contains_user(nickname)
         if not userExist:
             return create_error_response(404, "User not found.",
-                                        "can't find a user to retrieve their river")
+                                         "can't find a user to retrieve their river")
 
         # FILTER AND GENERATE THE RESPONSE
         # Create the envelope
@@ -1134,16 +1139,12 @@ class UserRiver(Resource):
 
         # PEFORM OPERATIONS INITIAL CHECKS
         # Get the post from db and create posts list
-        post_db = g.con.get_posts_by_user(nickname,False)
+        post_db = g.con.get_posts_by_user(nickname, False)
         if not post_db:
             return create_error_response(404, "Message not found",
                                          "There is no a message with id %s" % nickname)
 
         for post in post_db:
-            if post["anonymous"]:
-                senderPerson = "Anonymous"
-            else:
-                senderPerson = post["sender"]
             item = CritiqueObject(
                 postId=post["post_id"],
                 ratingValue=post['rating'],
@@ -1154,7 +1155,7 @@ class UserRiver(Resource):
                 bestRating=10,
                 anonymous=post['anonymous'],
                 public=post['public'],
-                sender = senderPerson
+                sender=post["sender"]
             )
 
             if (post['public'] == 1):
@@ -1163,6 +1164,8 @@ class UserRiver(Resource):
                 item.add_control("self",
                                  href=api.url_for(UserRiver, nickname=post['receiver']))
                 item.add_control("profile", href=CRITIQUE_POST_PROFILE)
+                item.add_control_delete_post(post['post_id'])
+                item.add_control_edit_post(post['post_id'])
 
         envelope.add_namespace("critique", LINK_RELATIONS_URL)
         envelope.add_control_user_river(nickname)
@@ -1177,8 +1180,9 @@ class UserRiver(Resource):
         # else:
         #     envelope.add_control("atom-thread:in-reply-to", href=None)
 
-        #RENDER
-        return Response(json.dumps(envelope), 200, mimetype=MASON) #+";" + CRITIQUE_POST_PROFILE)
+        # RENDER
+        # +";" + CRITIQUE_POST_PROFILE)
+        return Response(json.dumps(envelope), 200, mimetype=MASON)
 
 
 class Ratings(Resource):
@@ -1230,30 +1234,32 @@ class Post(Resource):
             return create_error_response(404, "Post not found.")
 
         envelope = CritiqueObject(
-            sender = post_db["sender"],
-            receiver = post_db["receiver"],
-            timestamp = post_db["timestamp"],
-            postId = post_db["post_id"],
-            body = post_db["post_text"],
-            replyTo = post_db["reply_to"],
-            anonymous = post_db["anonymous"],
-            public = post_db["public"],
-            bestRating = 10,
-            ratingValue = post_db["rating"]
+            sender=post_db["sender"],
+            receiver=post_db["receiver"],
+            timestamp=post_db["timestamp"],
+            postId=post_db["post_id"],
+            body=post_db["post_text"],
+            replyTo=post_db["reply_to"],
+            anonymous=post_db["anonymous"],
+            public=post_db["public"],
+            bestRating=10,
+            ratingValue=post_db["rating"]
         )
         envelope.add_namespace("critique", LINK_RELATIONS_URL)
 
-        envelope.add_control("self", href=api.url_for(Post, postId = postId))
+        envelope.add_control("self", href=api.url_for(Post, postId=postId))
         envelope.add_control("profile", href=CRITIQUE_POST_PROFILE)
         envelope.add_control("collection", href=api.url_for(Posts))
-        envelope.add_control_edit_post(postId = postId)
-        envelope.add_control_reply_to(postId = postId)
-        envelope.add_control_delete_post(nickname = post_db["sender"], post_id = postId)
-        envelope.add_control_sender(nickname = post_db["sender"])
+        envelope.add_control_edit_post(postId=postId)
+        envelope.add_control_reply_to(postId=postId)
+        envelope.add_control_delete_post(
+            nickname=post_db["sender"], post_id=postId)
+        envelope.add_control_sender(nickname=post_db["sender"])
         if post_db["receiver"] is not None:
-            envelope.add_control_receiver(nickname = post_db["receiver"])
+            envelope.add_control_receiver(nickname=post_db["receiver"])
 
-        return Response(json.dumps(envelope), 200, mimetype=MASON) #+";"+ CRITIQUE_POST_PROFILE)
+        # +";"+ CRITIQUE_POST_PROFILE)
+        return Response(json.dumps(envelope), 200, mimetype=MASON)
 
     def post(self, postId):
         '''
@@ -1289,13 +1295,13 @@ class Post(Resource):
             abort(415)
 
         # check if postId is available
-        postExists = g.con.contains_post(post_id = postId)
+        postExists = g.con.contains_post(post_id=postId)
         if not postExists:
             return create_error_response(404, "Post not found",
-                                    "There is no post with id %s" %postId)
+                                         "There is no post with id %s" % postId)
 
         # parse request
-        request_body = request.get_json(force = True)
+        request_body = request.get_json(force=True)
         if not request_body:
             return create_error_response(415, "Unsupported Media Type")
 
@@ -1304,30 +1310,30 @@ class Post(Resource):
             post_text = request_body['body']
         except KeyError:
             return create_error_response(400, "Wrong request format",
-             "Post body missing or sender nickname invalid")
+                                         "Post body missing or sender nickname invalid")
 
         userExist = g.con.contains_user(sender)
         if not userExist:
-            return create_error_response(404,"Sending user not found")
+            return create_error_response(404, "Sending user not found")
 
         # getting the receiving user
         # parent_post_db = g.con.get_post(postId)
         # reply_to = parent_post_db['post_id']
 
-        new_post_id = g.con.create_post(sender_nickname = sender,
-                                        receiver_nickname = None,
-                                        reply_to = postId,
-                                        post_text = post_text,
-                                        anonymous = 0,
-                                        public = 1,
-                                        rating = None)
+        new_post_id = g.con.create_post(sender_nickname=sender,
+                                        receiver_nickname=None,
+                                        reply_to=postId,
+                                        post_text=post_text,
+                                        anonymous=0,
+                                        public=1,
+                                        rating=None)
         if not new_post_id:
             return create_error_response(500, "Problem with database",
-                                            "can not access database.")
+                                         "can not access database.")
 
-        url = api.url_for(Post, postId = new_post_id )
+        url = api.url_for(Post, postId=new_post_id)
 
-        return Response(status = 201,  headers={"Location": url})
+        return Response(status=201,  headers={"Location": url})
 
     def delete(self, postId):
         '''
@@ -1348,7 +1354,7 @@ class Post(Resource):
             g.con.delete_post(postId)
         except:
             return create_error_response(500,
-                "The system has failed. Please, contact the administrator.")
+                                         "The system has failed. Please, contact the administrator.")
         return Response('', 204)
 
     def put(self, postId):
@@ -1376,11 +1382,11 @@ class Post(Resource):
         if not post_db:
             return create_error_response(404, "Post not found.")
 
-        if JSON != request.headers.get("Content-Type",""):
+        if JSON != request.headers.get("Content-Type", ""):
             return create_error_response(415, "UnsupportedMediaType",
                                          "Use a JSON compatible format")
 
-        request_body = request.get_json(force = True)
+        request_body = request.get_json(force=True)
         if not request_body:
             return create_error_response(415, "Format of the input is not json.")
         try:
@@ -1392,7 +1398,7 @@ class Post(Resource):
                 'public', post_db['public'])
         except KeyError:
             return create_error_response(400, "Wrong request format",
-             "Can't acquire, either post body, rating or public value")
+                                         "Can't acquire, either post body, rating or public value")
         if not g.con.modify_post(postId, post_db['post_text'], post_db['rating'], post_db['public']):
             return create_error_response(500, "The system has failed. Please, contact the administrator.")
 
@@ -1408,7 +1414,7 @@ class Rating(Resource):
     track of the ratings.
     '''
 
-    def get(self, nickname ,ratingId):
+    def get(self, nickname, ratingId):
         '''
         Extract a rating from the database.
 
@@ -1437,37 +1443,39 @@ class Rating(Resource):
         ratingExist = g.con.contains_rating(ratingId)
         if not ratingExist:
             return create_error_response(404, "Rating not found",
-                            "There is no rating with the given ID.")
+                                         "There is no rating with the given ID.")
 
         userExist = g.con.contains_user(nickname)
         if not userExist:
             return create_error_response(404, "Resquested user not found",
-                                    "There is no user with the given nickname")
+                                         "There is no user with the given nickname")
         # Filter and generate the response
         # Create the envelope
         # get the rating from DB
         rating_db = g.con.get_rating(ratingId)
         item = CritiqueObject(
-            bestRating = 10,
-            ratingValue = rating_db["rating"],
+            bestRating=10,
+            ratingValue=rating_db["rating"],
             ratingId=rating_db["rating_id"],
-            sender = rating_db["sender"],
-            receiver = rating_db["receiver"]
+            sender=rating_db["sender"],
+            receiver=rating_db["receiver"]
         )
         item.add_namespace("critique", LINK_RELATIONS_URL)
 
-        item.add_control("self", href = api.url_for(
-            Rating, nickname = rating_db["receiver"], ratingId = rating_db["rating_id"]))
-        item.add_control("profile", href = CRITIQUE_RATING_PROFILE)
-        item.add_control("collection", href = api.url_for(UserRatings, nickname=rating_db["receiver"]))
+        item.add_control("self", href=api.url_for(
+            Rating, nickname=rating_db["receiver"], ratingId=rating_db["rating_id"]))
+        item.add_control("profile", href=CRITIQUE_RATING_PROFILE)
+        item.add_control("collection", href=api.url_for(
+            UserRatings, nickname=rating_db["receiver"]))
         item.add_control_edit_rating(
             ratingId=rating_db["rating_id"], nickname=rating_db["receiver"])
         item.add_control_delete_rating(
             ratingId=rating_db["rating_id"], nickname=rating_db["receiver"])
-        item.add_control_sender(nickname = rating_db["sender"])
-        item.add_control_receiver(nickname = rating_db["receiver"])
+        item.add_control_sender(nickname=rating_db["sender"])
+        item.add_control_receiver(nickname=rating_db["receiver"])
 
-        return Response(json.dumps(item), 200, mimetype=MASON) #+";" + CRITIQUE_RATING_PROFILE)
+        # +";" + CRITIQUE_RATING_PROFILE)
+        return Response(json.dumps(item), 200, mimetype=MASON)
 
     def put(self, nickname, ratingId):
         '''
@@ -1497,7 +1505,7 @@ class Rating(Resource):
         if not rating_db:
             return create_error_response(404, "User not found.")
 
-        request_body = request.get_json(force = True)
+        request_body = request.get_json(force=True)
         if not request_body:
             return create_error_response(415, "Format of the input is not json.")
         try:
@@ -1505,13 +1513,13 @@ class Rating(Resource):
                 'ratingValue', rating_db['rating'])
         except KeyError:
             return create_error_response(400, "Wrong request format",
-             "rating missing")
+                                         "rating missing")
 
         if not g.con.modify_rating(ratingId, rating_db['rating']):
             return create_error_response(500, "The system has failed. Please, contact the administrator.")
 
         return Response(status=204,
-                        headers={"Location": api.url_for(Rating, nickname = nickname,ratingId=ratingId)})
+                        headers={"Location": api.url_for(Rating, nickname=nickname, ratingId=ratingId)})
 
     def delete(self, nickname, ratingId):
         '''
@@ -1540,6 +1548,7 @@ class Rating(Resource):
             return create_error_response(500,
                                          "The system has failed. Please, contact the administrator.")
         return Response('', 204)
+
 
 class Posts(Resource):
     def get(self):
@@ -1605,13 +1614,14 @@ api.add_resource(Rating, "/critique/api/users/<nickname>/ratings/<regex('rtg-\d+
                  endpoint="rating")
 api.add_resource(Posts, "/critique/api/posts/",
                  endpoint="posts")
-api.add_resource(Post, "/critique/api/posts/<regex('p-\d+'):postId>/",
+api.add_resource(Post, "/critique/api/posts/<postId>/",
                  endpoint="post")
 
 # Redirect profile
 
 
-@app.route("/critique/profiles/<profile_name>/")  # Borrowed from lab exercises [1]
+# Borrowed from lab exercises [1]
+@app.route("/critique/profiles/<profile_name>/")
 def redirect_to_profile(profile_name):
     return redirect(APIARY_PROFILES_URL + profile_name)
 

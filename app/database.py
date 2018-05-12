@@ -985,9 +985,8 @@ class Connection(object):
             raise ValueError("No input post id")
 
         m = re.match('p-(\d+)', post_id)
-        if m is None or m.group(1) is None:
-            raise ValueError('post id is malformed')
-        post_id = int(m.group(1))
+        if m is not None and m.group(1) is not None:
+            post_id = int(m.group(1))
 
         # setting foreign keys support
         self.set_foreign_keys_support()
@@ -1483,9 +1482,8 @@ class Connection(object):
             raise ValueError("No post ID inserted to delete.")
 
         m = re.match('p-(\d+)', post_id)
-        if m is None or m.group(1) is None:
-            raise ValueError('post id is malformed')
-        post_id = int(m.group(1))
+        if m is not None and m.group(1) is not None:
+            post_id = int(m.group(1))
 
         queryParameter = (post_id, )
 
@@ -1565,9 +1563,8 @@ class Connection(object):
             raise ValueError("No input post id")
 
         m = re.match('p-(\d+)', post_id)
-        if m is None or m.group(1) is None:
-            raise ValueError('post id is malformed')
-        post_id = int(m.group(1))
+        if m is not None and m.group(1) is not None:
+            post_id = int(m.group(1))
 
         # SQL Statement to update the messages table
         query = 'UPDATE posts SET post_text = ?, rating = ?, public = ? WHERE post_id = ?'
@@ -1659,9 +1656,8 @@ class Connection(object):
         # the database table
         if reply_to is not None:
             m = re.match('p-(\d+)', reply_to)
-            if m is None or m.group(1) is None:
-                raise ValueError('post id is malformed')
-            reply_to = int(m.group(1))
+            if m is not None and m.group(1) is not None:
+                post_id = int(m.group(1))
 
             pvalue = (reply_to,)
             cur.execute(query1, pvalue)
