@@ -1546,7 +1546,42 @@ class Posts(Resource):
         '''
         Gets a list of all posts
         '''
-        return Response('NOT IMPLEMENTED', 200)
+
+        # PERFORM OPERATIONS
+        # create users list
+        posts_db = g.con.get_posts()
+
+        # FILTER AND GENERATE THE RESPONSE
+        # Create the envelope
+        envelope = CritiqueObject()
+
+        items = envelope["items"] = []
+
+        for post in posts_db:
+            item = CritiqueObject(
+                sender=post["sender"],
+                receiver=post["receiver"],
+                timestamp=post["timestamp"],
+                postId=post["post_id"],
+                body=post["post_text"],
+                replyTo=post["reply_to"],
+                anonymous=post["anonymous"],
+                public=post["public"],
+                bestRating=10,
+                ratingValue=post["rating"]
+            )
+            items.append(item)
+            item.add_control("self", href=api.url_for(
+                Post, postId=post["post_id"]))
+            item.add_control("profile", href=CRITIQUE_POST_PROFILE)
+
+        envelope.add_namespace("critique", LINK_RELATIONS_URL)
+        envelope.add_control_all_posts()
+
+        envelope.add_control_all_users()
+        envelope.add_control("self", href=api.url_for(Posts))
+
+        return Response(json.dumps(envelope), 200, mimetype=MASON)
 
 
 # Add the Regex Converter so we can use regex expressions when we define the
