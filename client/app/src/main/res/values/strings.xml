@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Critique</string>
+    <string-array name="rating_array">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+    </string-array>
+    <string name="title_activity_main">Critique</string>
+    <string name="title_users">Users</string>
+    <string name="title_inbox">Inbox</string>
+    <string name="title_profile">Profile</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="lorem_ipsum">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum lectus ex, vehicula nec purus eget, gravida gravida ex. Aenean non lectus quam. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Donec sed.
+    </string>
+</resources>
