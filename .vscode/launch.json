@@ -5,6 +5,27 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
+			"name": "Flask (linux/osx)",
+			"type": "python",
+			"request": "launch",
+			"stopOnEntry": false,
+			"pythonPath": "${config:python.pythonPath}",
+			"module": "flask",
+			"env": {
+				"FLASK_APP": "${workspaceRoot}/main.py"
+			},
+			"args": [
+				"run",
+				"--no-debugger",
+				"--no-reload"
+			],
+			"debugOptions": [
+				"WaitOnAbnormalExit",
+				"WaitOnNormalExit",
+				"RedirectOutput"
+			]
+		},
+		{
 			"name": "database_api_tests_user",
 			"type": "python",
 			"request": "launch",
@@ -17,57 +38,56 @@
 			"debugOptions": [
 				"RedirectOutput"
 			]
-        },
-        {
-            "name": "database_api_tests_ratings",
-            "type": "python",
-            "request": "launch",
-            "stopOnEntry": false,
-            "pythonPath": "${config:python.pythonPath}",
-            "module": "tests.database_api_tests_ratings",
-            "cwd": "${workspaceFolder}",
-            "env": {},
-            "envFile": "${workspaceFolder}/.env",
-            "debugOptions": [
-                "RedirectOutput"
-            ]
-        },
-        {
-            "name": "critique_api_tests",
-            "type": "python",
-            "request": "launch",
-            "stopOnEntry": false,
-            "pythonPath": "${config:python.pythonPath}",
-            "module": "tests.critique_api_tests",
-            "cwd": "${workspaceFolder}",
-            "env": {},
-            "envFile": "${workspaceFolder}/.env",
-            "debugOptions": [
-                "RedirectOutput"
-            ]
-        },
-        {
-            "name": "main",
-            "type": "python",
-            "request": "launch",
-            "stopOnEntry": false,
-            "pythonPath": "${config:python.pythonPath}",
-            "module": "main",
 		},
-		
-        {
-            "name": "database_api_tests_posts",
-            "type": "python",
-            "request": "launch",
-            "stopOnEntry": true,
-            "pythonPath": "${config:python.pythonPath}",
-            "module": "tests.database_api_tests_posts",
-            "cwd": "${workspaceFolder}",
-            "env": {},
-            "envFile": "${workspaceFolder}/.env",
-            "debugOptions": [
-                "RedirectOutput"
-            ]
-        }
+		{
+			"name": "database_api_tests_ratings",
+			"type": "python",
+			"request": "launch",
+			"stopOnEntry": false,
+			"pythonPath": "${config:python.pythonPath}",
+			"module": "tests.database_api_tests_ratings",
+			"cwd": "${workspaceFolder}",
+			"env": {},
+			"envFile": "${workspaceFolder}/.env",
+			"debugOptions": [
+				"RedirectOutput"
+			]
+		},
+		{
+			"name": "critique_api_tests",
+			"type": "python",
+			"request": "launch",
+			"stopOnEntry": false,
+			"pythonPath": "${config:python.pythonPath}",
+			"module": "tests.critique_api_tests",
+			"cwd": "${workspaceFolder}",
+			"env": {},
+			"envFile": "${workspaceFolder}/.env",
+			"debugOptions": [
+				"RedirectOutput"
+			]
+		},
+		{
+			"name": "main",
+			"type": "python",
+			"request": "launch",
+			"stopOnEntry": false,
+			"pythonPath": "${config:python.pythonPath}",
+			"module": "main",
+		},
+		{
+			"name": "database_api_tests_posts",
+			"type": "python",
+			"request": "launch",
+			"stopOnEntry": true,
+			"pythonPath": "${config:python.pythonPath}",
+			"module": "tests.database_api_tests_posts",
+			"cwd": "${workspaceFolder}",
+			"env": {},
+			"envFile": "${workspaceFolder}/.env",
+			"debugOptions": [
+				"RedirectOutput"
+			]
+		}
 	]
 }

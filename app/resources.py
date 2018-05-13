@@ -987,6 +987,8 @@ class UserInbox(Resource):
                 item.add_control("profile", href=CRITIQUE_POST_PROFILE)
                 item.add_control_delete_post(post['post_id'])
                 item.add_control_edit_post(post['post_id'])
+                item.add_control_sender(post['sender'])
+                item.add_control_receiver(post["receiver"])
 
         envelope.add_namespace("critique", LINK_RELATIONS_URL)
         envelope.add_control_user_inbox(nickname)
@@ -1166,6 +1168,8 @@ class UserRiver(Resource):
                 item.add_control("profile", href=CRITIQUE_POST_PROFILE)
                 item.add_control_delete_post(post['post_id'])
                 item.add_control_edit_post(post['post_id'])
+                item.add_control_sender(post['sender'])
+                item.add_control_receiver(post['receiver'])
 
         envelope.add_namespace("critique", LINK_RELATIONS_URL)
         envelope.add_control_user_river(nickname)

@@ -15,7 +15,6 @@ import io.critique.critique.Globals
  */
 data class Post(
         val sender: String = "",
-        val senderAvatar: String? = "",
         val receiver: String? = null,
         val timestamp: Long = 0L,
         val postId: String = "",
@@ -46,6 +45,11 @@ data class Post(
      * get edit post URL from controls
      */
     fun getEditPostURL(): String? = getControlLink("edit")
+
+    /**
+     * get sender of the post URL from controls
+     */
+    fun getSenderURL(): String? = getControlLink("critique:sender")
 
     /**
      * helper function for getting a control

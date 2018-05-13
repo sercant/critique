@@ -10,6 +10,8 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.Toast
 import com.bumptech.glide.Glide
+import com.github.kittinunf.fuel.httpGet
+import com.github.kittinunf.result.Result
 import io.critique.critique.Events
 import io.critique.critique.Globals
 import io.critique.critique.ProfileActivity
@@ -17,10 +19,10 @@ import io.critique.critique.R
 import io.critique.critique.helper.FirebaseHelper
 import io.critique.critique.model.Post
 import io.critique.critique.model.Rating
+import io.critique.critique.model.User
 import kotlinx.android.synthetic.main.post_card.view.*
 import org.ocpsoft.prettytime.PrettyTime
 import java.util.*
-import kotlin.collections.ArrayList
 
 /**
  * Updates the items in the recycle view
@@ -94,17 +96,33 @@ class PostAdapter(private val data: ArrayList<Post>) :
                 image.visibility = GONE
             }
 
-            if (!post.senderAvatar.isNullOrBlank() && !post.anonymous) {
-                FirebaseHelper.getImageFromStorage(post.senderAvatar!!, {
-                    avatar.setImageBitmap(it)
-                })
+            avatar.setImageResource(R.drawable.ic_account_circle_black_24dp)
+            // attempt to set the avatar of the sender.
+            if (!post.anonymous) {
                 avatar.setOnClickListener {
                     openProfile(context, post.sender)
                 }
-            } else {
-                avatar.setImageResource(R.drawable.ic_account_circle_black_24dp)
-            }
 
+                post.getSenderURL()?.httpGet()?.responseString { _, _, result ->
+                    when (result) {
+                        is Result.Failure -> {
+                            // couldn't load the user for avatar. no big deal ignore it.
+                            result.error.exception.printStackTrace()
+                        }
+                        is Result.Success -> {
+                            val senderUser = User.fromJson(result.get())
+                            senderUser.avatar?.let {
+                                if (!it.isBlank())
+                                    FirebaseHelper.getImageFromStorage(it, {
+                                        it ?: return@getImageFromStorage
+
+                                        avatar.setImageBitmap(it)
+                                    })
+                            }
+                        }
+                    }
+                }
+            }
 
             day.text = prettyTime.format(Date(System.currentTimeMillis() - post.timestamp))
 
