@@ -64,32 +64,11 @@ dependencies {
     implementation('com.journeyapps:zxing-android-embedded:3.6.0') { transitive = false }
     implementation 'com.google.zxing:core:3.3.0'
 
-    implementation("com.github.bumptech.glide:glide:4.6.1") {
-        exclude group: "com.android.support"
-    }
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0-RC1'
     implementation 'com.android.support:multidex:1.0.3'
 
     // Firebase Authentication
     implementation 'com.google.firebase:firebase-auth:15.0.0'
-    implementation 'com.google.firebase:firebase-database:15.0.0'
     implementation 'com.google.firebase:firebase-storage:15.0.0'
-
-    // Google Sign In SDK (only required for Google Sign In)
-//    implementation 'com.google.android.gms:play-services-auth:15.0.0'
-
-    // Firebase UI
-    // Used in FirebaseUIActivity.
-//    implementation 'com.firebaseui:firebase-ui-auth:3.3.1'
-
-    //    // Facebook Android SDK (only required for Facebook Login)
-    //    // Used in FacebookLoginActivity.
-    //    implementation 'com.facebook.android:facebook-login:4.32.0'
-    //    implementation 'com.android.support:customtabs:27.1.1'
-
-    // Twitter Android SDK (only required for Twitter Login)
-//    implementation 'com.twitter.sdk.android:twitter-core:3.2.0'
-//    implementation 'com.twitter.sdk.android:twitter:3.2.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

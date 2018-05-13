@@ -42,7 +42,7 @@ class LoginActivity : AppCompatActivity() {
                         when (result) {
                             is Result.Failure -> {
                                 // got an error, show the message to the user.
-                                val err = Error.fromJson(result.error.errorData)
+                                val err = Error.fromError(result.error.message, result.error.errorData)
                                 toast(err.error.message)
                             }
                             is Result.Success -> {

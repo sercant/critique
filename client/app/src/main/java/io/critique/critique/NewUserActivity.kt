@@ -160,7 +160,7 @@ class NewUserActivity : AppCompatActivity() {
         }, {
             // Show the error.
 
-            val error = Error.fromJson(it.errorData)
+            val error = Error.fromError(it.message, it.errorData)
             toast(error.error.message)
         })
     }

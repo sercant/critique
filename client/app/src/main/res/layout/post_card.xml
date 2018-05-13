@@ -68,11 +68,6 @@
                 app:layout_constraintTop_toBottomOf="@id/name_bar" />
         </android.support.constraint.ConstraintLayout>
 
-        <ImageView
-            android:id="@+id/image"
-            android:layout_width="match_parent"
-            android:layout_height="128dp" />
-
         <TextView
             android:id="@+id/body"
             style="@style/TextAppearance.AppCompat.Body1"

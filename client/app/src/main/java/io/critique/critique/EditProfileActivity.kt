@@ -106,7 +106,7 @@ class EditProfileActivity : AppCompatActivity() {
         Globals.myUser.updateUser(user, {
             finish()
         }, {
-            val err = Error.fromJson(it?.errorData)
+            val err = Error.fromError(it?.message, it?.errorData)
             toast(err.error.message)
         })
     }

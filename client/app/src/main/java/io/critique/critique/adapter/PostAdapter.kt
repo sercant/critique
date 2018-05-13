@@ -9,7 +9,6 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.Toast
-import com.bumptech.glide.Glide
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.result.Result
 import io.critique.critique.Events
@@ -81,19 +80,6 @@ class PostAdapter(private val data: ArrayList<Post>) :
 
             holder.cardView.setOnClickListener {
 
-            }
-
-            if (post.image != null) {
-                image.visibility = VISIBLE
-                image.setOnClickListener {
-                    openProfile(context, post.sender)
-                }
-
-                Glide.with(context)
-                        .load(post.image)
-                        .into(image)
-            } else {
-                image.visibility = GONE
             }
 
             avatar.setImageResource(R.drawable.ic_account_circle_black_24dp)

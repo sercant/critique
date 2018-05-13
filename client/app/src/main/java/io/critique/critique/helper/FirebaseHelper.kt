@@ -2,11 +2,6 @@ package io.critique.critique.helper
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.net.Uri
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
 import java.io.ByteArrayOutputStream
 

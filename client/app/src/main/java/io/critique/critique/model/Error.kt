@@ -26,7 +26,13 @@ data class Error(
         /**
          * Convert to Error object from ByteArray
          */
-        fun fromJson(data: ByteArray?): Error = if (data != null) fromJson(String(data)) else Error()
+        fun fromError(message: String?, data: ByteArray?): Error =
+                if (data != null && data.isNotEmpty())
+                    fromJson(String(data))
+                else if (message != null && !message.isBlank())
+                    Error(error = ErrorBody(message))
+                else
+                    Error()
 
         /**
          * Convert to Error object from String
