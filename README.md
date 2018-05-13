@@ -71,3 +71,16 @@ aglio -i docs/apiary.apib --server
 . venv/bin/activate
 python main.py
 ```
+
+## How to run client
+
+Software needed
+
++ Gradle
++ Android Studio
++ Android SDK
++ Android Emulator or Device
+
+Steps to run the client and the server.
+
+If you have android studio, open the project folder `client` using android studio and run the application through the IDE. You might have to change the API URL in the `Globals.kt` file. Currently it is set to be run on a local machine on an android emulator.
