@@ -35,7 +35,7 @@ RATING1 = {
     'timestamp': 1362022401,
     'sender': 'Scott',
     'receiver': 'Kim',
-    'rating': 3
+    'rating': 6
 }
 
 RATING1_MODIFIED = {
@@ -53,7 +53,7 @@ RATING2 = {
     'timestamp': 1362022411,
     'sender': 'Scott',
     'receiver': 'Stephen',
-    'rating': 5
+    'rating': 10
 }
 
 WRONG_RATING_ID = 'rtg-200'

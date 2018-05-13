@@ -1128,7 +1128,7 @@ class PostTestCase(ResourcesAPITestCase):
 
         data = json.dumps(self.reply_create_good)
         resp = self.client.post(resources.api.url_for(resources.Post,
-                                                      postId='p-1'),
+                                                      postId='1'),
                                 headers={"Content-Type": JSON},
                                 data=json.dumps(self.reply_create_good))
         self.assertEqual(resp.status_code, 201)

@@ -1256,8 +1256,7 @@ class Post(Resource):
         envelope.add_control("collection", href=api.url_for(Posts))
         envelope.add_control_edit_post(postId=postId)
         envelope.add_control_reply_to(postId=postId)
-        envelope.add_control_delete_post(
-            nickname=post_db["sender"], post_id=postId)
+        envelope.add_control_delete_post(post_id=postId)
         envelope.add_control_sender(nickname=post_db["sender"])
         if post_db["receiver"] is not None:
             envelope.add_control_receiver(nickname=post_db["receiver"])
