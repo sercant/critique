@@ -50,7 +50,9 @@ class LoginActivity : AppCompatActivity() {
 
                                 // set our current user and switch to MainActivity
                                 Globals.myUser = User.fromJson(data)
-                                startActivity(Intent(this, MainActivity::class.java))
+                                startActivity(Intent(this, MainActivity::class.java).apply {
+                                    putExtra(MainActivity.EXTRA_SHOW_WEATHER, true)
+                                })
                             }
                         }
                     }

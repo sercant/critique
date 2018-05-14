@@ -10,6 +10,10 @@ import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
+import com.github.kittinunf.fuel.httpGet
+import com.google.gson.Gson
+import com.google.gson.JsonObject
 import com.google.zxing.integration.android.IntentIntegrator
 import io.critique.critique.helper.DeeplinkHelper
 import io.critique.critique.helper.QRCodeHelper
@@ -26,6 +30,10 @@ import kotlinx.android.synthetic.main.activity_main.*
  * Third tab is the profile of the current user.
  */
 class MainActivity : AppCompatActivity() {
+
+    companion object {
+        const val EXTRA_SHOW_WEATHER = "extra_show_weather"
+    }
 
     // View managers
     lateinit var userManager: UserManager
@@ -150,6 +158,41 @@ class MainActivity : AppCompatActivity() {
             addAction(Events.ACTION_POST_PUBLISH)
             addAction(Events.ACTION_POST_DELETE)
         })
+
+        // should I show the weather info?
+        if (intent.extras?.getBoolean(EXTRA_SHOW_WEATHER) == true) {
+            val currentCity = "Oulu"
+            "${Globals.WEATHER_API_URL}/weather?appid=${Globals.WEATHER_API_KEY}&q=$currentCity&units=metric"
+                    .httpGet()
+                    .responseString { _, _, result ->
+                        result.fold({
+                            val weatherData = Gson().fromJson(it, JsonObject::class.java)
+
+                            try {
+                                // form the weather information string.
+                                var weatherText = ""
+                                val description = weatherData.getAsJsonArray("weather")[0]
+                                        .asJsonObject.get("description").asString
+                                val temperature = weatherData.getAsJsonObject("main")
+                                        .get("temp").asDouble
+
+                                weatherText += "Welcome ${Globals.myUser.nickname}!\n"
+                                weatherText += "Weather is $description\n"
+                                weatherText += "Temperature is $temperature degrees"
+
+                                // Show it as a toast message.
+                                Toast.makeText(this, weatherText, Toast.LENGTH_LONG).show()
+                            } catch (e: Exception) {
+                                // ignore
+                                e.printStackTrace()
+                            }
+                        }, {
+                            // ignore
+                            it.printStackTrace()
+                        })
+                    }
+            intent.removeExtra(EXTRA_SHOW_WEATHER)
+        }
     }
 
     override fun onDestroy() {
