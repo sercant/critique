@@ -20,8 +20,12 @@ class Globals {
         // URL of the users resource
         const val API_USERS_URL = "$API_URL/critique/api/users"
 
+        // External API for weather
         const val WEATHER_API_KEY = "***REMOVED***"
         const val WEATHER_API_URL = "http://api.openweathermap.org/data/2.5"
+
+        // External API for user profile from email
+        const val GRAVATAR_API_URL = "https://www.gravatar.com"
 
         // My user
         var myUser: User = User()

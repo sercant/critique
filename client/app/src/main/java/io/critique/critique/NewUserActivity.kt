@@ -13,7 +13,11 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.EditText
 import android.widget.Toast
+import com.github.kittinunf.fuel.httpGet
+import com.google.gson.Gson
+import com.google.gson.JsonObject
 import io.critique.critique.helper.FirebaseHelper
+import io.critique.critique.helper.MD5Util
 import io.critique.critique.model.Error
 import io.critique.critique.model.User
 import kotlinx.android.synthetic.main.activity_new_user.*
@@ -35,6 +39,16 @@ class NewUserActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_user)
         setSupportActionBar(my_toolbar)
+
+        email.setOnFocusChangeListener { view, hasFocus ->
+            if (!hasFocus) {
+                val text = email.getTrimmedText()
+
+                if (text.matches(emailReg)) {
+                    tryFillGravatarProfile(text)
+                }
+            }
+        }
     }
 
     /**
@@ -163,6 +177,56 @@ class NewUserActivity : AppCompatActivity() {
             val error = Error.fromError(it.message, it.errorData)
             toast(error.error.message)
         })
+    }
+
+    /**
+     * Trys to auto fill user information from gravatar profile
+     *
+     * @param email email of the user
+     */
+    private fun tryFillGravatarProfile(email: String) {
+        val md5email = MD5Util.md5Hex(email) ?: return
+
+        "${Globals.GRAVATAR_API_URL}/$md5email.json".httpGet()
+                .responseString { _, _, result ->
+                    result.fold({
+                        try {
+                            val profile = Gson().fromJson(it, JsonObject::class.java)
+                                    .getAsJsonArray("entry")[0].asJsonObject
+
+                            val preferredUserName = profile.get("preferredUsername").asString
+                            preferredUserName?.let {
+                                if (nickname.getTrimmedText().isBlank()) {
+                                    nickname.setText(preferredUserName)
+                                }
+                            }
+
+                            val displayName = profile.get("displayName").asString
+                            displayName?.let {
+                                if (given_name.getTrimmedText().isBlank()) {
+                                    val names = it.split(" ")
+                                    if (names.size > 1) {
+                                        val lastName = names[names.size - 1]
+                                        val givenName = names.subList(0, names.size - 1).joinToString(" ")
+
+                                        given_name.setText(givenName)
+                                        family_name.setText(lastName)
+                                    } else {
+                                        given_name.setText(it)
+                                    }
+                                }
+                            }
+                        } catch (e: Exception) {
+                            //ignore
+                            e.printStackTrace()
+                        }
+
+                        0
+                    }, {
+                        // ignore
+                        it.printStackTrace()
+                    })
+                }
     }
 
     /**

@@ -61,6 +61,8 @@ dependencies {
     implementation 'org.ocpsoft.prettytime:prettytime:4.0.1.Final'
     implementation 'com.github.kittinunf.fuel:fuel-android:1.12.1'
 
+    implementation "commons-codec:commons-codec:1.10"
+
     implementation('com.journeyapps:zxing-android-embedded:3.6.0') { transitive = false }
     implementation 'com.google.zxing:core:3.3.0'
 
