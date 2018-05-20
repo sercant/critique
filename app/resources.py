@@ -761,13 +761,17 @@ class UserRatings(Resource):
          * Media type: JSON
          * Profile: rating-profile
 
-        Semantic descriptors used in template: nickname (string), avatar (string), bio (string)
-
+        Semantic descriptors used in template: ratingId (mandatory), sender (mandatory), receiver (mandatory),
+                            bestRating(optional), ratingValue(mandatory)
+        
 
         RESPONSE STATUS CODE:
-         * Returns 201 + the url of the new resource in the Location header
-         * Return 400 User info is not well formed or entity body is missing.
+         * Returns 201 + the url of the new resource in the Location header if the rating was successfully created 
+         * Return 400 if Rating info is not well formed or entity body is missing.
+         * Return 404 if User not found. 
          * Return 415 if it receives a media type != application/json
+         * Return 422 if Sender or reciever not found
+         * Return 500 in case of system failure.
 
         NOTE:
          * The attribute givenName is obtained from the column users_profile.firstname
@@ -996,12 +1000,6 @@ class UserInbox(Resource):
         envelope.add_control("profile", href=CRITIQUE_POST_PROFILE)
         envelope.add_control("self", href=api.url_for(
             UserInbox, nickname=nickname))
-
-        # if post['reply_to']:
-        #     envelope.add_control("atom-thread:in-reply-to",
-        #                          href=api.url_for(Post, postId=post['post_id']))
-        # else:
-        #     envelope.add_control("atom-thread:in-reply-to", href=None)
 
         # RENDER
         # +";" + CRITIQUE_POST_PROFILE)

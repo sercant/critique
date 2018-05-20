@@ -78,6 +78,9 @@ class ResourcesAPITestCase(unittest.TestCase): # Borrowed from lab exercises [1]
 
 
 class UsersTestCase (ResourcesAPITestCase):
+    """
+    Class to test users related cases, related to users list
+    """
 
     user_1_request = {
         "nickname": "alkila",
@@ -196,6 +199,7 @@ class UsersTestCase (ResourcesAPITestCase):
     def test_get_users_mimetype(self):
         """
         Checks that GET users return correct status code and data format
+        Response code should be 200 if the get request is successful 
         """
         print("("+self.test_get_users_mimetype.__name__+")",
               self.test_get_users_mimetype.__doc__)
@@ -209,6 +213,7 @@ class UsersTestCase (ResourcesAPITestCase):
     def test_add_user(self):
         """
         Checks that the user is added correctly
+        Response code should be 201 if create user was successful 
         """
         print("("+self.test_add_user.__name__+")", self.test_add_user.__doc__)
 
@@ -249,6 +254,7 @@ class UsersTestCase (ResourcesAPITestCase):
     def test_add_user_missing_mandatory(self):
         """
         Test that it returns error when is missing a mandatory data
+        Response code should be 400
         """
         print("("+self.test_add_user_missing_mandatory.__name__+")",
               self.test_add_user_missing_mandatory.__doc__)
@@ -277,7 +283,7 @@ class UsersTestCase (ResourcesAPITestCase):
     def test_add_existing_user(self):
         """
         Testing that trying to add an existing user will fail
-
+        Response code should be 422 stating that Nickname, email, or mobile already exist in the users list.
         """
         print("("+self.test_add_existing_user.__name__+")",
               self.test_add_existing_user.__doc__)
@@ -299,6 +305,7 @@ class UsersTestCase (ResourcesAPITestCase):
     def test_wrong_type(self):
         """
         Test that return adequate error if sent incorrect mime type
+        Response code should be 415 if format of the input is not json
         """
         print("("+self.test_wrong_type.__name__+")",
               self.test_wrong_type.__doc__)
@@ -310,7 +317,9 @@ class UsersTestCase (ResourcesAPITestCase):
 
 
 class UserTestCase(ResourcesAPITestCase):
-
+    """
+    Class to test user related cases
+    """
     user_mod_req_1 = {
         "givenName": "Scotta",
         "familyName": "Pilgrimu",
@@ -418,6 +427,7 @@ class UserTestCase(ResourcesAPITestCase):
     def test_get_user_mimetype(self):
         """
         Checks that GET user return correct status code and data format
+        Response code should be 200 if successful 
         """
         print("("+self.test_get_user_mimetype.__name__+")",
               self.test_get_user_mimetype.__doc__)
@@ -432,6 +442,7 @@ class UserTestCase(ResourcesAPITestCase):
     def test_modify_user(self):
         """
         Modify an existing user and check that the user has been modified correctly in the server
+        Response code should be 204: User modified successfully.
         """
         print("("+self.test_modify_user.__name__+")",
               self.test_modify_user.__doc__)
@@ -452,6 +463,7 @@ class UserTestCase(ResourcesAPITestCase):
     def test_modify_nonexisting_user(self):
         """
         Try to modify a user that does not exist
+        Response code should be 404: User not found.
         """
         print("("+self.test_modify_nonexisting_user.__name__+")",
               self.test_modify_nonexisting_user.__doc__)
@@ -463,6 +475,7 @@ class UserTestCase(ResourcesAPITestCase):
     def test_delete_user(self):
         """
         Checks that Delete user return correct status code if corrected delete
+        Response code can be 404: User not found or 404: User not found.
         """
         print("("+self.test_delete_user.__name__+")",
               self.test_delete_user.__doc__)
@@ -474,6 +487,7 @@ class UserTestCase(ResourcesAPITestCase):
     def test_delete_nonexisting_user(self):
         """
         Checks that Delete user return correct status code if given a wrong address
+        Response code should be 404: User not found.        
         """
         print("("+self.test_delete_nonexisting_user.__name__+")",
               self.test_delete_nonexisting_user.__doc__)
@@ -482,7 +496,9 @@ class UserTestCase(ResourcesAPITestCase):
 
 
 class UserRatingsTestCase(ResourcesAPITestCase):
-
+    """
+    Class to test ratings related cases, related to ratings list 
+    """
     CREATE_RATING_SCHEMA = json.load(open('app/schema/create_rating.json'))
 
     def setUp(self):
@@ -515,7 +531,7 @@ class UserRatingsTestCase(ResourcesAPITestCase):
 
     def test_get_user_ratings(self):
         """
-        Checks that GET user_ratings return correct status code and data format
+        Checks that GET user ratings return correct status code and data format
         """
         print("("+self.test_get_user_ratings.__name__+")",
               self.test_get_user_ratings.__doc__)
@@ -575,6 +591,7 @@ class UserRatingsTestCase(ResourcesAPITestCase):
     def test_get_user_ratings_mimetype(self):
         """
         Checks that GET user ratings return correct status code and data format
+        Response code should be 200 if successful
         """
         print("("+self.test_get_user_ratings_mimetype.__name__+")",
               self.test_get_user_ratings_mimetype.__doc__)
@@ -585,9 +602,25 @@ class UserRatingsTestCase(ResourcesAPITestCase):
         self.assertEqual(resp.headers.get("Content-Type", None),
                          "{}".format(MASON_JSON)) # "{};{}".format(MASON_JSON, CRITIQUE_RATING_PROFILE))
 
+    def test_get_non_existing_user_rating(self):
+        """
+        Checks that GET user ratings return correct status code when user is not existing 
+        Response code should be 404: Rating not found.
+        """        
+        print("("+self.test_get_non_existing_user_rating.__name__+")",
+              self.test_get_non_existing_user_rating.__doc__)
+
+        # Check that I receive status code 404
+        # User not found
+        resp = self.client.get(self.url_wrong)
+        self.assertEqual(resp.status_code, 404)
+        self.assertEqual(resp.headers.get("Content-Type", None),
+                         "{}".format(MASON_JSON)) # "{};{}".format(MASON_JSON, CRITIQUE_RATING_PROFILE))
 
 class UserRiverTestCase(ResourcesAPITestCase):
-
+    """
+    Class to test user river (public posts) related cases
+    """
 
     CREATE_POSTS_SCHEMA = json.load(open('app/schema/create_posts.json'))
 
@@ -644,12 +677,6 @@ class UserRiverTestCase(ResourcesAPITestCase):
         self.assertIn("href", add_ctrl)
         self.assertEqual(add_ctrl["href"], resources.api.url_for(
             resources.UserRiver, nickname="Scott", _external=False))
-        # self.assertIn("encoding", add_ctrl)
-        # self.assertEqual(add_ctrl["encoding"], "json")
-        # self.assertIn("method", add_ctrl)
-        # self.assertEqual(add_ctrl["method"], "POST")
-        # self.assertIn("schema", add_ctrl)
-        # self.assertEqual(add_ctrl["schema"], self.CREATE_POSTS_SCHEMA)
 
         items = data["items"]
         self.assertEqual(len(items), scott_posts_count)
@@ -664,21 +691,10 @@ class UserRiverTestCase(ResourcesAPITestCase):
             self.assertIn("anonymous", item)
             self.assertIn("public", item)
 
-
             self.assertIn("@controls", item)
             self.assertIn("self", item["@controls"])
 
             self.assertIn("href", item["@controls"]["self"])
-            # self.assertEqual(item["@controls"]["self"]["href"], resources.api.url_for(
-            #     resources.UserRiver, nickname="Scott", _external=False))
-
-            # self.assertIn("href", item["@controls"]["critique:sender"])
-            # self.assertEqual(item["@controls"]["critique:sender"]["href"], resources.api.url_for(
-            #     resources.User, nickname=item["sender"], _external=False))
-
-            # self.assertIn("href", item["@controls"]["critique:receiver"])
-            # self.assertEqual(item["@controls"]["critique:receiver"]["href"], resources.api.url_for(
-            #     resources.User, nickname=item["receiver"], _external=False))
 
             self.assertIn("profile", item["@controls"])
             self.assertEqual(item["@controls"]["profile"]
@@ -687,6 +703,7 @@ class UserRiverTestCase(ResourcesAPITestCase):
     def test_get_posts_by_user_mimetype(self):
         """
         Checks that GET user ratings return correct status code and data format
+        Response code should be 200 if received successfully 
         """
         print("("+self.test_get_posts_by_user_mimetype.__name__+")",
               self.test_get_posts_by_user_mimetype.__doc__)
@@ -699,7 +716,9 @@ class UserRiverTestCase(ResourcesAPITestCase):
 
 
 class UserInboxTestCase(ResourcesAPITestCase):
-
+    """
+    Class to test user inbox (private posts) related cases
+    """
     post_mod_req_1 = {
         "anonymous": False,
         "sender": "Scott",
@@ -723,6 +742,13 @@ class UserInboxTestCase(ResourcesAPITestCase):
         "sender": "Moamen",
         "receiver": "Stephen",
         "body": "You are the worst actor ever",
+        "public": 1
+    }
+
+    post_create_bad_flag = {
+        "sender": "Kim",
+        "receiver": "Stephen",
+        "body": "We went to the school together and you were the best",
         "public": 1
     }
 
@@ -781,12 +807,7 @@ class UserInboxTestCase(ResourcesAPITestCase):
         self.assertIn("href", add_ctrl)
         self.assertEqual(add_ctrl["href"], resources.api.url_for(
             resources.UserInbox, nickname="Scott", _external=False))
-        # self.assertIn("encoding", add_ctrl)
-        # self.assertEqual(add_ctrl["encoding"], "json")
-        # self.assertIn("method", add_ctrl)
-        # self.assertEqual(add_ctrl["method"], "POST")
-        # self.assertIn("schema", add_ctrl)
-        # self.assertEqual(add_ctrl["schema"], self.CREATE_POSTS_SCHEMA)
+
 
         items = data["items"]
         self.assertEqual(len(items), scott_inbox_count)
@@ -806,16 +827,6 @@ class UserInboxTestCase(ResourcesAPITestCase):
             self.assertIn("self", item["@controls"])
 
             self.assertIn("href", item["@controls"]["self"])
-            # self.assertEqual(item["@controls"]["self"]["href"], resources.api.url_for(
-            #     resources.UserInbox, nickname="Scott", postId=item["postId"], _external=False))
-
-            # self.assertIn("href", item["@controls"]["critique:sender"])
-            # self.assertEqual(item["@controls"]["critique:sender"]["href"], resources.api.url_for(
-            #     resources.User, nickname=item["sender"], _external=False))
-
-            # self.assertIn("href", item["@controls"]["critique:receiver"])
-            # self.assertEqual(item["@controls"]["critique:receiver"]["href"], resources.api.url_for(
-            #     resources.User, nickname=item["receiver"], _external=False))
 
             self.assertIn("profile", item["@controls"])
             self.assertEqual(item["@controls"]["profile"]
@@ -823,7 +834,8 @@ class UserInboxTestCase(ResourcesAPITestCase):
 
     def test_get_posts_by_user_mimetype(self):
         """
-        Checks that GET user ratings return correct status code and data format
+        Checks that GET get_posts_by_user return correct status code and data format
+        Response code is 200 if successful 
         """
         print("("+self.test_get_posts_by_user_mimetype.__name__+")",
               self.test_get_posts_by_user_mimetype.__doc__)
@@ -837,6 +849,7 @@ class UserInboxTestCase(ResourcesAPITestCase):
     def test_create_post(self):
         """
         Creates a new post and appends it to the database
+        Response code is 200 indicating that it was created successfully 
         """
         print("("+self.test_create_post.__name__+")",
               self.test_create_post.__doc__)
@@ -857,6 +870,7 @@ class UserInboxTestCase(ResourcesAPITestCase):
     def test_create_wrong_post(self):
         """
         Creates a faulty post
+        Response code is 404: Post not found.
         """
         print("("+self.test_create_wrong_post.__name__+")",
               self.test_create_wrong_post.__doc__)
@@ -867,8 +881,24 @@ class UserInboxTestCase(ResourcesAPITestCase):
                                 data=json.dumps(self.post_create_bad))
         self.assertEqual(resp.status_code, 404)
 
-class UserRatingTestCase(ResourcesAPITestCase):
+    def test_create__post_without_anonymous_flag(self):
+        """
+        Tests create a post without identifying the anonymous flag
+        Response code is 400: Post info is not well formed or entity body is missing.
+        """
+        print("("+self.test_create__post_without_anonymous_flag.__name__+")",
+              self.test_create__post_without_anonymous_flag.__doc__)
+        data = json.dumps(self.post_create_bad_flag)
+        resp = self.client.post(resources.api.url_for(resources.UserInbox,
+                                                      nickname=self.post_create_bad_flag['receiver']),
+                                headers={"Content-Type": JSON},
+                                data=json.dumps(self.post_create_bad_flag))
+        self.assertEqual(resp.status_code, 400)
 
+class UserRatingTestCase(ResourcesAPITestCase):
+    """
+    Class to test user rating related cases
+    """
 
     rating_mod_req_1 = {
         "rating_id":"rtg-1",
@@ -893,6 +923,12 @@ class UserRatingTestCase(ResourcesAPITestCase):
         "sender": "Knives",
         "receiver": "lapland",
         "ratingValue": 6
+    }
+
+    rating_create_bad_value = {
+        "sender": "Knives",
+        "receiver": "lapland",
+        "ratingValue": "six"
     }
 
     CREATE_RATING_SCHEMA = json.load(open('app/schema/create_rating.json'))
@@ -930,6 +966,7 @@ class UserRatingTestCase(ResourcesAPITestCase):
     def test_modify_rating(self):
         """
         Modify an existing Rating and check that the Rating has been modified correctly in the server
+        Response code is 200 if successful 
         """
         print("("+self.test_modify_rating.__name__+")",
               self.test_modify_rating.__doc__)
@@ -950,6 +987,7 @@ class UserRatingTestCase(ResourcesAPITestCase):
     def test_modify_nonexisting_rating(self):
         """
         Try to modify a Rating that does not exist
+        Response code is 404: Rating not found 
         """
         print("("+self.test_modify_nonexisting_rating.__name__+")",
               self.test_modify_nonexisting_rating.__doc__)
@@ -961,6 +999,7 @@ class UserRatingTestCase(ResourcesAPITestCase):
     def test_delete_rating(self):
         """
         Checks that Delete Rating return correct status code if corrected delete
+        Response code is 404 if Rating not found or 204 if successfully deleted 
         """
         print("("+self.test_delete_rating.__name__+")",
               self.test_delete_rating.__doc__)
@@ -972,6 +1011,7 @@ class UserRatingTestCase(ResourcesAPITestCase):
     def test_delete_nonexisting_rating(self):
         """
         Checks that Delete rating return correct status code if given a wrong address
+        Response code is 404: Rating not found 
         """
         print("("+self.test_delete_nonexisting_rating.__name__+")",
               self.test_delete_nonexisting_rating.__doc__)
@@ -980,7 +1020,8 @@ class UserRatingTestCase(ResourcesAPITestCase):
 
     def test_create_rating(self):
         """
-        Creates a new rating and appends it to the database
+        Checks Creating a new rating and appending it to the database
+        Response code is 200 if successfully created
         """
         print("("+self.test_create_rating.__name__+")",
               self.test_create_rating.__doc__)
@@ -1003,7 +1044,8 @@ class UserRatingTestCase(ResourcesAPITestCase):
 
     def test_create_faulty_rating(self):
         """
-        Creates a faulty rating
+        Checks creating a faulty rating
+        Response code is 404: Rating not found 
         """
         print("("+self.test_create_rating.__name__+")",
               self.test_create_rating.__doc__)
@@ -1014,8 +1056,24 @@ class UserRatingTestCase(ResourcesAPITestCase):
                                 data=json.dumps(self.rating_create_bad))
         self.assertEqual(resp.status_code, 404)
 
-class PostTestCase(ResourcesAPITestCase):
+    def test_create_rating_value_not_number(self):
+        """
+        Checks creating a faulty rating as a value instead of a number
+        Response code is 404: Rating not found as it should be refenced with number (ID)
+        """
+        print("("+self.test_create_rating_value_not_number.__name__+")",
+              self.test_create_rating_value_not_number.__doc__)
+        data=json.dumps(self.rating_create_bad_value)
+        resp = self.client.post(resources.api.url_for(resources.UserRatings,
+                                nickname = self.rating_create_bad_value['receiver']),
+                                headers={"Content-Type": JSON},
+                                data=json.dumps(self.rating_create_bad_value))
+        self.assertEqual(resp.status_code, 404)
 
+class PostTestCase(ResourcesAPITestCase):
+    """
+    Class to test post related cases
+    """
     post_mod_req_1 = {
         "anonymous": 0,
         "sender": "Scott",
@@ -1070,6 +1128,7 @@ class PostTestCase(ResourcesAPITestCase):
     def test_modify_post(self):
         """
         Modify an existing post and check that the post has been modified correctly in the server
+        Response code 204: successfully modified the post
         """
         print("("+self.test_modify_post.__name__+")",
               self.test_modify_post.__doc__)
@@ -1091,6 +1150,7 @@ class PostTestCase(ResourcesAPITestCase):
     def test_modify_nonexisting_post(self):
         """
         Try to modify a post that does not exist
+        Response code 404: Post not found 
         """
         print("("+self.test_modify_nonexisting_post.__name__+")",
               self.test_modify_nonexisting_post.__doc__)
@@ -1102,6 +1162,7 @@ class PostTestCase(ResourcesAPITestCase):
     def test_delete_post(self):
         """
         Checks that Delete post return correct status code if corrected delete
+        Response code can be 204 if successfully deleted or 404 if not found 
         """
         print("("+self.test_delete_post.__name__+")",
               self.test_delete_post.__doc__)
@@ -1113,6 +1174,7 @@ class PostTestCase(ResourcesAPITestCase):
     def test_delete_nonexisting_post(self):
         """
         Checks that Delete post return correct status code if given a wrong address
+        Response 404: Post not found 
         """
         print("("+self.test_delete_nonexisting_post.__name__+")",
               self.test_delete_nonexisting_post.__doc__)
@@ -1122,6 +1184,7 @@ class PostTestCase(ResourcesAPITestCase):
     def test_create_reply(self):
         """
         Creates a new reply and appends it to the database
+        Response code is 200: successfully created a reply
         """
         print("("+self.test_create_reply.__name__+")",
               self.test_create_reply.__doc__)
@@ -1142,6 +1205,7 @@ class PostTestCase(ResourcesAPITestCase):
     def test_create_wrong_reply(self):
         """
         Creates a faulty reply
+        Response 404: Post not found 
         """
         print("("+self.test_create_wrong_reply.__name__+")",
               self.test_create_wrong_reply.__doc__)
@@ -1152,6 +1216,19 @@ class PostTestCase(ResourcesAPITestCase):
                                 data=json.dumps(self.reply_create_bad))
         self.assertEqual(resp.status_code, 404)
 
+    def test_create_reply_non_existing_post(self):
+        """
+        Creates a reply to a non existing post
+        Response 404: Post not found 
+        """
+        print("("+self.test_create_reply_non_existing_post.__name__+")",
+              self.test_create_reply_non_existing_post.__doc__)
+        data = json.dumps(self.reply_create_good)
+        resp = self.client.post(resources.api.url_for(resources.Post,
+                                                      postId='p-100'),
+                                headers={"Content-Type": JSON},
+                                data=json.dumps(self.reply_create_good))
+        self.assertEqual(resp.status_code, 404)
 
 if __name__ == "__main__": # Borrowed from lab exercises [1]
     print("Start running tests")
