@@ -1184,12 +1184,12 @@ class UserRiver(Resource):
                 item.add_control_edit_post(post['post_id'])
                 item.add_control_sender(post['sender'])
                 item.add_control_receiver(post['receiver'])
-                item.add_control_up(api.url_for(UserRatings, nickname=post['receiver']))
+                item.add_control_up(api.url_for(UserRiver, nickname=post['receiver']))
 
         envelope.add_namespace("critique", LINK_RELATIONS_URL)
         envelope.add_control_user_river(nickname)
         envelope.add_control_add_reply(nickname)
-        item.add_control_up(api.url_for(User, nickname=nickname))
+        envelope.add_control_up(api.url_for(User, nickname=nickname))
         envelope.add_control("profile", href=CRITIQUE_POST_PROFILE)
         envelope.add_control("self", href=api.url_for(
             UserRiver, nickname=nickname))
