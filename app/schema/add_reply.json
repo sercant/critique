@@ -1,0 +1,16 @@
+{
+    "type": "object",
+    "properties": {
+      "sender": {
+        "title": "Sender",
+        "description": "Nickname of sender of the rating",
+        "type": "string"
+      },
+      "body": {
+        "title": "Body",
+        "description": "Text of the post",
+        "type": "number"
+      }
+    },
+    "required": []
+  }

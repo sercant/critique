@@ -196,6 +196,13 @@ class UsersTestCase (ResourcesAPITestCase):
             self.assertEqual(item["@controls"]["profile"]
                              ["href"], CRITIQUE_USER_PROFILE)
 
+            self.assertIn("up", item["@controls"])
+            self.assertIn("href", item["@controls"]["up"])
+
+            self.assertEqual(item["@controls"]["up"]["href"], resources.api.url_for(
+                resources.Users, _external=False))
+
+
     def test_get_users_mimetype(self):
         """
         Checks that GET users return correct status code and data format
@@ -413,6 +420,11 @@ class UserTestCase(ResourcesAPITestCase):
                 resources.UserInbox, _external=False, nickname="Scott"
             ))
 
+            self.assertIn("up", controls)
+            self.assertEqual(controls["up"]["href"],  resources.api.url_for(
+                resources.Users, _external=False
+            ))
+
             # Check rest attributes
             self.assertIn("nickname", data)
             self.assertIn("givenName", data)
@@ -560,6 +572,12 @@ class UserRatingsTestCase(ResourcesAPITestCase):
         self.assertIn("schema", add_ctrl)
         self.assertEqual(add_ctrl["schema"], self.CREATE_RATING_SCHEMA)
 
+        self.assertIn("up", data["@controls"])
+        self.assertIn("href", data["@controls"]["up"])
+        self.assertIn("title", data["@controls"]["up"])
+        self.assertEqual(data["@controls"]["up"]["href"], resources.api.url_for(
+                resources.User, nickname="Scott", _external=False))
+
         items = data["items"]
         self.assertEqual(len(items), scott_ratings_count)
         for item in items:
@@ -583,6 +601,10 @@ class UserRatingsTestCase(ResourcesAPITestCase):
             self.assertIn("href", item["@controls"]["critique:receiver"])
             self.assertEqual(item["@controls"]["critique:receiver"]["href"], resources.api.url_for(
                 resources.User, nickname=item["receiver"], _external=False))
+
+            self.assertIn("up", item["@controls"])
+            self.assertEqual(item["@controls"]["up"]["href"], resources.api.url_for(
+                resources.UserRatings, nickname=item["receiver"], _external=False))
 
             self.assertIn("profile", item["@controls"])
             self.assertEqual(item["@controls"]["profile"]
@@ -678,6 +700,12 @@ class UserRiverTestCase(ResourcesAPITestCase):
         self.assertEqual(add_ctrl["href"], resources.api.url_for(
             resources.UserRiver, nickname="Scott", _external=False))
 
+        self.assertIn("up", data["@controls"])
+        self.assertIn("href", data["@controls"]["up"])
+        self.assertIn("title", data["@controls"]["up"])
+        self.assertEqual(data["@controls"]["up"]["href"], resources.api.url_for(
+                resources.User, nickname="Scott", _external=False))
+
         items = data["items"]
         self.assertEqual(len(items), scott_posts_count)
         for item in items:
@@ -699,6 +727,18 @@ class UserRiverTestCase(ResourcesAPITestCase):
             self.assertIn("profile", item["@controls"])
             self.assertEqual(item["@controls"]["profile"]
                              ["href"], CRITIQUE_POST_PROFILE)
+
+            self.assertIn("href", item["@controls"]["critique:sender"])
+            self.assertEqual(item["@controls"]["critique:sender"]["href"], resources.api.url_for(
+                resources.User, nickname=item["sender"], _external=False))
+
+            self.assertIn("href", item["@controls"]["critique:receiver"])
+            self.assertEqual(item["@controls"]["critique:receiver"]["href"], resources.api.url_for(
+                resources.User, nickname=item["receiver"], _external=False))
+
+            self.assertIn("up", item["@controls"])
+            self.assertEqual(item["@controls"]["up"]["href"], resources.api.url_for(
+                resources.UserRiver, nickname=item["receiver"], _external=False))
 
     def test_get_posts_by_user_mimetype(self):
         """
@@ -802,6 +842,12 @@ class UserInboxTestCase(ResourcesAPITestCase):
         self.assertIn("href", controls["self"])
         self.assertEqual(controls["self"]["href"], self.url)
 
+        self.assertIn("up", data["@controls"])
+        self.assertIn("href", data["@controls"]["up"])
+        self.assertIn("title", data["@controls"]["up"])
+        self.assertEqual(data["@controls"]["up"]["href"], resources.api.url_for(
+                resources.User, nickname="Scott", _external=False))
+
         items = data["items"]
         self.assertEqual(len(items), scott_inbox_count)
         for item in items:
@@ -824,6 +870,18 @@ class UserInboxTestCase(ResourcesAPITestCase):
             self.assertIn("profile", item["@controls"])
             self.assertEqual(item["@controls"]["profile"]
                              ["href"], CRITIQUE_POST_PROFILE)
+
+            self.assertIn("up", item["@controls"])
+            self.assertEqual(item["@controls"]["up"]["href"], resources.api.url_for(
+                resources.UserInbox, nickname=item["receiver"], _external=False))
+
+            self.assertIn("href", item["@controls"]["critique:sender"])
+            self.assertEqual(item["@controls"]["critique:sender"]["href"], resources.api.url_for(
+                resources.User, nickname=item["sender"], _external=False))
+
+            self.assertIn("href", item["@controls"]["critique:receiver"])
+            self.assertEqual(item["@controls"]["critique:receiver"]["href"], resources.api.url_for(
+                resources.User, nickname=item["receiver"], _external=False))
 
     def test_get_posts_by_user_mimetype(self):
         """
@@ -925,6 +983,7 @@ class UserRatingTestCase(ResourcesAPITestCase):
     }
 
     CREATE_RATING_SCHEMA = json.load(open('app/schema/create_rating.json'))
+    EDIT_RATING_SCHEMA = json.load(open('app/schema/edit_rating.json'))
 
     def setUp(self):
         super(UserRatingTestCase, self).setUp()
@@ -955,6 +1014,68 @@ class UserRatingTestCase(ResourcesAPITestCase):
         """
         resp = self.client.get(self.url_wrong)
         self.assertEqual(resp.status_code, 404)
+
+    def test_get_rating(self):
+        """
+        Checks that GET rating return correct status code and data format
+        """
+        print("("+self.test_get_rating.__name__+")",
+                self.test_get_rating.__doc__)
+        with resources.app.test_client() as client:
+            resp = client.get(self.url)
+            self.assertEqual(resp.status_code, 200)
+            data = json.loads(resp.data.decode("utf-8"))
+
+            controls = data["@controls"]
+            self.assertIn("self", controls)
+            self.assertIn("profile", controls)
+            self.assertIn("collection", controls)
+            self.assertIn("edit", controls)
+            self.assertIn("critique:delete", controls)
+            self.assertIn("critique:receiver", controls)
+            self.assertIn("critique:sender", controls)
+
+            self.assertIn("bestRating", data)
+            self.assertIn("ratingValue", data)
+            self.assertIn("ratingId", data)
+            self.assertIn("sender", data)
+            self.assertIn("receiver", data)
+
+
+            edit_ctrl = controls["edit"]
+            self.assertIn("title", edit_ctrl)
+            self.assertIn("href", edit_ctrl)
+            self.assertEqual(edit_ctrl["href"], self.url)
+            self.assertIn("encoding", edit_ctrl)
+            self.assertEqual(edit_ctrl["encoding"], "json")
+            self.assertIn("method", edit_ctrl)
+            self.assertEqual(edit_ctrl["method"], "PUT")
+            self.assertIn("schema", edit_ctrl)
+            self.assertEqual(edit_ctrl["schema"], self.EDIT_RATING_SCHEMA)
+
+            self.assertIn("href", controls["self"])
+            self.assertEqual(controls["self"]["href"], self.url)
+
+            self.assertIn("href", controls["profile"])
+            self.assertEqual(controls["profile"]
+                                ["href"], CRITIQUE_RATING_PROFILE)
+
+            self.assertIn("href", controls["collection"])
+            self.assertEqual(controls["collection"]["href"], resources.api.url_for(
+                resources.UserRatings, nickname="Kim", _external=False
+            ))
+
+            del_ctrl = controls["critique:delete"]
+            self.assertIn("href", del_ctrl)
+            self.assertEqual(del_ctrl["href"], self.url)
+            self.assertIn("method", del_ctrl)
+            self.assertEqual(del_ctrl["method"], "DELETE")
+
+            self.assertIn("up", controls)
+            self.assertEqual(controls["up"]["href"],  resources.api.url_for(
+                resources.UserRatings, nickname="Kim", _external=False
+            ))
+
 
     def test_modify_rating(self):
         """
@@ -1087,6 +1208,8 @@ class PostTestCase(ResourcesAPITestCase):
     }
 
     CREATE_POSTS_SCHEMA = json.load(open('app/schema/create_posts.json'))
+    EDIT_POST_SCHEMA = json.load(open('app/schema/edit_post.json'))
+    ADD_REPLY_SCHEMA = json.load(open('app/schema/add_reply.json'))
 
     def setUp(self):
         super(PostTestCase, self).setUp()
@@ -1116,6 +1239,96 @@ class PostTestCase(ResourcesAPITestCase):
         """
         resp = self.client.get(self.url_wrong)
         self.assertEqual(resp.status_code, 404)
+        
+    def test_get_post(self):
+        """
+        Checks that GET test_get_post return correct status code and data format
+        """
+
+        print("("+self.test_get_post.__name__+")",
+              self.test_get_post.__doc__)
+        # Check that I receive status code 200
+        resp = self.client.get(self.url)
+        self.assertEqual(resp.status_code, 200)
+
+        # Check that I receive a collection and adequate href
+        data = json.loads(resp.data.decode("utf-8"))
+
+        controls = data["@controls"]
+        self.assertIn("self", controls)
+        self.assertIn("profile", controls)
+        self.assertIn("collection", controls)
+
+        self.assertIn("edit", controls)
+        self.assertIn("critique:add-reply", controls)
+        self.assertIn("critique:delete", controls)
+        self.assertIn("critique:sender", controls)
+        self.assertIn("critique:receiver", controls)
+        self.assertIn("up", controls)
+
+        edit_ctrl = controls["edit"]
+        self.assertIn("title", edit_ctrl)
+        self.assertIn("href", edit_ctrl)
+        self.assertEqual(edit_ctrl["href"], self.url)
+        self.assertIn("encoding", edit_ctrl)
+        self.assertEqual(edit_ctrl["encoding"], "json")
+        self.assertIn("method", edit_ctrl)
+        self.assertEqual(edit_ctrl["method"], "PUT")
+        self.assertIn("schema", edit_ctrl)
+        self.assertEqual(edit_ctrl["schema"], self.EDIT_POST_SCHEMA)
+
+        reply_ctrl = controls["edit"]
+        self.assertIn("title", reply_ctrl)
+        self.assertIn("href", reply_ctrl)
+        self.assertEqual(reply_ctrl["href"], self.url)
+        self.assertIn("encoding", reply_ctrl)
+        self.assertEqual(reply_ctrl["encoding"], "json")
+        self.assertIn("method", reply_ctrl)
+        self.assertEqual(reply_ctrl["method"], "PUT")
+        self.assertIn("schema", reply_ctrl)
+        # self.assertEqual(reply_ctrl["schema"], self.ADD_REPLY_SCHEMA)
+
+        self.assertIn("href", controls["self"])
+        self.assertEqual(controls["self"]["href"], self.url)
+
+        self.assertIn("href", controls["profile"])
+        self.assertEqual(controls["profile"]
+                            ["href"], CRITIQUE_POST_PROFILE)
+
+        self.assertIn("href", controls["collection"])
+        self.assertEqual(controls["collection"]["href"], resources.api.url_for(
+            resources.Posts, _external=False
+        ))
+
+        del_ctrl = controls["critique:delete"]
+        self.assertIn("href", del_ctrl)
+        self.assertEqual(del_ctrl["href"], self.url)
+        self.assertIn("title", del_ctrl)
+        self.assertIn("method", del_ctrl)
+        self.assertEqual(del_ctrl["method"], "DELETE")
+
+        sender_ctrl = controls["critique:sender"]
+        self.assertIn("href", sender_ctrl)
+        self.assertEqual(sender_ctrl["href"], resources.api.url_for(
+                resources.User, _external=False, nickname="Scott"))
+        self.assertIn("title", sender_ctrl)
+
+        receiver_ctrl = controls["critique:receiver"]
+        self.assertIn("href", receiver_ctrl)
+        self.assertEqual(receiver_ctrl["href"],resources.api.url_for(
+                resources.User, _external=False, nickname="Stephen"))
+        self.assertIn("title", receiver_ctrl)
+
+        # CHECK PUBLIC
+        public=data["public"]
+        self.assertIn("up", controls)
+        if public==1:
+            self.assertEqual(controls["up"]["href"],  resources.api.url_for(
+                resources.UserRiver, nickname= data["receiver"], _external=False))
+        elif public==0:
+            self.assertEqual(controls["up"]["href"],  resources.api.url_for(
+                resources.UserInbox, nickname= data["receiver"], _external=False))
+        
 
 
     def test_modify_post(self):
