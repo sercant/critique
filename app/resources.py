@@ -1184,10 +1184,12 @@ class UserRiver(Resource):
                 item.add_control_edit_post(post['post_id'])
                 item.add_control_sender(post['sender'])
                 item.add_control_receiver(post['receiver'])
+                item.add_control_up(api.url_for(UserRatings, nickname=post['receiver']))
 
         envelope.add_namespace("critique", LINK_RELATIONS_URL)
         envelope.add_control_user_river(nickname)
         envelope.add_control_add_reply(nickname)
+        item.add_control_up(api.url_for(User, nickname=nickname))
         envelope.add_control("profile", href=CRITIQUE_POST_PROFILE)
         envelope.add_control("self", href=api.url_for(
             UserRiver, nickname=nickname))
@@ -1227,7 +1229,7 @@ class Post(Resource):
 
     def get(self, postId):
         '''
-        Extracts a post and all it’s information.
+        Extracts a post and all it's information.
 
         :param str postId: ID of the requested post
 
@@ -1272,7 +1274,12 @@ class Post(Resource):
         envelope.add_control_add_reply(postId=postId)
         envelope.add_control_delete_post(post_id=postId)
         envelope.add_control_sender(nickname=post_db["sender"])
-        envelope.add_control_up(api.url_for(Posts))
+        up_url = api.url_for(Posts)
+        if post_db["public"] == 1 and post_db["reply_to"] is None:
+            up_url = api.url_for(UserRiver, nickname=post_db["receiver"])
+        elif post_db["public"] == 0:
+            up_url = api.url_for(UserInbox, nickname=post_db["receiver"])
+        envelope.add_control_up(up_url)
         if post_db["receiver"] is not None:
             envelope.add_control_receiver(nickname=post_db["receiver"])
 
