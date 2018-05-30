@@ -684,6 +684,10 @@ class User(Resource):
             }
         '''
 
+        if JSON != request.headers.get("Content-Type", ""):
+            return create_error_response(415, "UnsupportedMediaType",
+                                         "Use a JSON compatible format")
+
         user_db = g.con.get_user(nickname)
         if not user_db:
             return create_error_response(404, "User not found.")
@@ -1530,6 +1534,10 @@ class Rating(Resource):
         rating_db = g.con.get_rating(ratingId)
         if not rating_db:
             return create_error_response(404, "User not found.")
+
+        if JSON != request.headers.get("Content-Type", ""):
+            return create_error_response(415, "UnsupportedMediaType",
+                                         "Use a JSON compatible format")
 
         request_body = request.get_json(force=True)
         if not request_body:
