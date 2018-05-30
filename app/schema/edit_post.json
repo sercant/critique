@@ -14,7 +14,7 @@
         "public": {
             "title": "Public",
             "description": "Publicity of the post",
-            "type": "boolean"
+            "type": "number"
         }
     },
     "required": []

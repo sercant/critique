@@ -225,7 +225,7 @@ Inherited from IANA RFC5988:
  * `sender` (string): Nickname of the sender. Mandatory in representations in which a new post is generated.
  * `receiver` (string): Nickname of the receiver. Optional in representations in which a new post is generated.
  * `timestamp` (number): Time of the post created in UNIX format.
- * `postId` (string): Id of the post in 'p-(\d+)' format.
+ * `postId` (string): Id of the post in '(\d+)' format.
  * `replyTo` (string): Id of the parent post. If `null` is returned it means post is the top most.
  * `body` (string): Text of the post. Mandatory in creation of a new post.
  * `anonymous` (boolean): Is the post sent anonymously or not. Mandatory in creation of a new post.
@@ -327,6 +327,10 @@ Extracts all users summary in the database.
                             },
                             "profile": {
                                 "href": "/critique/profiles/user-profile/"
+                            },
+                            "up": {
+                                "href": "/critique/api/users/",
+                                "title": "Parent document"
                             }
                         }
                     },
@@ -335,28 +339,86 @@ Extracts all users summary in the database.
                         "givenName": "Kim",
                         "familyName": "Pine",
                         "bio": "Drums! Dont irritate me...",
-                        "avatar": "photo3.jpg",
+                        "avatar": "photo3.png",
                         "@controls": {
                             "self": {
                                 "href": "/critique/api/users/Kim/"
                             },
                             "profile": {
                                 "href": "/critique/profiles/user-profile/"
+                            },
+                            "up": {
+                                "href": "/critique/api/users/",
+                                "title": "Parent document"
+                            }
+                        }
+                    },
+                    {
+                        "nickname": "Stephen",
+                        "givenName": "Stephen",
+                        "familyName": "Stills",
+                        "avatar": "photo4.png",
+                        "bio": "Im the best!",
+                        "@controls": {
+                            "self": {
+                                "href": "/critique/api/users/Stephen/"
+                            },
+                            "profile": {
+                                "href": "/critique/profiles/user-profile/"
+                            },
+                            "up": {
+                                "href": "/critique/api/users/",
+                                "title": "Parent document"
+                            }
+                        }
+                    },
+                    {
+                        "nickname": "Young",
+                        "givenName": "Young",
+                        "familyName": "Neil",
+                        "avatar": "photo_5.jpg",
+                        "bio": "Im good at gameboy",
+                        "@controls": {
+                            "self": {
+                                "href": "/critique/api/users/Young/"
+                            },
+                            "profile": {
+                                "href": "/critique/profiles/user-profile/"
+                            },
+                            "up": {
+                                "href": "/critique/api/users/",
+                                "title": "Parent document"
+                            }
+                        }
+                    },
+                    {
+                        "nickname": "Knives",
+                        "givenName": "Knives",
+                        "familyName": "Chau",
+                        "avatar": "photo8.png",
+                        "bio": "Love you Scott!!",
+                        "@controls": {
+                            "self": {
+                                "href": "/critique/api/users/Knives/"
+                            },
+                            "profile": {
+                                "href": "/critique/profiles/user-profile/"
+                            },
+                            "up": {
+                                "href": "/critique/api/users/",
+                                "title": "Parent document"
                             }
                         }
                     }
                 ],
-                "@namespaces": {
-                    "critique": {
-                        "name": "/critique/link-relations/"
-                    }
-                },
                 "@controls": {
-                    "self": {
-                        "href": "/forum/api/users/"
+                    "critique:all-posts": {
+                        "href": "/critique/api/posts/",
+                        "title": "List posts"
                     },
                     "critique:add-user": {
-                        "href": "/forum/api/users/",
+                        "href": "/critique/api/users/",
+                        "title": "Create a new user",
                         "encoding": "json",
                         "method": "POST",
                         "schema": {
@@ -415,8 +477,13 @@ Extracts all users summary in the database.
                             ]
                         }
                     },
-                    "critique:all-posts": {
-                        "href": "/forum/api/posts/"
+                    "self": {
+                        "href": "/critique/api/users/"
+                    }
+                },
+                "@namespaces": {
+                    "critique": {
+                        "name": "/critique/link-relations/"
                     }
                 }
             }
@@ -613,6 +680,10 @@ Extract information of a user.
                     },
                     "critique:user-ratings": {
                         "href": "/critique/api/users/Scott/ratings/"
+                    },
+                    "up": {
+                        "href": "/critique/api/users/",
+                        "title": "Parent document"
                     }
                 },
                 "@namespaces": {
@@ -795,49 +866,177 @@ Posts sent to the user which are currently public.
             {
                 "items": [
                     {
-                        "sender": "Margaret",
+                        "postId": "11",
+                        "ratingValue": 10,
                         "receiver": "Scott",
-                        "timestamp": 45345234234,
-                        "postId": "p-2",
-                        "replyTo": null,
-                        "body": "He is a great bass.",
-                        "anonymous": false,
-                        "public": true,
+                        "replyTo": "None",
+                        "body": "I love you scott!",
+                        "timestamp": 1362021481,
                         "bestRating": 10,
-                        "ratingValue": 8,
+                        "anonymous": 0,
+                        "public": 1,
+                        "sender": "Knives",
                         "@controls": {
                             "self": {
-                                "href": "/critique/api/posts/p-2"
+                                "href": "/critique/api/users/Scott/river/"
                             },
                             "profile": {
-                                "href": "/critique/profiles/post-profile/"
+                                "href": "/critique/profiles/post_profile/"
+                            },
+                            "critique:delete": {
+                                "href": "/critique/api/posts/11/",
+                                "title": "Delete a user's post",
+                                "method": "DELETE"
+                            },
+                            "edit": {
+                                "href": "/critique/api/posts/11/",
+                                "title": "Edit a post",
+                                "method": "PUT",
+                                "encoding": "json",
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ratingValue": {
+                                            "title": "Rating",
+                                            "description": "Rating given in the post",
+                                            "type": "number"
+                                        },
+                                        "body": {
+                                            "title": "Body",
+                                            "description": "Text of the post",
+                                            "type": "number"
+                                        },
+                                        "public": {
+                                            "title": "Public",
+                                            "description": "Publicity of the post",
+                                            "type": "number"
+                                        }
+                                    },
+                                    "required": []
+                                }
+                            },
+                            "critique:sender": {
+                                "href": "/critique/api/users/Knives/",
+                                "title": "Sender of the resource"
+                            },
+                            "critique:receiver": {
+                                "href": "/critique/api/users/Scott/",
+                                "title": "Receiver of the resource"
+                            },
+                            "up": {
+                                "href": "/critique/api/users/Scott/river/",
+                                "title": "Parent document"
                             }
                         }
                     },
                     {
-                        "sender": "Kim",
+                        "postId": "8",
+                        "ratingValue": 8,
                         "receiver": "Scott",
-                        "timestamp": 45345434534,
-                        "postId": "p-3",
-                        "replyTo": null,
-                        "body": "I hate you.",
-                        "anonymous": false,
-                        "public": true,
+                        "replyTo": "None",
+                        "body": "Nice bass!",
+                        "timestamp": 1362012381,
                         "bestRating": 10,
-                        "ratingValue": 3,
+                        "anonymous": 0,
+                        "public": 1,
+                        "sender": "Young",
                         "@controls": {
                             "self": {
-                                "href": "/critique/api/posts/p-3"
+                                "href": "/critique/api/users/Scott/river/"
                             },
                             "profile": {
-                                "href": "/critique/profiles/post-profile/"
+                                "href": "/critique/profiles/post_profile/"
+                            },
+                            "critique:delete": {
+                                "href": "/critique/api/posts/8/",
+                                "title": "Delete a user's post",
+                                "method": "DELETE"
+                            },
+                            "edit": {
+                                "href": "/critique/api/posts/8/",
+                                "title": "Edit a post",
+                                "method": "PUT",
+                                "encoding": "json",
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ratingValue": {
+                                            "title": "Rating",
+                                            "description": "Rating given in the post",
+                                            "type": "number"
+                                        },
+                                        "body": {
+                                            "title": "Body",
+                                            "description": "Text of the post",
+                                            "type": "number"
+                                        },
+                                        "public": {
+                                            "title": "Public",
+                                            "description": "Publicity of the post",
+                                            "type": "number"
+                                        }
+                                    },
+                                    "required": []
+                                }
+                            },
+                            "critique:sender": {
+                                "href": "/critique/api/users/Young/",
+                                "title": "Sender of the resource"
+                            },
+                            "critique:receiver": {
+                                "href": "/critique/api/users/Scott/",
+                                "title": "Receiver of the resource"
+                            },
+                            "up": {
+                                "href": "/critique/api/users/Scott/river/",
+                                "title": "Parent document"
                             }
                         }
                     }
                 ],
-                "@controls":{
+                "@controls": {
+                    "critique:user-river": {
+                        "href": "/critique/api/users/Scott/river/"
+                    },
+                    "critique:add-reply": {
+                        "href": "/critique/api/posts/Scott/",
+                        "title": "Add reply",
+                        "encoding": "json",
+                        "method": "POST",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "sender": {
+                                    "title": "Sender",
+                                    "description": "Nickname of sender of the rating",
+                                    "type": "string"
+                                },
+                                "body": {
+                                    "title": "Body",
+                                    "description": "Text of the post",
+                                    "type": "number"
+                                }
+                            },
+                            "required": [
+                                "sender",
+                                "body"
+                            ]
+                        }
+                    },
+                    "up": {
+                        "href": "/critique/api/users/Scott/",
+                        "title": "Parent document"
+                    },
+                    "profile": {
+                        "href": "/critique/profiles/post_profile/"
+                    },
                     "self": {
-                        "href": "/critique/api/users/Scott/river"
+                        "href": "/critique/api/users/Scott/river/"
+                    }
+                },
+                "@namespaces": {
+                    "critique": {
+                        "name": "/critique/link-relations/"
                     }
                 }
             }
@@ -882,49 +1081,110 @@ Posts sent to the user which are currently private.
             {
                 "items": [
                     {
-                        "sender": "Margaret",
-                        "receiver": "Scott",
-                        "timestamp": 45345234234,
-                        "postId": "p-2",
-                        "replyTo": null,
-                        "body": "He is a great bass.",
-                        "anonymous": false,
-                        "public": false,
-                        "bestRating": 10,
-                        "ratingValue": 8,
-                        "@controls": {
-                            "self": {
-                                "href": "/critique/api/posts/p-2"
-                            },
-                            "profile": {
-                                "href": "/critique/profiles/post-profile/"
-                            }
-                        }
-                    },
-                    {
+                        "postId": "4",
                         "sender": "Kim",
-                        "receiver": "Scott",
-                        "timestamp": 45345434534,
-                        "postId": "p-3",
-                        "replyTo": null,
-                        "body": "I hate you.",
-                        "anonymous": false,
-                        "public": false,
+                        "timestamp": 1362011481,
                         "bestRating": 10,
-                        "ratingValue": 3,
+                        "ratingValue": 2,
+                        "receiver": "Scott",
+                        "replyTo": "None",
+                        "body": "Go and die scott!",
+                        "anonymous": 1,
+                        "public": 0,
                         "@controls": {
                             "self": {
-                                "href": "/critique/api/posts/p-3"
+                                "href": "/critique/api/posts/4/"
                             },
                             "profile": {
-                                "href": "/critique/profiles/post-profile/"
+                                "href": "/critique/profiles/post_profile/"
+                            },
+                            "critique:delete": {
+                                "href": "/critique/api/posts/4/",
+                                "title": "Delete a user's post",
+                                "method": "DELETE"
+                            },
+                            "edit": {
+                                "href": "/critique/api/posts/4/",
+                                "title": "Edit a post",
+                                "method": "PUT",
+                                "encoding": "json",
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ratingValue": {
+                                            "title": "Rating",
+                                            "description": "Rating given in the post",
+                                            "type": "number"
+                                        },
+                                        "body": {
+                                            "title": "Body",
+                                            "description": "Text of the post",
+                                            "type": "number"
+                                        },
+                                        "public": {
+                                            "title": "Public",
+                                            "description": "Publicity of the post",
+                                            "type": "number"
+                                        }
+                                    },
+                                    "required": []
+                                }
+                            },
+                            "critique:sender": {
+                                "href": "/critique/api/users/Kim/",
+                                "title": "Sender of the resource"
+                            },
+                            "critique:receiver": {
+                                "href": "/critique/api/users/Scott/",
+                                "title": "Receiver of the resource"
+                            },
+                            "critique:add-reply": {
+                                "href": "/critique/api/posts/4/",
+                                "title": "Add reply",
+                                "encoding": "json",
+                                "method": "POST",
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "sender": {
+                                            "title": "Sender",
+                                            "description": "Nickname of sender of the rating",
+                                            "type": "string"
+                                        },
+                                        "body": {
+                                            "title": "Body",
+                                            "description": "Text of the post",
+                                            "type": "number"
+                                        }
+                                    },
+                                    "required": [
+                                        "sender",
+                                        "body"
+                                    ]
+                                }
+                            },
+                            "up": {
+                                "href": "/critique/api/users/Scott/inbox/",
+                                "title": "Parent document"
                             }
                         }
                     }
                 ],
-                "@controls":{
+                "@controls": {
+                    "profile": {
+                        "href": "/critique/profiles/post_profile/"
+                    },
                     "self": {
-                        "href": "/critique/api/users/Scott/inbox"
+                        "href": "/critique/api/users/Scott/inbox/"
+                    },
+                    "up": {
+                        "href": "/critique/api/users/Scott/",
+                        "title": "Parent document"
+                    }
+                },
+                "@namespaces": {
+                    "critique": {
+                        "name": "/critique/link-relations/"
                     }
                 }
             }
@@ -1065,7 +1325,7 @@ Contains the information needed from a specific post where it contains the post 
 
 + Parameters
 
-    + postId: `p-1` (string) - Post id.
+    + postId: `1` (string) - Post id.
 
 ## Receive post's information [GET]
 
@@ -1084,35 +1344,30 @@ Extracts a post and all it’s information.
 
             {
                 "sender": "Scott",
-                "receiver": "Kim",
-                "timestamp": 45345234234,
-                "postId": "p-1",
+                "receiver": "Stephen",
+                "timestamp": 1362012481,
+                "postId": 1,
+                "body": "You are such a cool actor. Can we get a photo?",
                 "replyTo": null,
-                "body": "She is great! (sometimes)",
-                "anonymous": false,
-                "public": true,
+                "anonymous": 0,
+                "public": 1,
                 "bestRating": 10,
-                "ratingValue": 8,
-                "@namespaces": {
-                    "critique": {
-                        "name": "/critique/link-relations/"
-                    }
-                },
+                "ratingValue": 10,
                 "@controls": {
-                    "collection": {
-                        "href": "/critique/api/posts"
-                    },
                     "self": {
-                        "href": "/critique/api/posts/p-1"
+                        "href": "/critique/api/posts/1/"
                     },
                     "profile": {
-                        "href": "/critique/profiles/post-profile/"
+                        "href": "/critique/profiles/post_profile/"
+                    },
+                    "collection": {
+                        "href": "/critique/api/posts/"
                     },
                     "edit": {
+                        "href": "/critique/api/posts/1/",
                         "title": "Edit a post",
-                        "href": "/critique/api/posts/p-1",
-                        "encoding": "json",
                         "method": "PUT",
+                        "encoding": "json",
                         "schema": {
                             "type": "object",
                             "properties": {
@@ -1129,15 +1384,15 @@ Extracts a post and all it’s information.
                                 "public": {
                                     "title": "Public",
                                     "description": "Publicity of the post",
-                                    "type": "boolean"
+                                    "type": "number"
                                 }
                             },
                             "required": []
                         }
                     },
                     "critique:add-reply": {
+                        "href": "/critique/api/posts/1/",
                         "title": "Add reply",
-                        "href": "/critique/api/posts/p-1",
                         "encoding": "json",
                         "method": "POST",
                         "schema": {
@@ -1161,14 +1416,26 @@ Extracts a post and all it’s information.
                         }
                     },
                     "critique:delete": {
-                        "href": "/critique/api/posts/p-1",
+                        "href": "/critique/api/posts/1/",
+                        "title": "Delete a user's post",
                         "method": "DELETE"
                     },
                     "critique:sender": {
-                        "href": "/critique/api/users/Scott"
+                        "href": "/critique/api/users/Scott/",
+                        "title": "Sender of the resource"
+                    },
+                    "up": {
+                        "href": "/critique/api/users/Stephen/river/",
+                        "title": "Parent document"
                     },
                     "critique:receiver": {
-                        "href": "/critique/api/users/Kim"
+                        "href": "/critique/api/users/Stephen/",
+                        "title": "Receiver of the resource"
+                    }
+                },
+                "@namespaces": {
+                    "critique": {
+                        "name": "/critique/link-relations/"
                     }
                 }
             }
@@ -1329,7 +1596,6 @@ Posts a new post as a reply to a given post.
 
             {
                 "sender": "Scott",
-                "replyTo": "p-1",
                 "body": "It's actually useful"
             }
 
@@ -1467,13 +1733,17 @@ Extracts the ratings given to the user.
                                 "sender"
                             ]
                         }
+                    },
+                    "up": {
+                        "href": "/critique/api/users/Stephen/",
+                        "title": "Parent document"
                     }
                 },
                 "items": [
                     {
                         "ratingId": "rtg-2",
                         "bestRating": 10,
-                        "ratingValue": 5,
+                        "ratingValue": 10,
                         "sender": "Scott",
                         "receiver": "Stephen",
                         "@controls": {
@@ -1490,6 +1760,10 @@ Extracts the ratings given to the user.
                             },
                             "profile": {
                                 "href": "/critique/profiles/rating-profile/"
+                            },
+                            "up": {
+                                "href": "/critique/api/users/Stephen/ratings/",
+                                "title": "Parent document"
                             }
                         }
                     },
@@ -1513,13 +1787,17 @@ Extracts the ratings given to the user.
                             },
                             "profile": {
                                 "href": "/critique/profiles/rating-profile/"
+                            },
+                            "up": {
+                                "href": "/critique/api/users/Stephen/ratings/",
+                                "title": "Parent document"
                             }
                         }
                     },
                     {
                         "ratingId": "rtg-15",
                         "bestRating": 10,
-                        "ratingValue": 4,
+                        "ratingValue": 8,
                         "sender": "Young",
                         "receiver": "Stephen",
                         "@controls": {
@@ -1536,6 +1814,10 @@ Extracts the ratings given to the user.
                             },
                             "profile": {
                                 "href": "/critique/profiles/rating-profile/"
+                            },
+                            "up": {
+                                "href": "/critique/api/users/Stephen/ratings/",
+                                "title": "Parent document"
                             }
                         }
                     }
@@ -1678,28 +1960,26 @@ Extracts a rating from the database.
     + Body
 
             {
-                "ratingId": "rtg-015",
                 "bestRating": 10,
                 "ratingValue": 8,
-                "sender": "Scott",
-                "receiver": "Kim",
-                "@namespaces": {
-                    "critique": {
-                        "name": "/critique/link-relations/"
-                    }
-                },
+                "ratingId": "rtg-15",
+                "sender": "Young",
+                "receiver": "Stephen",
                 "@controls": {
                     "self": {
-                        "href": "/critique/api/ratings/rtg-015"
+                        "href": "/critique/api/users/Stephen/ratings/rtg-15/"
                     },
                     "profile": {
                         "href": "/critique/profiles/rating-profile/"
                     },
+                    "collection": {
+                        "href": "/critique/api/users/Stephen/ratings/"
+                    },
                     "edit": {
+                        "href": "/critique/api/users/Stephen/ratings/rtg-15/",
                         "title": "Edit Rating",
-                        "href": "/critique/api/ratings/rtg-015",
-                        "encoding": "json",
                         "method": "PUT",
+                        "encoding": "json",
                         "schema": {
                             "type": "object",
                             "properties": {
@@ -1713,14 +1993,25 @@ Extracts a rating from the database.
                         }
                     },
                     "critique:delete": {
-                        "href": "/critique/api/ratings/rtg-015",
+                        "href": "/critique/api/users/Stephen/ratings/rtg-15/",
                         "method": "DELETE"
                     },
                     "critique:sender": {
-                        "href": "/critique/api/users/Scott"
+                        "href": "/critique/api/users/Young/",
+                        "title": "Sender of the resource"
                     },
                     "critique:receiver": {
-                        "href": "/critique/api/users/Kim"
+                        "href": "/critique/api/users/Stephen/",
+                        "title": "Receiver of the resource"
+                    },
+                    "up": {
+                        "href": "/critique/api/users/Stephen/ratings/",
+                        "title": "Parent document"
+                    }
+                },
+                "@namespaces": {
+                    "critique": {
+                        "name": "/critique/link-relations/"
                     }
                 }
             }
