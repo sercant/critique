@@ -78,6 +78,16 @@ class CritiqueObject(MasonObject):  # Borrowed from lab exercises [1]
         super(CritiqueObject, self).__init__(**kwargs)
         self["@controls"] = {}
 
+    def add_control_up(self, href):
+        '''
+        This adds the up link to an object. Intended for the document object.
+        '''
+
+        self["@controls"]["up"] = {
+            "href": href,
+            "title": "Parent document"
+        }
+
     def add_control_users_collection(self):
         '''
         This adds the user collection link to an object. Intended for the document object.
@@ -158,7 +168,7 @@ class CritiqueObject(MasonObject):  # Borrowed from lab exercises [1]
             "href": api.url_for(UserRatings, nickname=nickname),
         }
 
-    def add_control_reply_to(self, postId):
+    def add_control_add_reply(self, postId):
         '''
         This adds the reply to a post control to an object. Intended for the
         document object.
@@ -381,7 +391,7 @@ class Users(Resource):
 
         Semantic descriptions used in items: nickname, givenName, familyName, bio, avatar
 
-        Link relations used in links: self, profile, add-user
+        Link relations used in links: self, profile, add-user, up, all-posts
 
         Semantic descriptors used in template: items
 
@@ -413,6 +423,7 @@ class Users(Resource):
             item.add_control("self", href=api.url_for(
                 User, nickname=user["nickname"]))
             item.add_control("profile", href=CRITIQUE_USER_PROFILE)
+            item.add_control_up(api.url_for(Users))
 
         envelope.add_namespace("critique", LINK_RELATIONS_URL)
         envelope.add_control_all_posts()
@@ -552,7 +563,7 @@ class User(Resource):
                 /critique/profiles/user-profile/
 
         Link relations used: self, collection, delete, user-inbox, edit,
-        user-river, user-ratings, profile
+        user-river, user-ratings, profile, up
 
         Semantic descriptors used: nickname, givenName, familyName, avatar,
         bio, email, birthday, telephone, gender
@@ -619,6 +630,7 @@ class User(Resource):
         envelope.add_control_user_inbox(nickname)
         envelope.add_control_user_river(nickname)
         envelope.add_control_user_ratings(nickname)
+        envelope.add_control_up(api.url_for(Users))
 
         # +";" + CRITIQUE_USER_PROFILE)
         return Response(json.dumps(envelope), 200, mimetype=MASON)
@@ -763,12 +775,12 @@ class UserRatings(Resource):
 
         Semantic descriptors used in template: ratingId (mandatory), sender (mandatory), receiver (mandatory),
                             bestRating(optional), ratingValue(mandatory)
-        
+
 
         RESPONSE STATUS CODE:
-         * Returns 201 + the url of the new resource in the Location header if the rating was successfully created 
+         * Returns 201 + the url of the new resource in the Location header if the rating was successfully created
          * Return 400 if Rating info is not well formed or entity body is missing.
-         * Return 404 if User not found. 
+         * Return 404 if User not found.
          * Return 415 if it receives a media type != application/json
          * Return 422 if Sender or reciever not found
          * Return 500 in case of system failure.
@@ -849,11 +861,11 @@ class UserRatings(Resource):
             * Profile: Rating
                 /profiles/rating-profile
 
-        Link relations used in items: self, profile
+        Link relations used in items: self, profile, sender, receiver, up
 
         Semantic descriptions used in items: ratingId, bestRating, ratingValue, sender, receiver
 
-        Link relations used in links: self, add-rating
+        Link relations used in links: self, add-rating, up
 
         Semantic descriptors used in template: items
 
@@ -901,12 +913,14 @@ class UserRatings(Resource):
             item.add_control("self",
                              href=api.url_for(Rating, nickname=nickname, ratingId=rating["rating_id"]))
             item.add_control("profile", href=CRITIQUE_RATING_PROFILE)
+            item.add_control_up(api.url_for(UserRatings, nickname=nickname))
 
         envelope.add_namespace("critique", LINK_RELATIONS_URL)
 
         envelope.add_control("self", href=api.url_for(
             UserRatings, nickname=nickname))
         envelope.add_control_add_rating(nickname)
+        envelope.add_control_up(api.url_for(User, nickname=nickname))
 
         # RENDER
         # +";" + CRITIQUE_RATING_PROFILE)
@@ -943,11 +957,11 @@ class UserInbox(Resource):
             * Profile: Inbox
                 /profiles/post_profile
 
-        Link relations used in items: self, profile
+        Link relations used in items: self, profile, sender, receiver, up, delete, edit
 
         Semantic descriptions used in items: sender, receiver, timestamp, postId, replyTo, body, anonymous, public
 
-        Link relations used in links: self, add-post, add-reply
+        Link relations used in links: self, add-post, add-reply, up
 
         Semantic descriptors used in template: items
 
@@ -987,19 +1001,21 @@ class UserInbox(Resource):
                 # check if the post is not public and then append
                 items.append(item)
                 item.add_control("self",
-                                 href=api.url_for(UserInbox, nickname=post['receiver']))
+                                    href=api.url_for(Post, postId=post['post_id']))
                 item.add_control("profile", href=CRITIQUE_POST_PROFILE)
                 item.add_control_delete_post(post['post_id'])
                 item.add_control_edit_post(post['post_id'])
                 item.add_control_sender(post['sender'])
-                item.add_control_receiver(post["receiver"])
+                if post["receiver"] is not None:
+                    item.add_control_receiver(post["receiver"])
+                item.add_control_add_reply(post['post_id'])
+                item.add_control_up(api.url_for(UserInbox, nickname=nickname))
 
         envelope.add_namespace("critique", LINK_RELATIONS_URL)
-        envelope.add_control_user_inbox(nickname)
-        envelope.add_control_reply_to(nickname)
         envelope.add_control("profile", href=CRITIQUE_POST_PROFILE)
         envelope.add_control("self", href=api.url_for(
             UserInbox, nickname=nickname))
+        envelope.add_control_up(api.url_for(User, nickname=nickname))
 
         # RENDER
         # +";" + CRITIQUE_POST_PROFILE)
@@ -1171,7 +1187,7 @@ class UserRiver(Resource):
 
         envelope.add_namespace("critique", LINK_RELATIONS_URL)
         envelope.add_control_user_river(nickname)
-        envelope.add_control_reply_to(nickname)
+        envelope.add_control_add_reply(nickname)
         envelope.add_control("profile", href=CRITIQUE_POST_PROFILE)
         envelope.add_control("self", href=api.url_for(
             UserRiver, nickname=nickname))
@@ -1229,7 +1245,7 @@ class Post(Resource):
                 /critique/profiles/post-profile/
 
         Link relations used: self, profile, add-reply, delete, edit,
-        collection, post-rating
+        collection, up, sender, receiver
         '''
         post_db = g.con.get_post(postId)
         if not post_db:
@@ -1253,9 +1269,10 @@ class Post(Resource):
         envelope.add_control("profile", href=CRITIQUE_POST_PROFILE)
         envelope.add_control("collection", href=api.url_for(Posts))
         envelope.add_control_edit_post(postId=postId)
-        envelope.add_control_reply_to(postId=postId)
+        envelope.add_control_add_reply(postId=postId)
         envelope.add_control_delete_post(post_id=postId)
         envelope.add_control_sender(nickname=post_db["sender"])
+        envelope.add_control_up(api.url_for(Posts))
         if post_db["receiver"] is not None:
             envelope.add_control_receiver(nickname=post_db["receiver"])
 
@@ -1474,6 +1491,7 @@ class Rating(Resource):
             ratingId=rating_db["rating_id"], nickname=rating_db["receiver"])
         item.add_control_sender(nickname=rating_db["sender"])
         item.add_control_receiver(nickname=rating_db["receiver"])
+        item.add_control_up(api.url_for(UserRatings, nickname=rating_db["receiver"]))
 
         # +";" + CRITIQUE_RATING_PROFILE)
         return Response(json.dumps(item), 200, mimetype=MASON)
@@ -1553,45 +1571,7 @@ class Rating(Resource):
 
 class Posts(Resource):
     def get(self):
-        '''
-        Gets a list of all posts
-        '''
-
-        # PERFORM OPERATIONS
-        # create users list
-        posts_db = g.con.get_posts()
-
-        # FILTER AND GENERATE THE RESPONSE
-        # Create the envelope
-        envelope = CritiqueObject()
-
-        items = envelope["items"] = []
-
-        for post in posts_db:
-            item = CritiqueObject(
-                sender=post["sender"],
-                receiver=post["receiver"],
-                timestamp=post["timestamp"],
-                postId=post["post_id"],
-                body=post["post_text"],
-                replyTo=post["reply_to"],
-                anonymous=post["anonymous"],
-                public=post["public"],
-                bestRating=10,
-                ratingValue=post["rating"]
-            )
-            items.append(item)
-            item.add_control("self", href=api.url_for(
-                Post, postId=post["post_id"]))
-            item.add_control("profile", href=CRITIQUE_POST_PROFILE)
-
-        envelope.add_namespace("critique", LINK_RELATIONS_URL)
-        envelope.add_control_all_posts()
-
-        envelope.add_control_all_users()
-        envelope.add_control("self", href=api.url_for(Posts))
-
-        return Response(json.dumps(envelope), 200, mimetype=MASON)
+        return Response('NOT IMPLEMENTED', 200)
 
 
 # Add the Regex Converter so we can use regex expressions when we define the

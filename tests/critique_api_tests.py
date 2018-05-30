@@ -199,7 +199,7 @@ class UsersTestCase (ResourcesAPITestCase):
     def test_get_users_mimetype(self):
         """
         Checks that GET users return correct status code and data format
-        Response code should be 200 if the get request is successful 
+        Response code should be 200 if the get request is successful
         """
         print("("+self.test_get_users_mimetype.__name__+")",
               self.test_get_users_mimetype.__doc__)
@@ -213,7 +213,7 @@ class UsersTestCase (ResourcesAPITestCase):
     def test_add_user(self):
         """
         Checks that the user is added correctly
-        Response code should be 201 if create user was successful 
+        Response code should be 201 if create user was successful
         """
         print("("+self.test_add_user.__name__+")", self.test_add_user.__doc__)
 
@@ -427,7 +427,7 @@ class UserTestCase(ResourcesAPITestCase):
     def test_get_user_mimetype(self):
         """
         Checks that GET user return correct status code and data format
-        Response code should be 200 if successful 
+        Response code should be 200 if successful
         """
         print("("+self.test_get_user_mimetype.__name__+")",
               self.test_get_user_mimetype.__doc__)
@@ -487,7 +487,7 @@ class UserTestCase(ResourcesAPITestCase):
     def test_delete_nonexisting_user(self):
         """
         Checks that Delete user return correct status code if given a wrong address
-        Response code should be 404: User not found.        
+        Response code should be 404: User not found.
         """
         print("("+self.test_delete_nonexisting_user.__name__+")",
               self.test_delete_nonexisting_user.__doc__)
@@ -497,7 +497,7 @@ class UserTestCase(ResourcesAPITestCase):
 
 class UserRatingsTestCase(ResourcesAPITestCase):
     """
-    Class to test ratings related cases, related to ratings list 
+    Class to test ratings related cases, related to ratings list
     """
     CREATE_RATING_SCHEMA = json.load(open('app/schema/create_rating.json'))
 
@@ -604,9 +604,9 @@ class UserRatingsTestCase(ResourcesAPITestCase):
 
     def test_get_non_existing_user_rating(self):
         """
-        Checks that GET user ratings return correct status code when user is not existing 
+        Checks that GET user ratings return correct status code when user is not existing
         Response code should be 404: Rating not found.
-        """        
+        """
         print("("+self.test_get_non_existing_user_rating.__name__+")",
               self.test_get_non_existing_user_rating.__doc__)
 
@@ -703,7 +703,7 @@ class UserRiverTestCase(ResourcesAPITestCase):
     def test_get_posts_by_user_mimetype(self):
         """
         Checks that GET user ratings return correct status code and data format
-        Response code should be 200 if received successfully 
+        Response code should be 200 if received successfully
         """
         print("("+self.test_get_posts_by_user_mimetype.__name__+")",
               self.test_get_posts_by_user_mimetype.__doc__)
@@ -798,16 +798,9 @@ class UserInboxTestCase(ResourcesAPITestCase):
 
         controls = data["@controls"]
         self.assertIn("self", controls)
-        self.assertIn("critique:user-inbox", controls)
 
         self.assertIn("href", controls["self"])
         self.assertEqual(controls["self"]["href"], self.url)
-
-        add_ctrl = controls["critique:user-inbox"]
-        self.assertIn("href", add_ctrl)
-        self.assertEqual(add_ctrl["href"], resources.api.url_for(
-            resources.UserInbox, nickname="Scott", _external=False))
-
 
         items = data["items"]
         self.assertEqual(len(items), scott_inbox_count)
@@ -835,7 +828,7 @@ class UserInboxTestCase(ResourcesAPITestCase):
     def test_get_posts_by_user_mimetype(self):
         """
         Checks that GET get_posts_by_user return correct status code and data format
-        Response code is 200 if successful 
+        Response code is 200 if successful
         """
         print("("+self.test_get_posts_by_user_mimetype.__name__+")",
               self.test_get_posts_by_user_mimetype.__doc__)
@@ -849,7 +842,7 @@ class UserInboxTestCase(ResourcesAPITestCase):
     def test_create_post(self):
         """
         Creates a new post and appends it to the database
-        Response code is 200 indicating that it was created successfully 
+        Response code is 200 indicating that it was created successfully
         """
         print("("+self.test_create_post.__name__+")",
               self.test_create_post.__doc__)
@@ -966,7 +959,7 @@ class UserRatingTestCase(ResourcesAPITestCase):
     def test_modify_rating(self):
         """
         Modify an existing Rating and check that the Rating has been modified correctly in the server
-        Response code is 200 if successful 
+        Response code is 200 if successful
         """
         print("("+self.test_modify_rating.__name__+")",
               self.test_modify_rating.__doc__)
@@ -987,7 +980,7 @@ class UserRatingTestCase(ResourcesAPITestCase):
     def test_modify_nonexisting_rating(self):
         """
         Try to modify a Rating that does not exist
-        Response code is 404: Rating not found 
+        Response code is 404: Rating not found
         """
         print("("+self.test_modify_nonexisting_rating.__name__+")",
               self.test_modify_nonexisting_rating.__doc__)
@@ -999,7 +992,7 @@ class UserRatingTestCase(ResourcesAPITestCase):
     def test_delete_rating(self):
         """
         Checks that Delete Rating return correct status code if corrected delete
-        Response code is 404 if Rating not found or 204 if successfully deleted 
+        Response code is 404 if Rating not found or 204 if successfully deleted
         """
         print("("+self.test_delete_rating.__name__+")",
               self.test_delete_rating.__doc__)
@@ -1011,7 +1004,7 @@ class UserRatingTestCase(ResourcesAPITestCase):
     def test_delete_nonexisting_rating(self):
         """
         Checks that Delete rating return correct status code if given a wrong address
-        Response code is 404: Rating not found 
+        Response code is 404: Rating not found
         """
         print("("+self.test_delete_nonexisting_rating.__name__+")",
               self.test_delete_nonexisting_rating.__doc__)
@@ -1045,7 +1038,7 @@ class UserRatingTestCase(ResourcesAPITestCase):
     def test_create_faulty_rating(self):
         """
         Checks creating a faulty rating
-        Response code is 404: Rating not found 
+        Response code is 404: Rating not found
         """
         print("("+self.test_create_rating.__name__+")",
               self.test_create_rating.__doc__)
@@ -1150,7 +1143,7 @@ class PostTestCase(ResourcesAPITestCase):
     def test_modify_nonexisting_post(self):
         """
         Try to modify a post that does not exist
-        Response code 404: Post not found 
+        Response code 404: Post not found
         """
         print("("+self.test_modify_nonexisting_post.__name__+")",
               self.test_modify_nonexisting_post.__doc__)
@@ -1162,7 +1155,7 @@ class PostTestCase(ResourcesAPITestCase):
     def test_delete_post(self):
         """
         Checks that Delete post return correct status code if corrected delete
-        Response code can be 204 if successfully deleted or 404 if not found 
+        Response code can be 204 if successfully deleted or 404 if not found
         """
         print("("+self.test_delete_post.__name__+")",
               self.test_delete_post.__doc__)
@@ -1174,7 +1167,7 @@ class PostTestCase(ResourcesAPITestCase):
     def test_delete_nonexisting_post(self):
         """
         Checks that Delete post return correct status code if given a wrong address
-        Response 404: Post not found 
+        Response 404: Post not found
         """
         print("("+self.test_delete_nonexisting_post.__name__+")",
               self.test_delete_nonexisting_post.__doc__)
@@ -1205,7 +1198,7 @@ class PostTestCase(ResourcesAPITestCase):
     def test_create_wrong_reply(self):
         """
         Creates a faulty reply
-        Response 404: Post not found 
+        Response 404: Post not found
         """
         print("("+self.test_create_wrong_reply.__name__+")",
               self.test_create_wrong_reply.__doc__)
@@ -1219,7 +1212,7 @@ class PostTestCase(ResourcesAPITestCase):
     def test_create_reply_non_existing_post(self):
         """
         Creates a reply to a non existing post
-        Response 404: Post not found 
+        Response 404: Post not found
         """
         print("("+self.test_create_reply_non_existing_post.__name__+")",
               self.test_create_reply_non_existing_post.__doc__)
